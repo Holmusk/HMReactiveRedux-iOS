@@ -1,5 +1,5 @@
 //
-//  Redux+AsyncJob.swift
+//  Redux+Awaitable.swift
 //  SwiftReduxTests
 //
 //  Created by Viethai Pham on 10/3/19.
@@ -9,30 +9,30 @@
 import XCTest
 @testable import SwiftRedux
 
-class AsyncJobTests: XCTestCase {
-  func test_defaultAsyncJob_shouldThrowErrorOnAwait() throws {
+class AwaitableTests: XCTestCase {
+  func test_defaultAwaitable_shouldThrowErrorOnAwait() throws {
     /// Setup
-    let job = AsyncJob<Int>()
+    let job = Awaitable<Int>()
     
     /// When && Then
     XCTAssertThrowsError(try job.await(), "") {
-      XCTAssertTrue($0 is AsyncJobError)
-      XCTAssertEqual($0 as! AsyncJobError, .unavailable)
+      XCTAssertTrue($0 is AwaitableError)
+      XCTAssertEqual($0 as! AwaitableError, .unavailable)
     }
   }
   
-  func test_emptyJob_shouldReturnImmediately() throws {
+  func test_emptyAwaitable_shouldReturnImmediately() throws {
     /// Setup
-    let job = EmptyJob.instance
+    let job = EmptyAwaitable.instance
     
     /// When && Then
     XCTAssertNotNil(try job.await())
   }
   
-  func test_justJob_shouldReturnSpecifiedResult() throws {
+  func test_justAwaitable_shouldReturnSpecifiedResult() throws {
     /// Setup
     let result = 1000
-    let job = JustJob(result)
+    let job = JustAwaitable(result)
     
     /// When && Then
     XCTAssertEqual(try job.await(), result)

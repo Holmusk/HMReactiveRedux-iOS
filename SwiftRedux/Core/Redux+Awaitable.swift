@@ -1,5 +1,5 @@
 //
-//  Redux+AsyncJob.swift
+//  Redux+Awaitable.swift
 //  SwiftRedux
 //
 //  Created by Viethai Pham on 10/3/19.
@@ -8,8 +8,8 @@
 
 import Foundation
 
-/// Errors that can be used with async job.
-enum AsyncJobError : LocalizedError {
+/// Errors that can be used with awaitable jobs.
+enum AwaitableError : LocalizedError {
   
   /// Represents a lack of result.
   case unavailable
@@ -27,7 +27,7 @@ enum AsyncJobError : LocalizedError {
 }
 
 /// Represents a job that can await for its result.
-public protocol AsyncJobType {
+public protocol AwaitableType {
   associatedtype Result
   
   /// Wait for the result of some operations.
@@ -37,20 +37,20 @@ public protocol AsyncJobType {
   func await() throws -> Result
 }
 
-/// Default implementation of async job.
-public class AsyncJob<Result> : AsyncJobType {
+/// Default implementation of awaitable job.
+public class Awaitable<Result> : AwaitableType {
   public func await() throws -> Result {
-    throw AsyncJobError.unavailable
+    throw AwaitableError.unavailable
   }
 }
 
-/// An async job that does not return anything meaningful. This should be used
-/// when we do not care what the result is, but just want to provide an async
-/// job implementation to conform with some requirements.
-public final class EmptyJob : AsyncJob<Any> {
+/// An awaitable job that does not return anything meaningful. This should be
+/// used when we do not care what the result is, but just want to provide an
+/// awaitable job implementation to conform with some requirements.
+public final class EmptyAwaitable : Awaitable<Any> {
   
   /// Use this singleton everywhere instead of initializing new empty jobs.
-  public static let instance = EmptyJob()
+  public static let instance = EmptyAwaitable()
   
   override private init() {}
   
@@ -59,8 +59,8 @@ public final class EmptyJob : AsyncJob<Any> {
   }
 }
 
-/// An async job that simply returns some specified value.
-public final class JustJob<Result> : AsyncJob<Result> {
+/// An awaitable job that simply returns some specified value.
+public final class JustAwaitable<Result> : Awaitable<Result> {
   private let result: Result
   
   public init(_ result: Result) {
