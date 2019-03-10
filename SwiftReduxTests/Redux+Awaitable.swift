@@ -12,11 +12,18 @@ import XCTest
 @testable import SwiftRedux
 
 class AwaitableTests: XCTestCase {
+  private let timeout: Double = 1000
+  
   func test_awaitableError_shouldHaveCorrectDescription() {
     /// Setup && When && Then
     XCTAssertEqual(
       AwaitableError.unavailable.localizedDescription,
       AwaitableError.unavailable.errorDescription
+    )
+    
+    XCTAssertEqual(
+      AwaitableError.timedOut(millis: self.timeout).localizedDescription,
+      AwaitableError.timedOut(millis: self.timeout).errorDescription
     )
   }
   
@@ -25,7 +32,7 @@ class AwaitableTests: XCTestCase {
     let job = Awaitable<Int>()
     
     /// When && Then
-    XCTAssertThrowsError(try job.await(), "") {
+    XCTAssertThrowsError(try job.await(timeoutMillis: self.timeout), "") {
       XCTAssertTrue($0 is AwaitableError)
       XCTAssertEqual($0 as! AwaitableError, .unavailable)
     }
@@ -36,7 +43,7 @@ class AwaitableTests: XCTestCase {
     let job = EmptyAwaitable.instance
     
     /// When && Then
-    XCTAssertTrue(job.await() is Void)
+    XCTAssertTrue(job.await(timeoutMillis: self.timeout) is Void)
   }
   
   func test_justAwaitable_shouldReturnSpecifiedResult() throws {
@@ -45,14 +52,14 @@ class AwaitableTests: XCTestCase {
     let job = JustAwaitable(result)
     
     /// When && Then
-    XCTAssertEqual(job.await(), result)
+    XCTAssertEqual(job.await(timeoutMillis: self.timeout), result)
   }
   
   func test_asyncAwaitable_shouldWaitForAsyncBlockResult() throws {
     /// Setup
     let semaphore = DispatchSemaphore(value: 1)
     let expectedResult = 1000
-    let waitTimeNano = UInt64(1000_000_000)
+    let waitTimeNano = UInt64(self.timeout / 2 * pow(10, 6))
     let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
     var invocationCount = 0
     
@@ -66,8 +73,8 @@ class AwaitableTests: XCTestCase {
     }
     
     /// When && Then
-    XCTAssertEqual(try job.await(), expectedResult)
-    XCTAssertEqual(try job.await(), expectedResult)
+    XCTAssertEqual(try job.await(timeoutMillis: self.timeout), expectedResult)
+    XCTAssertEqual(try job.await(timeoutMillis: self.timeout), expectedResult)
     XCTAssertEqual(try job.await(), expectedResult)
     XCTAssertEqual(try job.await(), expectedResult)
     XCTAssertEqual(invocationCount, 1)
@@ -75,7 +82,7 @@ class AwaitableTests: XCTestCase {
   
   func test_asyncAwaitable_shouldReturnErrorWithErrorBlock() throws {
     /// Setup
-    let waitTimeNano = UInt64(1000_000_000)
+    let waitTimeNano = UInt64(self.timeout / 2 * pow(10, 6))
     let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
     
     let job = AsyncAwaitable<Int> {callback in
@@ -87,9 +94,34 @@ class AwaitableTests: XCTestCase {
     }
     
     /// When && Then
+    XCTAssertThrowsError(try job.await(timeoutMillis: self.timeout), "") {
+      XCTAssertTrue($0 is AwaitableError)
+      XCTAssertEqual($0 as! AwaitableError, .unavailable)
+    }
+    
     XCTAssertThrowsError(try job.await(), "") {
       XCTAssertTrue($0 is AwaitableError)
       XCTAssertEqual($0 as! AwaitableError, .unavailable)
+    }
+  }
+  
+  func test_asyncAwaitableTimeout_shouldThrowTimeoutError() throws {
+    /// Setup
+    let waitTimeNano = UInt64(self.timeout * 2 * pow(10, 6))
+    let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
+    
+    let job = AsyncAwaitable<Int> {callback in
+      let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
+      
+      DispatchQueue.global(qos: .background).asyncAfter(deadline: deadline) {
+        callback(Try.failure(AwaitableError.unavailable))
+      }
+    }
+    
+    /// When && Then
+    XCTAssertThrowsError(try job.await(timeoutMillis: self.timeout), "") {
+      XCTAssertTrue($0 is AwaitableError)
+      XCTAssertEqual($0 as! AwaitableError, .timedOut(millis: self.timeout))
     }
   }
 }
