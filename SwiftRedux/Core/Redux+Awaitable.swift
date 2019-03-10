@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftFP
 
 /// Errors that can be used with awaitable jobs.
 enum AwaitableError : LocalizedError {
@@ -47,16 +48,14 @@ public class Awaitable<Result> : AwaitableType {
 /// An awaitable job that does not return anything meaningful. This should be
 /// used when we do not care what the result is, but just want to provide an
 /// awaitable job implementation to conform with some requirements.
-public final class EmptyAwaitable : Awaitable<Any> {
+public final class EmptyAwaitable : Awaitable<Void> {
   
   /// Use this singleton everywhere instead of initializing new empty jobs.
   public static let instance = EmptyAwaitable()
   
   override private init() {}
   
-  override public func await() throws -> Any {
-    return {}
-  }
+  override public func await() {}
 }
 
 /// An awaitable job that simply returns some specified value.
@@ -67,7 +66,27 @@ public final class JustAwaitable<Result> : Awaitable<Result> {
     self.result = result
   }
   
-  override public func await() throws -> Result {
+  override public func await() -> Result {
     return self.result
+  }
+}
+
+/// An awaitable job that handles asynchronous operations.
+public final class AsyncAwaitable<Result> : Awaitable<Result> {
+  public typealias AsyncBlock = (@escaping (Try<Result>) -> Void) -> Void
+  
+  private let block: AsyncBlock
+  
+  public init(_ block: @escaping AsyncBlock) {
+    self.block = block
+  }
+  
+  override public func await() throws -> Result {
+    let dispatchGroup = DispatchGroup()
+    var result: Try<Result> = Try(AwaitableError.unavailable)
+    dispatchGroup.enter()
+    self.block({result = $0; dispatchGroup.leave()})
+    dispatchGroup.wait()
+    return try result.getOrThrow()
   }
 }
