@@ -6,6 +6,7 @@
 //  Copyright © 2019 Hai Pham. All rights reserved.
 //
 
+import RxSwift
 import SwiftFP
 import XCTest
 @testable import SwiftRedux
@@ -49,23 +50,27 @@ class AwaitableTests: XCTestCase {
   
   func test_asyncAwaitable_shouldWaitForAsyncBlockResult() throws {
     /// Setup
+    let semaphore = DispatchSemaphore(value: 1)
     let expectedResult = 1000
     let waitTimeNano = UInt64(1000_000_000)
     let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
+    var invocationCount = 0
     
     let job = AsyncAwaitable<Int> {callback in
       let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
       
       DispatchQueue.global(qos: .background).asyncAfter(deadline: deadline) {
+        semaphore.wait(); invocationCount += 1; semaphore.signal()
         callback(Try.success(expectedResult))
       }
     }
     
-    /// When
-    let actualResult = try job.await()
-    
-    /// Then
-    XCTAssertEqual(actualResult, expectedResult)
+    /// When && Then
+    XCTAssertEqual(try job.await(), expectedResult)
+    XCTAssertEqual(try job.await(), expectedResult)
+    XCTAssertEqual(try job.await(), expectedResult)
+    XCTAssertEqual(try job.await(), expectedResult)
+    XCTAssertEqual(invocationCount, 1)
   }
   
   func test_asyncAwaitable_shouldReturnErrorWithErrorBlock() throws {

@@ -71,22 +71,26 @@ public final class JustAwaitable<Result> : Awaitable<Result> {
   }
 }
 
-/// An awaitable job that handles asynchronous operations.
+/// An awaitable job that handles asynchronous operations. Note that this job
+/// is 'hot' - in the sense that the block logic is executed immediately upon
+/// creation, and the result is cached and returned on each invocation of
+/// await.
 public final class AsyncAwaitable<Result> : Awaitable<Result> {
   public typealias AsyncBlock = (@escaping (Try<Result>) -> Void) -> Void
   
-  private let block: AsyncBlock
+  private let dispatchGroup: DispatchGroup
+  private var result: Try<Result>
   
-  public init(_ block: @escaping AsyncBlock) {
-    self.block = block
+  public init(_ block: AsyncBlock) {
+    self.dispatchGroup = DispatchGroup()
+    self.result = Try.failure(AwaitableError.unavailable)
+    self.dispatchGroup.enter()
+    super.init()
+    block({self.result = $0; self.dispatchGroup.leave()})
   }
   
   override public func await() throws -> Result {
-    let dispatchGroup = DispatchGroup()
-    var result: Try<Result> = Try(AwaitableError.unavailable)
-    dispatchGroup.enter()
-    self.block({result = $0; dispatchGroup.leave()})
-    dispatchGroup.wait()
-    return try result.getOrThrow()
+    self.dispatchGroup.wait()
+    return try self.result.getOrThrow()
   }
 }
