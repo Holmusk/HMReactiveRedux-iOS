@@ -6,6 +6,7 @@ target 'SwiftRedux' do
 
   # Pods for SwiftRedux
   pod 'RxSwift'
+  pod 'RxBlocking'
   pod 'SwiftFP/Main', git: 'https://github.com/protoman92/SwiftFP.git'
   
   target 'SwiftReduxTests' do

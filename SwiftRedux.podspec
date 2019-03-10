@@ -38,6 +38,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'Middleware+Saga' do |ss|
     ss.dependency "RxSwift"
+    ss.dependency "RxBlocking"
     ss.dependency "SwiftRedux/Middleware"
     ss.source_files = "SwiftRedux/Middleware+Saga/*"
   end
