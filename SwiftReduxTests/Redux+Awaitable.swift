@@ -36,7 +36,7 @@ class AwaitableTests: XCTestCase {
     let job = EmptyAwaitable.instance
     
     /// When && Then
-    XCTAssertNotNil(job.await())
+    XCTAssertTrue(job.await() is Void)
   }
   
   func test_justAwaitable_shouldReturnSpecifiedResult() throws {

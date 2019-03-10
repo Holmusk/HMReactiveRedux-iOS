@@ -25,8 +25,9 @@ public struct SagaMiddleware<State>: MiddlewareProviderType {
         sagaOutputs.forEach({$0.subscribe({_ in})})
         
         return DispatchWrapper(newWrapperId) {action in
-          wrapper.dispatch(action)
-          sagaOutputs.forEach({$0.onAction(action)})
+          let dispatchResult = try! wrapper.dispatch(action).await()
+          sagaOutputs.forEach({_ = $0.onAction(action)})
+          return JustAwaitable(dispatchResult)
         }
       }
     }

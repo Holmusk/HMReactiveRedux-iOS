@@ -16,6 +16,6 @@ public final class SelectEffect<State, R>: SagaEffect<State, R> {
   }
   
   override public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
-    return SagaOutput(.just(self._selector(input.lastState())), {_ in})
+    return SagaOutput(.just(self._selector(input.lastState())))
   }
 }

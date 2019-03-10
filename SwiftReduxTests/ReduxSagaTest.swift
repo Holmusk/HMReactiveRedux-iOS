@@ -18,7 +18,12 @@ final class ReduxSagaTest: XCTestCase {
   override func setUp() {
     super.setUp()
     let input = MiddlewareInput({()})
-    let wrapper = DispatchWrapper("", {_ in self.dispatchCount += 1})
+    
+    let wrapper = DispatchWrapper("") {_ in
+      self.dispatchCount += 1
+      return EmptyAwaitable.instance
+    }
+    
     self.dispatchCount = 0
     self.testEffect = TestEffect()
 
@@ -35,10 +40,10 @@ extension ReduxSagaTest {
   
   func test_receivingAction_shouldInvokeSagaEffects() {
     /// Setup && When
-    self.dispatch(DefaultAction.noop)
-    self.dispatch(DefaultAction.noop)
-    self.dispatch(DefaultAction.noop)
-    self.dispatch(DefaultAction.noop)
+    _ = self.dispatch(DefaultAction.noop)
+    _ = self.dispatch(DefaultAction.noop)
+    _ = self.dispatch(DefaultAction.noop)
+    _ = self.dispatch(DefaultAction.noop)
     
     /// Then
     XCTAssertEqual(self.testEffect.invokeCount, 1)
@@ -50,8 +55,7 @@ extension ReduxSagaTest {
   
   func test_transformingOut_shouldWork() {
     /// Setup
-    let output = SagaOutput
-      .init(.just(0), {_ in})
+    let output = SagaOutput(.just(0))
       .map({$0 + 1})
       .debounce(bySeconds: 1)
       .printValue()
@@ -85,6 +89,7 @@ extension ReduxSagaTest {
       return SagaOutput(.just(input.lastState())) {
         self.onActionCount += 1
         self.pastActions.append($0)
+        return EmptyAwaitable.instance
       }
     }
   }

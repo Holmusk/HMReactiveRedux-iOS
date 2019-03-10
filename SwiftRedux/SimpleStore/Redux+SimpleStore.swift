@@ -45,6 +45,7 @@ public final class SimpleStore<State>: ReduxStoreType {
   public lazy private(set) var dispatch: ReduxDispatcher = {action in
     self._lock.modify {self._state = self._reducer(self._state, action)}
     self._lock.access {self._subscribers.forEach({$0.value(self._state)})}
+    return EmptyAwaitable.instance
   }
   
   /// Subscribe to state updates and immediately receive the latest state.

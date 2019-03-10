@@ -71,6 +71,7 @@
 		EE3A11D9221D7F650023B445 /* ViewController1.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD42221D174B00543DE2 /* ViewController1.swift */; };
 		EE3A11DA221D7F650023B445 /* LaunchScreen.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD46221D174B00543DE2 /* LaunchScreen.storyboard */; };
 		EE3A11DB221D7F650023B445 /* Main.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD47221D174B00543DE2 /* Main.storyboard */; };
+		EE7111D52235474B00532177 /* Redux+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111D42235474B00532177 /* Redux+Core.swift */; };
 		EEFD1AAF2234A38D00C3C00E /* SwiftRedux.podspec in Resources */ = {isa = PBXBuildFile; fileRef = EEFD1AAE2234A38D00C3C00E /* SwiftRedux.podspec */; };
 		EEFD1AB12234A53D00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB02234A53D00C3C00E /* Redux+Awaitable.swift */; };
 		EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB22234A81C00C3C00E /* Redux+Awaitable.swift */; };
@@ -121,6 +122,7 @@
 		D3943ED71FA32D5600898233 /* SwiftReduxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftReduxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3943EDE1FA32D5600898233 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E7F56163AB1D6772064939F4 /* Pods-SwiftReduxTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.debug.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.debug.xcconfig"; sourceTree = "<group>"; };
+		EE7111D42235474B00532177 /* Redux+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Core.swift"; sourceTree = "<group>"; };
 		EEAABD0B221D174500543DE2 /* Redux+SimpleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+SimpleStore.swift"; sourceTree = "<group>"; };
 		EEAABD0D221D174500543DE2 /* Redux+PropInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+PropInjector.swift"; sourceTree = "<group>"; };
 		EEAABD0E221D174500543DE2 /* ReduxCompatibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxCompatibleView.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 			children = (
 				D3943EDE1FA32D5600898233 /* Info.plist */,
 				EEFD1AB22234A81C00C3C00E /* Redux+Awaitable.swift */,
+				EE7111D42235474B00532177 /* Redux+Core.swift */,
 				D3810F5821C0CA550058FA86 /* ReduxLockTest.swift */,
 				D3300E1021B3713E00779B7F /* ReduxMiddlewareTest.swift */,
 				D30CC2FE205C40F0005B5EA1 /* ReduxPresetTest.swift */,
@@ -789,6 +792,7 @@
 				EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */,
 				D334ED5F21B773CA004C538E /* ReduxSagaTest+Effect.swift in Sources */,
 				D3300E1121B3713E00779B7F /* ReduxMiddlewareTest.swift in Sources */,
+				EE7111D52235474B00532177 /* Redux+Core.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

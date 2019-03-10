@@ -15,6 +15,6 @@ public final class JustEffect<State, R>: SagaEffect<State, R> {
   }
   
   override public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
-    return SagaOutput(.just(self.value), {_ in})
+    return SagaOutput(.just(self.value))
   }
 }

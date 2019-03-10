@@ -20,7 +20,16 @@ public typealias ReduxStateCallback<State> = (State) -> Void
 public typealias ReduxStateGetter<State> = () -> State
 
 /// Typealias for the dispatch function.
-public typealias ReduxDispatcher = (ReduxActionType) -> Void
+public typealias ReduxDispatcher = (ReduxActionType) -> Awaitable<Any>
+
+/// Represents an action dispatcher that does not do anything.
+public class NoopDispatcher {
+  
+  /// The singleton noop dispatcher instance.
+  public static let instance: ReduxDispatcher = {_ in EmptyAwaitable.instance}
+  
+  init() {}
+}
 
 /// Typealias for the state subscribe function. Pass in the subscriber id and
 /// callback function.

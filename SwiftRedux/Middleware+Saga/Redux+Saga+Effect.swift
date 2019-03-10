@@ -22,7 +22,7 @@ public class SagaEffect<State, R>: SagaEffectType {
   init() {}
   
   public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
-    return SagaOutput(.error(SagaError.unimplemented), {_ in})
+    return SagaOutput(.error(SagaError.unimplemented))
   }
   
   public func asEffect() -> SagaEffect<State, R> {

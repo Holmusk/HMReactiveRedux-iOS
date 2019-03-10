@@ -66,10 +66,10 @@ extension ReduxStoreTest {
       if async {
         actions.forEach({action in
           let qos = qoses.randomElement()!
-          DispatchQueue.global(qos: qos).async{store.dispatch(action)}
+          DispatchQueue.global(qos: qos).async{_ = store.dispatch(action)}
         })
       } else {
-        actions.forEach(store.dispatch)
+        actions.forEach({_ = store.dispatch($0)})
       }
     }
 
@@ -100,9 +100,9 @@ extension ReduxStoreTest {
     let subscription = store.subscribeState("", {_ in callbackCount += 1})
     
     /// When
-    (0..<iterations).forEach({_ in store.dispatch(Action.add)})
+    (0..<iterations).forEach({_ in _ = store.dispatch(Action.add)})
     subscription.unsubscribe()
-    (0..<iterations).forEach({_ in store.dispatch(Action.add)})
+    (0..<iterations).forEach({_ in _ = store.dispatch(Action.add)})
     
     /// Then
     XCTAssertEqual(callbackCount, iterations + 1)

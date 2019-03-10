@@ -162,9 +162,7 @@ extension ReduxUITests {
       return {self.state}
     }
     
-    var dispatch: ReduxDispatcher {
-      return {_ in}
-    }
+    var dispatch = NoopDispatcher.instance
     
     var subscribeState: ReduxSubscriber<State> {
       return {
@@ -233,7 +231,7 @@ extension ReduxUITests.ViewController: PropMapperType {
   static func mapAction(dispatch: @escaping ReduxDispatcher,
                         state: ReduxState,
                         outProps: OutProps) -> ActionProps {
-    return {dispatch(DefaultAction.noop)}
+    return {_ = dispatch(DefaultAction.noop)}
   }
 }
 
@@ -252,7 +250,7 @@ extension ReduxUITests.View: PropMapperType {
   static func mapAction(dispatch: @escaping ReduxDispatcher,
                         state: ReduxState,
                         outProps: OutProps) -> ActionProps {
-    return {dispatch(DefaultAction.noop)}
+    return {_ = dispatch(DefaultAction.noop)}
   }
 }
 

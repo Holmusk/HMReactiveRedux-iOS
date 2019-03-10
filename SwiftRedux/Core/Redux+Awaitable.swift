@@ -48,14 +48,16 @@ public class Awaitable<Result> : AwaitableType {
 /// An awaitable job that does not return anything meaningful. This should be
 /// used when we do not care what the result is, but just want to provide an
 /// awaitable job implementation to conform with some requirements.
-public final class EmptyAwaitable : Awaitable<Void> {
+public final class EmptyAwaitable : Awaitable<Any> {
   
   /// Use this singleton everywhere instead of initializing new empty jobs.
   public static let instance = EmptyAwaitable()
   
   override private init() {}
   
-  override public func await() {}
+  override public func await() -> Any {
+    return Void()
+  }
 }
 
 /// An awaitable job that simply returns some specified value.

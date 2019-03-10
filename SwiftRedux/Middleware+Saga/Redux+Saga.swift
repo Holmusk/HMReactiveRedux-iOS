@@ -45,7 +45,7 @@ public struct SagaOutput<T> {
   let source: Observable<T>
   private let disposeBag: DisposeBag
   
-  init(_ source: Observable<T>, _ onAction: @escaping ReduxDispatcher) {
+  init(_ source: Observable<T>, _ onAction: @escaping ReduxDispatcher = NoopDispatcher.instance) {
     self.onAction = onAction
     self.source = source
     self.disposeBag = DisposeBag()

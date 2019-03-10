@@ -17,7 +17,12 @@ final class ReduxRouterTest: XCTestCase {
   override func setUp() {
     super.setUp()
     let input = MiddlewareInput({()})
-    let wrapper = DispatchWrapper("", {_ in self.dispatchCount += 1})
+    
+    let wrapper = DispatchWrapper("", {_ in
+      self.dispatchCount += 1
+      return EmptyAwaitable.instance
+    })
+    
     self.router = ReduxRouter()
     self.dispatchCount = 0
 
@@ -33,10 +38,10 @@ extension ReduxRouterTest {
     self.router.navigateCallback = { if $0 == 3 { expect.fulfill() } }
     
     /// When
-    self.dispatch(Screen.login)
-    self.dispatch(Screen.dashboard)
-    self.dispatch(Screen.login)
-    self.dispatch(DefaultAction.noop)
+    _ = self.dispatch(Screen.login)
+    _ = self.dispatch(Screen.dashboard)
+    _ = self.dispatch(Screen.login)
+    _ = self.dispatch(DefaultAction.noop)
     
     /// Then
     waitForExpectations(timeout: 10, handler: nil)

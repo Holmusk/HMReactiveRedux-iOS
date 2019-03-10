@@ -36,12 +36,12 @@ public struct RouterMiddleware<State, Screen: RouterScreenType>: MiddlewareProvi
         let newWrapperId = "\(wrapper.identifier)-router"
         
         return DispatchWrapper(newWrapperId) {action in
-          wrapper.dispatch(action)
-          
           if let screen = action as? Screen {
             // Force-navigate on the main thread.
             DispatchQueue.main.async {self._navigate(screen)}
           }
+          
+          return wrapper.dispatch(action)
         }
       }
     }
