@@ -7,10 +7,11 @@
 //
 
 import RxSwift
+import RxBlocking
 import SwiftFP
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
-public struct SagaOutput<T> {
+public final class SagaOutput<T>: Awaitable<T> {
   let onAction: ReduxDispatcher
   let source: Observable<T>
   private let disposeBag: DisposeBag
@@ -85,47 +86,11 @@ public struct SagaOutput<T> {
     self.source.subscribe(onNext: callback).disposed(by: self.disposeBag)
   }
   
-  /// Get the next value of the stream on the current thread.
-  ///
-  /// - Parameter nano: The time in nanoseconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInNanoseconds nano: Double) -> Try<T> {
-    let scheduler = ConcurrentDispatchQueueScheduler(qos: .default)
-    let stopStream = PublishSubject<Any?>()
-    defer {stopStream.onNext(nil)}
-    let dispatchGroup = DispatchGroup()
-    var value: Try<T> = Try.failure("No value found")
-    dispatchGroup.enter()
-    
-    self.source
-      .timeout(nano / pow(10, 9), scheduler: scheduler)
-      .takeUntil(stopStream)
-      .subscribe(
-        onNext: {value = Try.success($0); dispatchGroup.leave()},
-        onError: {value = Try.failure($0); dispatchGroup.leave()}
-      )
-      .disposed(by: self.disposeBag)
-    
-    let timeout = DispatchTime.now().uptimeNanoseconds + UInt64(nano)
-    let dispatchTimeout = DispatchTime(uptimeNanoseconds: timeout)
-    _ = dispatchGroup.wait(timeout: dispatchTimeout)
-    return value
+  override public func await() throws -> T {
+    return try self.source.toBlocking().single()
   }
   
-  /// Get the next value of a stream on the current thread.
-  ///
-  /// - Parameter millis: The time in milliseconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInMilliseconds millis: Double) -> Try<T> {
-    return self.nextValue(timeoutInNanoseconds: millis * pow(10, 6))
-  }
-  
-  /// Get the next value of a stream on the current thread.
-  ///
-  /// - Parameter seconds: The time in seconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInSeconds seconds: Double) -> Try<T> {
-    return self.nextValue(timeoutInMilliseconds: seconds * pow(10, 3))
+  override public func await(timeoutMillis: Double) throws -> T {
+    return try self.source.toBlocking(timeout: timeoutMillis).single()
   }
 }
-

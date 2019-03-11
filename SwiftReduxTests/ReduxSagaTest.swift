@@ -53,7 +53,7 @@ extension ReduxSagaTest {
                    [.noop, .noop, .noop, .noop])
   }
   
-  func test_transformingOut_shouldWork() {
+  func test_transformingOutput_shouldWork() throws {
     /// Setup
     let output = SagaOutput(.just(0))
       .map({$0 + 1})
@@ -61,10 +61,10 @@ extension ReduxSagaTest {
       .printValue()
     
     /// When
-    let value = output.nextValue(timeoutInSeconds: 10)
+    let value = try output.await(timeoutMillis: 10000)
     
     /// Then
-    XCTAssertEqual(value.value, 1)
+    XCTAssertEqual(value, 1)
   }
 }
 
