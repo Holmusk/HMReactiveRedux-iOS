@@ -72,6 +72,7 @@
 		EE3A11DA221D7F650023B445 /* LaunchScreen.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD46221D174B00543DE2 /* LaunchScreen.storyboard */; };
 		EE3A11DB221D7F650023B445 /* Main.storyboard in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD47221D174B00543DE2 /* Main.storyboard */; };
 		EE7111D52235474B00532177 /* Redux+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111D42235474B00532177 /* Redux+Core.swift */; };
+		EE7111DB2235756400532177 /* Redux+Saga+Output.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111DA2235756300532177 /* Redux+Saga+Output.swift */; };
 		EEFD1AAF2234A38D00C3C00E /* SwiftRedux.podspec in Resources */ = {isa = PBXBuildFile; fileRef = EEFD1AAE2234A38D00C3C00E /* SwiftRedux.podspec */; };
 		EEFD1AB12234A53D00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB02234A53D00C3C00E /* Redux+Awaitable.swift */; };
 		EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB22234A81C00C3C00E /* Redux+Awaitable.swift */; };
@@ -97,17 +98,23 @@
 
 /* Begin PBXFileReference section */
 		00E6F595566AB525C6B0A9BE /* Pods-SwiftReduxTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.release.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.release.xcconfig"; sourceTree = "<group>"; };
+		013550821548F2CF2B760654 /* Pods-SwiftReduxTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.release.xcconfig"; sourceTree = "<group>"; };
 		0AF81E158A134C3E9A82ACBD /* Pods-SwiftReduxTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.debug.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.debug.xcconfig"; sourceTree = "<group>"; };
+		151D0D1D9E9DCE34BE5BA728 /* Pods-SwiftRedux.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.release.xcconfig"; sourceTree = "<group>"; };
 		19629A17955F74392E75C1DE /* Pods-SwiftRedux.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.debug.xcconfig"; path = "Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.debug.xcconfig"; sourceTree = "<group>"; };
 		1C2E81432E7FA15157BDAD6E /* Pods_SwiftRedux.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftRedux.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C77C4A6530EC2AC46727B35 /* Pods-SwiftRedux.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.release.xcconfig"; path = "Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.release.xcconfig"; sourceTree = "<group>"; };
 		4AFDA05AD7C3AECC03492E0A /* Pods-SwiftRedux-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux-Demo.release.xcconfig"; path = "Target Support Files/Pods-SwiftRedux-Demo/Pods-SwiftRedux-Demo.release.xcconfig"; sourceTree = "<group>"; };
 		4D02E7D60F2EA52ECAE35965 /* Pods-SwiftRedux.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.debug.xcconfig"; path = "Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.debug.xcconfig"; sourceTree = "<group>"; };
+		678BCD016FE9A92FB019949E /* Pods-SwiftRedux.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.debug.xcconfig"; sourceTree = "<group>"; };
+		6EB653DBB0D4B61D45D96318 /* Pods-SwiftRedux-Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux-Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftRedux-Demo/Pods-SwiftRedux-Demo.release.xcconfig"; sourceTree = "<group>"; };
 		718A580F9FD725C306818826 /* Pods-SwiftRedux-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux-Demo.debug.xcconfig"; path = "Target Support Files/Pods-SwiftRedux-Demo/Pods-SwiftRedux-Demo.debug.xcconfig"; sourceTree = "<group>"; };
 		7541C70C3ACCC02418B2B7AC /* Pods-SwiftRedux.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux.release.xcconfig"; path = "Target Support Files/Pods-SwiftRedux/Pods-SwiftRedux.release.xcconfig"; sourceTree = "<group>"; };
+		8E1DE93EEDE71274737E11F3 /* Pods-SwiftReduxTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.debug.xcconfig"; sourceTree = "<group>"; };
 		92BE97133E8C5159CE105583 /* Pods_SwiftReduxTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftReduxTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		94B4ADF37A4A22B88D31B33F /* Pods-SwiftReduxTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.release.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.release.xcconfig"; sourceTree = "<group>"; };
 		B9EDBA54900509BCC49BFB00 /* Pods_SwiftRedux_Demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftRedux_Demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C36C772AA7FE61280A9F9EA9 /* Pods-SwiftRedux-Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftRedux-Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftRedux-Demo/Pods-SwiftRedux-Demo.debug.xcconfig"; sourceTree = "<group>"; };
 		D30CC2FE205C40F0005B5EA1 /* ReduxPresetTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxPresetTest.swift; sourceTree = "<group>"; };
 		D30DBF9C21AD8E2900CD1233 /* ReduxUITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxUITest.swift; sourceTree = "<group>"; };
 		D3300E1021B3713E00779B7F /* ReduxMiddlewareTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxMiddlewareTest.swift; sourceTree = "<group>"; };
@@ -123,6 +130,7 @@
 		D3943EDE1FA32D5600898233 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E7F56163AB1D6772064939F4 /* Pods-SwiftReduxTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.debug.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EE7111D42235474B00532177 /* Redux+Core.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Core.swift"; sourceTree = "<group>"; };
+		EE7111DA2235756300532177 /* Redux+Saga+Output.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Output.swift"; sourceTree = "<group>"; };
 		EEAABD0B221D174500543DE2 /* Redux+SimpleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+SimpleStore.swift"; sourceTree = "<group>"; };
 		EEAABD0D221D174500543DE2 /* Redux+PropInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+PropInjector.swift"; sourceTree = "<group>"; };
 		EEAABD0E221D174500543DE2 /* ReduxCompatibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReduxCompatibleView.swift; sourceTree = "<group>"; };
@@ -240,6 +248,12 @@
 				F48F8B4E6973B398A90D0BDC /* Pods-SwiftRedux-Demo.release.xcconfig */,
 				E7F56163AB1D6772064939F4 /* Pods-SwiftReduxTests.debug.xcconfig */,
 				94B4ADF37A4A22B88D31B33F /* Pods-SwiftReduxTests.release.xcconfig */,
+				678BCD016FE9A92FB019949E /* Pods-SwiftRedux.debug.xcconfig */,
+				151D0D1D9E9DCE34BE5BA728 /* Pods-SwiftRedux.release.xcconfig */,
+				C36C772AA7FE61280A9F9EA9 /* Pods-SwiftRedux-Demo.debug.xcconfig */,
+				6EB653DBB0D4B61D45D96318 /* Pods-SwiftRedux-Demo.release.xcconfig */,
+				8E1DE93EEDE71274737E11F3 /* Pods-SwiftReduxTests.debug.xcconfig */,
+				013550821548F2CF2B760654 /* Pods-SwiftReduxTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -328,6 +342,7 @@
 		EEAABD35221D174500543DE2 /* Middleware+Saga */ = {
 			isa = PBXGroup;
 			children = (
+				EE7111DA2235756300532177 /* Redux+Saga+Output.swift */,
 				EEAABD23221D174500543DE2 /* Protocols+Saga.swift */,
 				EEAABD2A221D174500543DE2 /* Redux+Middleware+Saga.swift */,
 				EEAABD24221D174500543DE2 /* Redux+Saga.swift */,
@@ -587,8 +602,6 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SwiftRedux-Demo/Pods-SwiftRedux-Demo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
@@ -599,8 +612,6 @@
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
@@ -685,8 +696,6 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
@@ -696,8 +705,6 @@
 				"${BUILT_PRODUCTS_DIR}/SafeNest/SafeNest.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
@@ -757,6 +764,7 @@
 				EE3A11B6221D7F4A0023B445 /* Redux+Middleware+Saga.swift in Sources */,
 				EE3A11B7221D7F4A0023B445 /* Redux+Saga+Delay.swift in Sources */,
 				EE3A11B8221D7F4A0023B445 /* Redux+Saga+Filter.swift in Sources */,
+				EE7111DB2235756400532177 /* Redux+Saga+Output.swift in Sources */,
 				EE3A11B9221D7F4A0023B445 /* Redux+Saga+Effects.swift in Sources */,
 				EE3A11BA221D7F4A0023B445 /* Redux+Saga+Do.swift in Sources */,
 				EE3A11BB221D7F4A0023B445 /* Redux+Saga+Call.swift in Sources */,
@@ -814,7 +822,7 @@
 /* Begin XCBuildConfiguration section */
 		D350C3721FA3881A0040556F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FC5D0C76EF1DF4B48DAEF6B0 /* Pods-SwiftRedux-Demo.debug.xcconfig */;
+			baseConfigurationReference = 718A580F9FD725C306818826 /* Pods-SwiftRedux-Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -831,7 +839,7 @@
 		};
 		D350C3731FA3881A0040556F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F48F8B4E6973B398A90D0BDC /* Pods-SwiftRedux-Demo.release.xcconfig */;
+			baseConfigurationReference = 4AFDA05AD7C3AECC03492E0A /* Pods-SwiftRedux-Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -971,7 +979,7 @@
 		};
 		D3943EE31FA32D5600898233 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4D02E7D60F2EA52ECAE35965 /* Pods-SwiftRedux.debug.xcconfig */;
+			baseConfigurationReference = 19629A17955F74392E75C1DE /* Pods-SwiftRedux.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -997,7 +1005,7 @@
 		};
 		D3943EE41FA32D5600898233 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7541C70C3ACCC02418B2B7AC /* Pods-SwiftRedux.release.xcconfig */;
+			baseConfigurationReference = 2C77C4A6530EC2AC46727B35 /* Pods-SwiftRedux.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
@@ -1022,7 +1030,7 @@
 		};
 		D3943EE61FA32D5600898233 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E7F56163AB1D6772064939F4 /* Pods-SwiftReduxTests.debug.xcconfig */;
+			baseConfigurationReference = 0AF81E158A134C3E9A82ACBD /* Pods-SwiftReduxTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -1041,7 +1049,7 @@
 		};
 		D3943EE71FA32D5600898233 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 94B4ADF37A4A22B88D31B33F /* Pods-SwiftReduxTests.release.xcconfig */;
+			baseConfigurationReference = 00E6F595566AB525C6B0A9BE /* Pods-SwiftReduxTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
