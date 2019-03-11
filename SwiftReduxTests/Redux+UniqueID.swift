@@ -34,6 +34,6 @@ public final class ReduxUniqueIDTests: XCTestCase {
     
     /// Then
     dispatchGroup.wait()
-    XCTAssertEqual(generatedIDs.sorted(), (0...iterations).map(Int64.init))
+    XCTAssertEqual(Set(generatedIDs).count, generatedIDs.count)
   }
 }

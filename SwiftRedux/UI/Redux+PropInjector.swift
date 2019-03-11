@@ -26,13 +26,6 @@ public class PropInjector<State>: PropInjectorType {
     CV.ReduxState == State
   {
     let dispatch = self.store.dispatch
-    
-    // Here we use the view's class name and a timestamp as the subscription
-    // id. We don't even need to store this id because we can simply cancel
-    // with the returned subscription callback (so the id can be literally
-    // anything, as long as it is unique).
-    let timestamp = Date().timeIntervalSince1970
-    let viewId = String(describing: cv) + String(describing: timestamp)
     var previous: CV.StateProps? = nil
     var first = true
     
@@ -69,7 +62,7 @@ public class PropInjector<State>: PropInjectorType {
     setProps(cv, self.store.lastState())
     
     let subscription = self.store
-      .subscribeState(viewId) {[weak cv] state in setProps(cv, state)}
+      .subscribeState(cv.uniqueID) {[weak cv] state in setProps(cv, state)}
     
     cv.staticProps = StaticProps(self, subscription)
     return subscription

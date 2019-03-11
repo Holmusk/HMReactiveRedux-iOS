@@ -52,7 +52,8 @@ extension ReduxMiddlewareTest {
     
     let wrapper = combineMiddlewares(middlewares)(self.store)
     let newStore = applyMiddlewares(middlewares)(self.store)
-    let subscription = newStore.subscribeState("", {subscribedValue = $0.a})
+    let subID = DefaultUniqueIDProvider.next()
+    let subscription = newStore.subscribeState(subID, {subscribedValue = $0.a})
     
     /// When
     _ = newStore.dispatch(DefaultAction.noop)

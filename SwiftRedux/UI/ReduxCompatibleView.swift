@@ -10,7 +10,7 @@ import UIKit
 
 /// A view that conforms to this protocol can receive state/action props and
 /// subscribe to state changes.
-public protocol ReduxCompatibleViewType: class {
+public protocol ReduxCompatibleViewType: class, UniqueIDProviderType {
 
   /// The app's global state type. This helps define the prop injector.
   associatedtype ReduxState

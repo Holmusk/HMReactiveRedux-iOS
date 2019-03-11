@@ -26,7 +26,7 @@ public final class SimpleStore<State>: ReduxStoreType {
   private let _lock: ReadWriteLockType
   private var _state: State
   private let _reducer: ReduxReducer<State>
-  private var _subscribers: [String : ReduxStateCallback<State>]
+  private var _subscribers: [SubscriberId : ReduxStateCallback<State>]
   
   private init(_ initialState: State, _ reducer: @escaping ReduxReducer<State>) {
     self._lock = ReadWriteLock()
@@ -56,7 +56,7 @@ public final class SimpleStore<State>: ReduxStoreType {
     /// Broadcast the latest state to this subscriber.
     self._lock.access {cb(self._state)}
     
-    return ReduxSubscription {
+    return ReduxSubscription(id) {
       self._lock.modify {self._subscribers.removeValue(forKey: id)}
     }
   }

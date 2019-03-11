@@ -11,7 +11,7 @@
 public typealias ReduxReducer<State> = (State, ReduxActionType) -> State
 
 /// Unique id for a subscriber.
-public typealias SubscriberId = String
+public typealias SubscriberId = UniqueIDProviderType.UniqueID
 
 /// Callback for state subscriptions.
 public typealias ReduxStateCallback<State> = (State) -> Void
@@ -35,16 +35,6 @@ public class NoopDispatcher {
 /// callback function.
 public typealias ReduxSubscriber<State> =
   (SubscriberId, @escaping ReduxStateCallback<State>) -> ReduxSubscription
-
-/// Subscription that can be unsubscribed from. This allows subscribers to
-/// store state to cancel anytime they want.
-public struct ReduxSubscription {
-  public let unsubscribe: () -> Void
-  
-  public init(_ unsubscribe: @escaping () -> Void) {
-    self.unsubscribe = unsubscribe
-  }
-}
 
 /// This store delegates all its functionalities to another store. It is used
 /// mainly for its type concreteness.

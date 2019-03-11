@@ -151,7 +151,7 @@ extension ReduxUITests {
       }
     }
     
-    private var subscribers = [String : ReduxStateCallback<State>]()
+    private var subscribers = [SubscriberId : ReduxStateCallback<State>]()
     var unsubscribeCount: Int = 0
     
     init() {
@@ -165,14 +165,13 @@ extension ReduxUITests {
     var dispatch = NoopDispatcher.instance
     
     var subscribeState: ReduxSubscriber<State> {
-      return {
-        let subscriberId = $0
-        self.subscribers[subscriberId] = $1
+      return {subscriberID, callback in
+        self.subscribers[subscriberID] = callback
       
-        return ReduxSubscription({
+        return ReduxSubscription(subscriberID) {
           self.unsubscribeCount += 1
-          self.subscribers.removeValue(forKey: subscriberId)
-        })
+          self.subscribers.removeValue(forKey: subscriberID)
+        }
       }
     }
   }
@@ -181,7 +180,7 @@ extension ReduxUITests {
 extension ReduxUITests {
   final class ViewController: UIViewController {
     deinit { self.onDeinit?() }
-    
+    let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<State>?
     
     var variableProps: VariableProps<StateProps, ActionProps>? {
@@ -199,7 +198,7 @@ extension ReduxUITests {
   
   final class View: UIView {
     deinit { self.onDeinit?() }
-    
+    let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<State>?
     
     var variableProps: VariableProps<StateProps, ActionProps>? {

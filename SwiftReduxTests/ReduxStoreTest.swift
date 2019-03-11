@@ -96,8 +96,9 @@ extension ReduxStoreTest {
   {
     /// Setup
     let iterations = 100
+    let subID = DefaultUniqueIDProvider.next()
     var callbackCount = 0
-    let subscription = store.subscribeState("", {_ in callbackCount += 1})
+    let subscription = store.subscribeState(subID, {_ in callbackCount += 1})
     
     /// When
     (0..<iterations).forEach({_ in _ = store.dispatch(Action.add)})
