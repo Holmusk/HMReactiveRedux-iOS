@@ -12,9 +12,9 @@ import XCTest
 @testable import SwiftRedux
 
 final class ReduxSagaEffectTest: XCTestCase {
-  private let timeout: Double = 10
+  private let timeout: Double = 10_000
   
-  func test_baseEffect_shouldThrowUnimplementedError() {
+  func test_baseEffect_shouldThrowUnimplementedError() throws {
     /// Setup
     var dispatchCount = 0
     
@@ -29,15 +29,17 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = dispatch(DefaultAction.noop)
     _ = output.onAction(DefaultAction.noop)
-    let value = output.nextValue(timeoutInSeconds: self.timeout)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
-    XCTAssert(value.error is SagaError)
-    XCTAssertEqual(value.error as? SagaError, .unimplemented)
+    
+    XCTAssertThrowsError(try output.await(timeoutMillis: self.timeout), "") {
+      XCTAssert($0 is SagaError)
+      XCTAssertEqual($0 as! SagaError, .unimplemented)
+    }
   }
   
-  func test_callEffect_shouldPerformAsyncWork() {
+  func test_callEffect_shouldPerformAsyncWork() throws {
     /// Setup
     let dispatch = NoopDispatcher.instance
     let error = SagaError.unimplemented
@@ -73,24 +75,16 @@ final class ReduxSagaEffectTest: XCTestCase {
     let output5 = effect5.invoke(withState: (), dispatch: dispatch)
     let output6 = effect6.invoke(withState: (), dispatch: dispatch)
     
-    /// When
-    let value1 = output1.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output2.nextValue(timeoutInSeconds: self.timeout)
-    let value3 = output3.nextValue(timeoutInSeconds: self.timeout)
-    let value4 = output4.nextValue(timeoutInSeconds: self.timeout)
-    let value5 = output5.nextValue(timeoutInSeconds: self.timeout)
-    let value6 = output6.nextValue(timeoutInSeconds: self.timeout)
-    
-    /// Then
-    XCTAssertEqual(value1.value, 300)
-    XCTAssertTrue(value2.isFailure)
-    XCTAssertTrue(value3.isFailure)
-    XCTAssertEqual(value4.value, 300)
-    XCTAssertTrue(value5.isFailure)
-    XCTAssertTrue(value6.isFailure)
+    /// When && Then
+    XCTAssertEqual(try output1.await(timeoutMillis: self.timeout), 300)
+    XCTAssertEqual(try output4.await(timeoutMillis: self.timeout), 300)
+    XCTAssertThrowsError(try output2.await(timeoutMillis: self.timeout))
+    XCTAssertThrowsError(try output3.await(timeoutMillis: self.timeout))
+    XCTAssertThrowsError(try output5.await(timeoutMillis: self.timeout))
+    XCTAssertThrowsError(try output6.await(timeoutMillis: self.timeout))
   }
   
-  func test_catchErrorEffect_shouldReturnFallback() {
+  func test_catchErrorEffect_shouldReturnFallback() throws {
     /// Setup
     let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
 
@@ -104,13 +98,9 @@ final class ReduxSagaEffectTest: XCTestCase {
     let output1 = source.invoke(withState: ())
     let output2 = caught.invoke(withState: ())
     
-    /// When
-    let value1 = output1.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output2.nextValue(timeoutInSeconds: self.timeout)
-    
-    /// Then
-    XCTAssertTrue(value1.isFailure)
-    XCTAssertEqual(value2.value, 100)
+    /// When && Then
+    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
+    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), 100)
   }
   
   func test_compactMap_shouldFilterNilValues() {
@@ -121,16 +111,12 @@ final class ReduxSagaEffectTest: XCTestCase {
     let output1 = effect1.invoke(withState: ())
     let output2 = effect2.invoke(withState: ())
     
-    /// When
-    let value1 = output1.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output2.nextValue(timeoutInSeconds: self.timeout)
-    
-    /// Then
-    XCTAssertTrue(value1.isFailure)
-    XCTAssertEqual(value2.value, "ab")
+    /// When && Then
+    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
+    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), "ab")
   }
   
-  func test_delayEffect_shouldDelayEmission() {
+  func test_delayEffect_shouldDelayEmission() throws {
     /// Setup
     var dispatchCount = 0
     
@@ -146,14 +132,13 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = dispatch(DefaultAction.noop)
     _ = output.onAction(DefaultAction.noop)
-    let value = output.nextValue(timeoutInSeconds: self.timeout)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
-    XCTAssertEqual(value.value, 400)
+    XCTAssertEqual(try output.await(timeoutMillis: self.timeout), 400)
   }
   
-  func test_doEffect_shouldPerformSideEffects() {
+  func test_doEffect_shouldPerformSideEffects() throws {
     /// Setup
     var valueCount = 0
     var errorCount = 0
@@ -174,15 +159,15 @@ final class ReduxSagaEffectTest: XCTestCase {
     let errorOutput = errorSource.invoke(withState: ())
     
     /// When
-    _ = valueOutput.nextValue(timeoutInSeconds: self.timeout)
-    _ = errorOutput.nextValue(timeoutInSeconds: self.timeout)
+    _ = try valueOutput.await()
+    do {_ = try errorOutput.await()} catch {}
     
     /// Then
     XCTAssertEqual(valueCount, 1)
     XCTAssertEqual(errorCount, 1)
   }
   
-  func test_emptyEffect_shouldNotEmitAnything() {
+  func test_emptyEffect_shouldNotEmitAnything() throws {
     /// Setup
     var dispatchCount = 0
     
@@ -197,14 +182,13 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = dispatch(DefaultAction.noop)
     _ = output.onAction(DefaultAction.noop)
-    let value = output.nextValue(timeoutInSeconds: self.timeout / 2)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
-    XCTAssertTrue(value.isFailure)
+    XCTAssertThrowsError(try output.await(timeoutMillis: self.timeout / 2))
   }
   
-  func test_filterEffect_shouldFilterOutFailValues() {
+  func test_filterEffect_shouldFilterOutFailValues() throws {
     /// Setup
     let source = SagaEffect<State, Int>.just(1)
     let effect1 = source.filter({$0 % 2 == 0})
@@ -212,16 +196,12 @@ final class ReduxSagaEffectTest: XCTestCase {
     let output1 = effect1.invoke(withState: ())
     let output2 = effect2.invoke(withState: ())
     
-    /// When
-    let value1 = output1.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output2.nextValue(timeoutInSeconds: self.timeout)
-    
-    /// Then
-    XCTAssertTrue(value1.isFailure)
-    XCTAssertEqual(value2.value, 1)
+    /// When && Then
+    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
+    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), 1)
   }
   
-  func test_justEffect_shouldEmitOnlyOneValue() {
+  func test_justEffect_shouldEmitOnlyOneValue() throws {
     /// Setup
     var dispatchCount = 0
     
@@ -236,28 +216,28 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = dispatch(DefaultAction.noop)
     _ = output.onAction(DefaultAction.noop)
-    let value1 = output.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output.nextValue(timeoutInSeconds: self.timeout)
-    let value3 = output.nextValue(timeoutInSeconds: self.timeout)
+    let value1 = try output.await(timeoutMillis: self.timeout)
+    let value2 = try output.await(timeoutMillis: self.timeout)
+    let value3 = try output.await(timeoutMillis: self.timeout)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
-    [value1, value2, value3].forEach({XCTAssertEqual($0.value, 10)})
+    [value1, value2, value3].forEach({XCTAssertEqual($0, 10)})
   }
   
-  func test_mapEffect_shouldMapInnerValue() {
+  func test_mapEffect_shouldMapInnerValue() throws {
     /// Setup
     let effect = SagaEffect<State, Int>.just(1).map({$0 * 10})
     let output = effect.invoke(withState: ())
     
     /// When
-    let value = output.nextValue(timeoutInSeconds: self.timeout)
+    let value = try output.await(timeoutMillis: self.timeout)
     
     /// Then
-    XCTAssertEqual(value.value, 10)
+    XCTAssertEqual(value, 10)
   }
   
-  func test_putEffect_shouldDispatchPutAction() {
+  func test_putEffect_shouldDispatchPutAction() throws {
     /// Setup
     enum Action: ReduxActionType { case input(Int) }
     typealias E = SagaEffect<State, Int>
@@ -281,8 +261,8 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = output1.onAction(DefaultAction.noop)
     _ = output2.onAction(DefaultAction.noop)
-    _ = output1.nextValue(timeoutInSeconds: self.timeout)
-    _ = output2.nextValue(timeoutInSeconds: self.timeout)
+    _ = try output1.await(timeoutMillis: self.timeout)
+    _ = try output2.await(timeoutMillis: self.timeout)
     waitForExpectations(timeout: self.timeout, handler: nil)
     
     /// Then
@@ -301,7 +281,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     }
   }
   
-  func test_selectEffect_shouldEmitOnlySelectedStateValue() {
+  func test_selectEffect_shouldEmitOnlySelectedStateValue() throws {
     /// Setup
     var dispatchCount = 0
     
@@ -316,16 +296,16 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// When
     _ = dispatch(DefaultAction.noop)
     _ = output.onAction(DefaultAction.noop)
-    let value1 = output.nextValue(timeoutInSeconds: self.timeout)
-    let value2 = output.nextValue(timeoutInSeconds: self.timeout)
-    let value3 = output.nextValue(timeoutInSeconds: self.timeout)
+    let value1 = try output.await(timeoutMillis: self.timeout)
+    let value2 = try output.await(timeoutMillis: self.timeout)
+    let value3 = try output.await(timeoutMillis: self.timeout)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
-    [value1, value2, value3].forEach({XCTAssertEqual($0.value, 100)})
+    [value1, value2, value3].forEach({XCTAssertEqual($0, 100)})
   }
   
-  func test_sequentializeEffect_shouldEnsureExecutionOrder() {
+  func test_sequentializeEffect_shouldEnsureExecutionOrder() throws {
     /// Setup
     let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
     
@@ -337,15 +317,15 @@ final class ReduxSagaEffectTest: XCTestCase {
     let output = sequence.invoke(withState: ())
     
     /// When
-    let value = output.nextValue(timeoutInSeconds: self.timeout)
+    let value = try output.await(timeoutMillis: self.timeout)
     
     /// Then
-    XCTAssertEqual(value.value, 2)
+    XCTAssertEqual(value, 2)
   }
 }
 
 extension ReduxSagaEffectTest {
-  enum TakeAction: ReduxActionType {
+  private enum TakeAction: ReduxActionType {
     case a
     case b
     

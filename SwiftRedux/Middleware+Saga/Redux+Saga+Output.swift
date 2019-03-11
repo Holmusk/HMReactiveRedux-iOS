@@ -10,7 +10,7 @@ import RxSwift
 import SwiftFP
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
-public struct SagaOutput<T> {
+public final class SagaOutput<T>: Awaitable<T> {
   let onAction: ReduxDispatcher
   let source: Observable<T>
   private let disposeBag: DisposeBag
@@ -85,47 +85,40 @@ public struct SagaOutput<T> {
     self.source.subscribe(onNext: callback).disposed(by: self.disposeBag)
   }
   
-  /// Get the next value of the stream on the current thread.
-  ///
-  /// - Parameter nano: The time in nanoseconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInNanoseconds nano: Double) -> Try<T> {
-    let scheduler = ConcurrentDispatchQueueScheduler(qos: .default)
-    let stopStream = PublishSubject<Any?>()
-    defer {stopStream.onNext(nil)}
+  override public func await() throws -> T {
+    return try self._await(timeoutMillis: nil)
+  }
+  
+  override public func await(timeoutMillis: Double) throws -> T {
+    return try self._await(timeoutMillis: timeoutMillis)
+  }
+  
+  private func _await(timeoutMillis: Double?) throws -> T {
     let dispatchGroup = DispatchGroup()
-    var value: Try<T> = Try.failure("No value found")
+    var result: Try<T> = Try.failure(AwaitableError.unavailable)
     dispatchGroup.enter()
     
-    self.source
-      .timeout(nano / pow(10, 9), scheduler: scheduler)
-      .takeUntil(stopStream)
-      .subscribe(
-        onNext: {value = Try.success($0); dispatchGroup.leave()},
-        onError: {value = Try.failure($0); dispatchGroup.leave()}
+    let disposable = self.source
+      .do(
+        onNext: {result = .success($0); dispatchGroup.leave()},
+        onError: {result = .failure($0); dispatchGroup.leave()}
       )
-      .disposed(by: self.disposeBag)
+      .subscribe()
     
-    let timeout = DispatchTime.now().uptimeNanoseconds + UInt64(nano)
-    let dispatchTimeout = DispatchTime(uptimeNanoseconds: timeout)
-    _ = dispatchGroup.wait(timeout: dispatchTimeout)
-    return value
-  }
-  
-  /// Get the next value of a stream on the current thread.
-  ///
-  /// - Parameter millis: The time in milliseconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInMilliseconds millis: Double) -> Try<T> {
-    return self.nextValue(timeoutInNanoseconds: millis * pow(10, 6))
-  }
-  
-  /// Get the next value of a stream on the current thread.
-  ///
-  /// - Parameter seconds: The time in seconds to wait for until timeout.
-  /// - Returns: A Try instance.
-  public func nextValue(timeoutInSeconds seconds: Double) -> Try<T> {
-    return self.nextValue(timeoutInMilliseconds: seconds * pow(10, 3))
+    if let timeout = timeoutMillis {
+      let waitTimeNano = UInt64(timeout * pow(10, 6))
+      let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
+      let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
+      
+      switch dispatchGroup.wait(timeout: deadline) {
+      case .success: return try result.getOrThrow()
+        
+      case .timedOut:
+        disposable.dispose(); throw AwaitableError.timedOut(millis: timeout)
+      }
+    }
+    
+    dispatchGroup.wait()
+    return try result.getOrThrow()
   }
 }
-
