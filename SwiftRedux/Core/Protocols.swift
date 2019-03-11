@@ -41,6 +41,14 @@ public protocol ReduxStoreType {
   var subscribeState: ReduxSubscriber<State> { get }
 }
 
+/// Represents an object that has a unique ID.
+public protocol UniqueIDProviderType {
+  typealias UniqueID = Int64
+  
+  /// The unique ID of this object.
+  var uniqueID: UniqueID { get }
+}
+
 /// Implement this protocol to provide read-write lock capabilities.
 public protocol ReadWriteLockType {
   
