@@ -17,7 +17,7 @@ public protocol ReduxActionType {}
 
 /// This represents a Redux store that can dispatch actions to mutate internal
 /// state and broadcast state updates to subscribers.
-public protocol ReduxStoreType {
+public protocol ReduxStoreType: ReduxUnsubscriberProviderType {
   
   /// The app-specific state type. For example:
   ///

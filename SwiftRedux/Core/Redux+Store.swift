@@ -11,7 +11,7 @@
 public typealias ReduxReducer<State> = (State, ReduxActionType) -> State
 
 /// Unique id for a subscriber.
-public typealias SubscriberId = UniqueIDProviderType.UniqueID
+public typealias SubscriberID = UniqueIDProviderType.UniqueID
 
 /// Callback for state subscriptions.
 public typealias ReduxStateCallback<State> = (State) -> Void
@@ -34,7 +34,17 @@ public class NoopDispatcher {
 /// Typealias for the state subscribe function. Pass in the subscriber id and
 /// callback function.
 public typealias ReduxSubscriber<State> =
-  (SubscriberId, @escaping ReduxStateCallback<State>) -> ReduxSubscription
+  (SubscriberID, @escaping ReduxStateCallback<State>) -> ReduxSubscription
+
+/// Typealias for state unsubscribe function. Pass in the subscriber id to
+/// determine which state callback should be disposed of.
+public typealias ReduxUnsubscriber = (SubscriberID) -> Void
+
+/// Provides an state unsubscribe function.
+public protocol ReduxUnsubscriberProviderType {
+  /// A ReduxUnsubscriber instance.
+  var unsubscribe: ReduxUnsubscriber { get }
+}
 
 /// This store delegates all its functionalities to another store. It is used
 /// mainly for its type concreteness.
@@ -42,16 +52,24 @@ public struct DelegateStore<State>: ReduxStoreType {
   public let lastState: ReduxStateGetter<State>
   public let dispatch: ReduxDispatcher
   public let subscribeState: ReduxSubscriber<State>
+  public let unsubscribe: ReduxUnsubscriber
   
   init<S>(_ store: S) where S: ReduxStoreType, S.State == State {
-    self.init(store.lastState, store.dispatch, store.subscribeState)
+    self.init(
+      store.lastState,
+      store.dispatch,
+      store.subscribeState,
+      store.unsubscribe
+    )
   }
   
   init(_ lastState: @escaping ReduxStateGetter<State>,
        _ dispatch: @escaping ReduxDispatcher,
-       _ subscribeState: @escaping ReduxSubscriber<State>) {
+       _ subscribeState: @escaping ReduxSubscriber<State>,
+       _ unsubscribe: @escaping ReduxUnsubscriber) {
     self.lastState = lastState
     self.dispatch = dispatch
     self.subscribeState = subscribeState
+    self.unsubscribe = unsubscribe
   }
 }

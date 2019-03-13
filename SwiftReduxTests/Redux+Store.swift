@@ -6,58 +6,31 @@
 //  Copyright © 2017 Hai Pham. All rights reserved.
 //
 
-import RxSwift
-import RxTest
 import SwiftFP
 import XCTest
 @testable import SwiftRedux
 
-final class ReduxStoreTest: XCTestCase {
-  private var disposeBag: DisposeBag!
-  private var scheduler: TestScheduler!
-  private var initialState: State!
-  private var simpleStore: SimpleStore<State>!
-  private var actionsPerIter: Int!
-
-  private var updateId: String {
-    return "layer1.layer2.layer3.calculation"
-  }
-
-  override func setUp() {
-    super.setUp()
-    self.scheduler = TestScheduler(initialClock: 0)
-    self.disposeBag = DisposeBag()
-    self.actionsPerIter = 5
-    self.initialState = 0
-    self.simpleStore = .create(self.initialState!, self.reduce)
-  }
-
-  func reduce(_ state: State, _ action: ReduxActionType) -> State {
-    switch action as? Action {
-    case .some(let action):
-      return action.stateUpdateFn()(state)
-      
-    default:
-      return state
-    }
-  }
+final class ReduxStoreTests: XCTestCase {
+  private let waitTime: TimeInterval = 10000
 }
 
-extension ReduxStoreTest {
+extension ReduxStoreTests {
   func test_dispatchAction_shouldUpdateStoreState<Store>(
     _ store: Store, async: Bool) where
     Store: ReduxStoreType, Store.State == State
   {
     /// Setup
+    let iterations = 10000
+    let actionsPerIteration = 10
     var accumStateValue = 0
     let expect = expectation(description: "Should have completed")
     let qoses = [DispatchQoS.QoSClass.userInteractive, .userInitiated, .background]
 
     /// When
-    for _ in 0..<StoreTestParams.callCount {
+    for _ in 0..<iterations {
       var actions = [Action]()
       
-      for _ in 0..<self.actionsPerIter! {
+      for _ in 0..<actionsPerIteration {
         let action = Action.allValues().randomElement()!
         accumStateValue = action.stateUpdateFn()(accumStateValue)
         actions.append(action)
@@ -78,7 +51,7 @@ extension ReduxStoreTest {
       expect.fulfill()
     }
     
-    waitForExpectations(timeout: StoreTestParams.waitTime, handler: nil)
+    waitForExpectations(timeout: self.waitTime, handler: nil)
 
     /// Then
     XCTAssertEqual(store.lastState(), accumStateValue)
@@ -86,11 +59,21 @@ extension ReduxStoreTest {
   
   func test_dispatchSimpleStoreAction_shouldUpdateState() {
     /// Setup && When && Then
-    test_dispatchAction_shouldUpdateStoreState(self.simpleStore, async: true)
+    let store = SimpleStore.create(0) {s, a in
+      switch a as? Action {
+      case .some(let action):
+        return action.stateUpdateFn()(s)
+        
+      default:
+        return s
+      }
+    }
+    
+    test_dispatchAction_shouldUpdateStoreState(store, async: true)
   }
 }
 
-extension ReduxStoreTest {
+extension ReduxStoreTests {
   func test_unsubscribeFromStore_shouldStopStream<S>(_ store: S) where
     S: ReduxStoreType
   {
@@ -110,11 +93,55 @@ extension ReduxStoreTest {
   }
   
   func test_unsubscribeFromSimpleStore_shouldStopStream() {
-    self.test_unsubscribeFromStore_shouldStopStream(self.simpleStore)
+    let store = SimpleStore.create(0) {s, a in
+      switch a as? Action {
+      case .some(let action):
+        return action.stateUpdateFn()(s)
+        
+      default:
+        return s
+      }
+    }
+    
+    self.test_unsubscribeFromStore_shouldStopStream(store)
+  }
+  
+  func test_unsubscribeWithID_shouldUnsubscribeSafely<S>(_ store: S) throws where
+    S: ReduxStoreType, S.State == Int
+  {
+    /// Setup
+    let iterations = 100000
+    let ids = (0...iterations).map({_ in DefaultUniqueIDProvider.next()})
+    let dispatchGroup = DispatchGroup()
+    var receiveCount = 0
+
+    ids.forEach({
+      _ = store.subscribeState($0) {_ in receiveCount += 1}
+      dispatchGroup.enter()
+    })
+    
+    /// When && Then - first dispatch.
+    _ = try store.dispatch(DefaultAction.noop).await()
+    XCTAssertGreaterThan(receiveCount, 0)
+    let oldReceiveCount = receiveCount
+
+    /// When && Then - after unsubscription
+    ids.forEach({id in DispatchQueue.global(qos: .background).async {
+      store.unsubscribe(id); dispatchGroup.leave()
+    }})
+    
+    dispatchGroup.wait()
+    _ = try store.dispatch(DefaultAction.noop).await()
+    XCTAssertEqual(receiveCount, oldReceiveCount)
+  }
+  
+  func test_unsubscribeWithIDUsingSimpleStore_shouldUnsubscribeSafely() throws {
+    let store = SimpleStore.create(0) {s, a in s}
+    try self.test_unsubscribeWithID_shouldUnsubscribeSafely(store)
   }
 }
 
-extension ReduxStoreTest {
+extension ReduxStoreTests {
   typealias State = Int
   
   enum Action: CaseIterable, ReduxActionType {
@@ -139,10 +166,5 @@ extension ReduxStoreTest {
         }
       }
     }
-  }
-  
-  final class StoreTestParams {
-    static var callCount = 50000
-    static var waitTime: TimeInterval = 100
   }
 }

@@ -33,7 +33,8 @@ public final class MockInjector<State>: PropInjector<State> {
     let store: DelegateStore<State> = .init(
       {fatalError()},
       {_ in fatalError()},
-      {_,_ in fatalError()}
+      {_,_ in fatalError()},
+      {_ in fatalError()}
     )
     
     self.init(store: store)

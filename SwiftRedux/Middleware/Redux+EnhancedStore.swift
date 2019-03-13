@@ -22,6 +22,10 @@ struct EnhancedStore<State> {
 }
 
 extension EnhancedStore: ReduxStoreType {
+  public var dispatch: ReduxDispatcher {
+    return self._dispatch
+  }
+  
   public var lastState: ReduxStateGetter<State> {
     return self._store.lastState
   }
@@ -30,7 +34,7 @@ extension EnhancedStore: ReduxStoreType {
     return self._store.subscribeState
   }
   
-  public var dispatch: ReduxDispatcher {
-    return self._dispatch
+  public var unsubscribe: ReduxUnsubscriber {
+    return self._store.unsubscribe
   }
 }

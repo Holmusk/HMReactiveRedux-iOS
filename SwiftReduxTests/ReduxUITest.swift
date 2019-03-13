@@ -151,7 +151,7 @@ extension ReduxUITests {
       }
     }
     
-    private var subscribers = [SubscriberId : ReduxStateCallback<State>]()
+    private var subscribers = [SubscriberID : ReduxStateCallback<State>]()
     var unsubscribeCount: Int = 0
     
     init() {
@@ -173,6 +173,10 @@ extension ReduxUITests {
           self.subscribers.removeValue(forKey: subscriberID)
         }
       }
+    }
+    
+    var unsubscribe: ReduxUnsubscriber {
+      return {self.subscribers.removeValue(forKey: $0)}
     }
   }
 }
