@@ -15,12 +15,13 @@ final class ReduxUITests: XCTestCase {
   private var store: Store!
   private var injector: PropInjector<State>!
   private let iterations = 100
+  private let runner = TestRunner()
   
   override func setUp() {
     super.setUp()
     State.counter = -1
     self.store = ReduxUITests.Store()
-    self.injector = PropInjector(store: self.store)
+    self.injector = PropInjector(store: self.store, runner: self.runner)
   }
 }
 
@@ -82,26 +83,29 @@ extension ReduxUITests {
   func test_reduxViewDeinit_shouldUnsubscribe() {
     /// Setup
     let dispatchGroup = DispatchGroup()
-    dispatchGroup.enter()
-    dispatchGroup.enter()
+    let waitTime = UInt64(pow(10 as Double, 9) * 2)
+    let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTime
+    let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
     var vc: ViewController? = ViewController()
     var view: View? = View()
-    vc!.onDeinit = dispatchGroup.leave
-    view!.onDeinit = dispatchGroup.leave
+    vc?.onDeinit = dispatchGroup.leave
+    view?.onDeinit = dispatchGroup.leave
+    
+    /// When
+    dispatchGroup.enter()
+    dispatchGroup.enter()
     self.injector.injectProps(controller: vc!, outProps: 0)
     self.injector.injectProps(view: view!, outProps: 0)
-    let waitTime = UInt64(pow(10 as Double, 9) * 10)
-    let timeout = DispatchTime.now().uptimeNanoseconds + waitTime
     
-    /// When && Then
-    DispatchQueue.main.async { vc = nil; view = nil }
-    DispatchQueue.main.async { XCTAssertEqual(self.store.unsubscribeCount, 2) }
-    _ = dispatchGroup.wait(timeout: DispatchTime(uptimeNanoseconds: timeout))
+    /// Then
+    DispatchQueue.main.async{vc = nil; view = nil}
+    DispatchQueue.main.async{XCTAssertEqual(self.store.unsubscribeCount, 2)}
+    _ = dispatchGroup.wait(timeout: deadline)
   }
   
   func test_mockInjector_shouldKeepTrackOfInjectionCount() {
     /// Setup
-    let mockInjector = MockInjector(forState: State.self)
+    let mockInjector = MockInjector(forState: State.self, runner: self.runner)
     let staticProps = MockStaticProps(injector: mockInjector)
     let vc = ViewController()
     let view = View()
@@ -183,7 +187,7 @@ extension ReduxUITests {
 
 extension ReduxUITests {
   final class ViewController: UIViewController {
-    deinit { self.onDeinit?() }
+    deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<State>?
     
@@ -201,7 +205,7 @@ extension ReduxUITests {
   }
   
   final class View: UIView {
-    deinit { self.onDeinit?() }
+    deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<State>?
     
@@ -216,6 +220,10 @@ extension ReduxUITests {
     var injectCallback: ((Int) -> Void)?
     var onDeinit: (() -> Void)?
     var setPropCount = 0
+  }
+  
+  final class TestRunner: MainThreadRunnerType {
+    func runOnMainThread(block: @escaping () -> Void) { block() }
   }
 }
 

@@ -11,12 +11,15 @@ import UIKit
 /// Basic Redux injector implementation that also handles view lifecycles.
 public class PropInjector<State>: PropInjectorType {
   private let store: DelegateStore<State>
+  private let runner: MainThreadRunnerType
   
   /// Initialize the injector with a Redux store instance. Every time an
   /// injection is requested, create a new subscription to this store's
   /// state updates, and destroy it when the injectee is disposed of.
-  public init<S>(store: S) where S: ReduxStoreType, S.State == State {
+  public init<S>(store: S, runner: MainThreadRunnerType = MainThreadRunner())
+    where S: ReduxStoreType, S.State == State {
     self.store = DelegateStore(store)
+    self.runner = runner
   }
   
   func _inject<CV, MP>(_ cv: CV, _ op: CV.OutProps, _ mapper: MP.Type)
@@ -37,7 +40,7 @@ public class PropInjector<State>: PropInjectorType {
       // Since UI operations must happen on the main thread, we dispatch
       // with the main queue. Setting the previous props here is ok as well
       // since only the main queue is accessing it.
-      DispatchQueue.main.async {
+      self.runner.runOnMainThread {
         let action = MP.mapAction(dispatch: dispatch, state: s, outProps: op)
         let next = MP.mapState(state: s, outProps: op)
         

@@ -29,7 +29,7 @@ public final class MockInjector<State>: PropInjector<State> {
   private var _injectCount: [String : Int] = [:]
   
   /// Initialize with a mock store that does not have any functionality.
-  convenience public init(forState: State.Type) {
+  convenience public init(forState: State.Type, runner: MainThreadRunnerType) {
     let store: DelegateStore<State> = .init(
       {fatalError()},
       {_ in fatalError()},
@@ -37,7 +37,7 @@ public final class MockInjector<State>: PropInjector<State> {
       {_ in fatalError()}
     )
     
-    self.init(store: store)
+    self.init(store: store, runner: runner)
   }
   
   /// Access the internal inject count statistics.
