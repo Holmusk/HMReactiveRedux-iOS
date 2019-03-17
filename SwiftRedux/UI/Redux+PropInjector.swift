@@ -22,7 +22,7 @@ public class PropInjector<State>: PropInjectorType {
     self.runner = runner
   }
   
-  func _inject<CV, MP>(_ cv: CV, _ op: CV.OutProps, _ mapper: MP.Type)
+  public func injectProps<CV, MP>(_ cv: CV, _ op: CV.OutProps, _ mapper: MP.Type)
     -> ReduxSubscription where
     MP: PropMapperType,
     MP.ReduxView == CV,
@@ -69,43 +69,5 @@ public class PropInjector<State>: PropInjectorType {
     
     cv.staticProps = StaticProps(self, subscription)
     return subscription
-  }
-  
-  public func injectProps<VC, MP>(
-    controller: VC, outProps: VC.OutProps, mapper: MP.Type) where
-    MP: PropMapperType,
-    MP.ReduxView == VC,
-    VC: UIViewController,
-    VC.ReduxState == State
-  {
-    let subscription = self._inject(controller, outProps, mapper)
-    let lifecycleVC = LifecycleViewController()
-    lifecycleVC.onDeinit = subscription.unsubscribe
-    controller.addChild(lifecycleVC)
-  }
-  
-  public func injectProps<V, MP>(
-    view: V, outProps: V.OutProps, mapper: MP.Type) where
-    MP: PropMapperType,
-    MP.ReduxView == V,
-    V: UIView,
-    V.ReduxState == State
-  {
-    let subscription = self._inject(view, outProps, mapper)
-    let lifecycleView = LifecycleView()
-    lifecycleView.onDeinit = subscription.unsubscribe
-    view.addSubview(lifecycleView)
-  }
-}
-
-extension PropInjector {
-  final class LifecycleViewController: UIViewController {
-    deinit { self.onDeinit?() }
-    var onDeinit: (() -> Void)?
-  }
-  
-  final class LifecycleView: UIView {
-    deinit { self.onDeinit?() }
-    var onDeinit: (() -> Void)?
   }
 }

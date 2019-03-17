@@ -48,34 +48,17 @@ public final class MockInjector<State>: PropInjector<State> {
   /// Add one count to the view controller injectee.
   ///
   /// - Parameters:
-  ///   - vc: A view controller instance.
+  ///   - cv: A Redux-compatible view.
   ///   - outProps: An OutProps instance.
   ///   - mapper: A Redux prop mapper.
-  override public func injectProps<VC, MP>(
-    controller: VC, outProps: VC.OutProps, mapper: MP.Type) where
+  public override func injectProps<CV, MP>(_ cv: CV, _ op: CV.OutProps, _ mapper: MP.Type)
+    -> ReduxSubscription where
     MP: PropMapperType,
-    MP.ReduxView == VC,
-    VC: UIViewController,
-    VC.ReduxState == State
+    MP.ReduxView == CV,
+    CV.ReduxState == State
   {
-    self.addInjecteeCount(controller)
-  }
-  
-  /// Add one count to the view injectee.
-  ///
-  /// - Parameters:
-  ///   - view: A view instance.
-  ///   - outProps: An OutProps instance.
-  ///   - mapper: A Redux prop mapper.
-  /// - Returns: A ReduxSubscription instance.
-  override public func injectProps<V, MP>(
-    view: V, outProps: V.OutProps, mapper: MP.Type) where
-    MP: PropMapperType,
-    MP.ReduxView == V,
-    V: UIView,
-    V.ReduxState == State
-  {
-    self.addInjecteeCount(view)
+    self.addInjecteeCount(cv)
+    return ReduxSubscription.noop
   }
   
   /// Check if a Redux view has been injected as many times as specified.
