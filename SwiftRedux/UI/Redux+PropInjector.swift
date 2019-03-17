@@ -140,13 +140,7 @@ public class PropInjector<GlobalState>: PropInjectorType {
         let next = MP.mapState(state: s, outProps: op)
         
         if first || !MP.compareState(lhs: previous, rhs: next) {
-          cv?.variableProps = VariableProps(
-            firstInstance: first,
-            previousState: previous,
-            nextState: next,
-            action: action
-          )
-
+          cv?.variableProps = VariableProps(first, next, action)
           previous = next
           first = false
         }

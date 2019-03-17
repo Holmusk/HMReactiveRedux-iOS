@@ -19,7 +19,7 @@ final class TableCell: UITableViewCell {
   var variableProps: Variables? {
     didSet {
       if let props = self.variableProps {
-        textInput.text = props.nextState.text
+        textInput.text = props.state.text
       }
     }
   }

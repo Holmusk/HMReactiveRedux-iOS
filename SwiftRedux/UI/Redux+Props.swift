@@ -27,22 +27,17 @@ public struct VariableProps<StateProps, ActionProps> {
   /// True if this is the first prop event.
   public let firstInstance: Bool
   
-  /// The previous state props.
-  public let previousState: StateProps?
-  
-  /// The next state props.
-  public let nextState: StateProps
+  /// The state props.
+  public let state: StateProps
   
   /// Props to store Redux actions.
   public let action: ActionProps
   
-  public init(firstInstance: Bool = false,
-              previousState: StateProps? = nil,
-              nextState: StateProps,
-              action: ActionProps) {
+  public init(_ firstInstance: Bool = false,
+              _ state: StateProps,
+              _ action: ActionProps) {
     self.firstInstance = firstInstance
-    self.previousState = previousState
-    self.nextState = nextState
+    self.state = state
     self.action = action
   }
 }

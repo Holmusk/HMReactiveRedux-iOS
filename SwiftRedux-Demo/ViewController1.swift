@@ -32,22 +32,22 @@ final class ViewController1: UIViewController {
   public var variableProps: Variables? {
     didSet {
       guard let props = self.variableProps else { return }
-      let nextState = props.nextState
-      self.counterTF.text = props.nextState.number.map(String.init)
-      self.slideTF.text = props.nextState.slider.map(String.init)
-      self.stringTF1.text = props.nextState.string
-      self.stringTF2.text = props.nextState.string
-      self.valueSL.value = props.nextState.slider ?? valueSL.minimumValue
+      let nextState = props.state
+      self.counterTF.text = props.state.number.map(String.init)
+      self.slideTF.text = props.state.slider.map(String.init)
+      self.stringTF1.text = props.state.string
+      self.stringTF2.text = props.state.string
+      self.valueSL.value = props.state.slider ?? valueSL.minimumValue
       
-      if props.nextState.progress.getOrElse(false) {
-        if props.nextState.progress != props.previousState?.progress {
+      if props.state.progress.getOrElse(false) {
+        if props.state.progress != oldValue?.state.progress {
           MRProgressOverlayView.showOverlayAdded(to: self.view, animated: true)
         }
       } else {
         MRProgressOverlayView.dismissOverlay(for: self.view, animated: true)
       }
       
-      let prevIndexes = props.previousState?.textIndexes ?? []
+      let prevIndexes = oldValue?.state.textIndexes ?? []
       let nextIndexes = nextState.textIndexes ?? []
       let prevSet = Set(prevIndexes.enumerated().map({[$0, $1]}))
       let nextSet = Set(nextIndexes.enumerated().map({[$0, $1]}))
@@ -117,7 +117,7 @@ final class ViewController1: UIViewController {
 extension ViewController1: UITableViewDataSource {
   func tableView(_ tableView: UITableView,
                  numberOfRowsInSection section: Int) -> Int {
-    return self.variableProps?.nextState.textIndexes?.count ?? 0
+    return self.variableProps?.state.textIndexes?.count ?? 0
   }
   
   func tableView(_ tableView: UITableView,
@@ -125,8 +125,8 @@ extension ViewController1: UITableViewDataSource {
     let cell = tableView
       .dequeueReusableCell(withIdentifier: "TableCell") as! TableCell
 
-    let textIndex = self.variableProps?.nextState.textIndexes?[indexPath.row]
-    cell.textIndex = self.variableProps?.nextState.textIndexes?[indexPath.row]
+    let textIndex = self.variableProps?.state.textIndexes?[indexPath.row]
+    cell.textIndex = self.variableProps?.state.textIndexes?[indexPath.row]
     _ = self.staticProps?.injector.injectProps(view: cell, outProps: textIndex!)
     return cell
   }
