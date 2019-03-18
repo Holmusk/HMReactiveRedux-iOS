@@ -13,7 +13,7 @@ import UIKit
 final class ConfirmButton: UIButton {
   let uniqueID = DefaultUniqueIDProvider.next()
   var staticProps: Static?
-  var variableProps: Variables?
+  var reduxProps: ReduxProps<StateProps, ActionProps>?
   
   override func awakeFromNib() {
     super.awakeFromNib()
@@ -21,7 +21,7 @@ final class ConfirmButton: UIButton {
   }
   
   @objc func onClick(_ sender: UIButton) {
-    self.variableProps?.action.confirmEdit()
+    self.reduxProps?.action.confirmEdit()
   }
 }
 

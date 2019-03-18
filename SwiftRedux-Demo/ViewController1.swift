@@ -29,9 +29,9 @@ final class ViewController1: UIViewController {
     }
   }
   
-  public var variableProps: Variables? {
+  public var reduxProps: ReduxProps<StateProps, ActionProps>? {
     didSet {
-      guard let props = self.variableProps else { return }
+      guard let props = self.reduxProps else { return }
       let nextState = props.state
       self.counterTF.text = props.state.number.map(String.init)
       self.slideTF.text = props.state.slider.map(String.init)
@@ -86,27 +86,27 @@ final class ViewController1: UIViewController {
   }
   
   @IBAction func incrementNumber(_ sender: UIButton) {
-    self.variableProps?.action.incrementNumber()
+    self.reduxProps?.action.incrementNumber()
   }
   
   @IBAction func decrementNumber(_ sender: UIButton) {
-    self.variableProps?.action.decrementNumber()
+    self.reduxProps?.action.decrementNumber()
   }
   
   @IBAction func updateString(_ sender: UITextField) {
-    self.variableProps?.action.updateString(sender.text)
+    self.reduxProps?.action.updateString(sender.text)
   }
   
   @IBAction func updateSlider(_ sender: UISlider) {
-    self.variableProps?.action.updateSlider(Double(sender.value))
+    self.reduxProps?.action.updateSlider(Double(sender.value))
   }
   
   @IBAction func addTextItem(_ sender: UIButton) {
-    self.variableProps?.action.addOneText()
+    self.reduxProps?.action.addOneText()
   }
   
   @objc func goBack(_ sender: UIBarButtonItem) {
-    self.variableProps?.action.goBack()
+    self.reduxProps?.action.goBack()
   }
   
   @objc func reloadTable(_ sender: UIBarButtonItem) {
@@ -117,7 +117,7 @@ final class ViewController1: UIViewController {
 extension ViewController1: UITableViewDataSource {
   func tableView(_ tableView: UITableView,
                  numberOfRowsInSection section: Int) -> Int {
-    return self.variableProps?.state.textIndexes?.count ?? 0
+    return self.reduxProps?.state.textIndexes?.count ?? 0
   }
   
   func tableView(_ tableView: UITableView,
@@ -125,8 +125,8 @@ extension ViewController1: UITableViewDataSource {
     let cell = tableView
       .dequeueReusableCell(withIdentifier: "TableCell") as! TableCell
 
-    let textIndex = self.variableProps?.state.textIndexes?[indexPath.row]
-    cell.textIndex = self.variableProps?.state.textIndexes?[indexPath.row]
+    let textIndex = self.reduxProps?.state.textIndexes?[indexPath.row]
+    cell.textIndex = self.reduxProps?.state.textIndexes?[indexPath.row]
     _ = self.staticProps?.injector.injectProps(view: cell, outProps: textIndex!)
     return cell
   }
@@ -141,7 +141,7 @@ extension ViewController1: UITableViewDataSource {
                  forRowAt indexPath: IndexPath) {
     switch editingStyle {
     case .delete:
-      self.variableProps?.action.deleteText(indexPath.row)
+      self.reduxProps?.action.deleteText(indexPath.row)
       
     default:
       break

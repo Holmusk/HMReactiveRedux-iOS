@@ -16,16 +16,16 @@ final class TableCell: UITableViewCell {
   let uniqueID = DefaultUniqueIDProvider.next()
   var staticProps: Static?
   
-  var variableProps: Variables? {
+  var reduxProps: ReduxProps<StateProps, ActionProps>? {
     didSet {
-      if let props = self.variableProps {
+      if let props = self.reduxProps {
         textInput.text = props.state.text
       }
     }
   }
   
   @IBAction func updateText(_ sender: UITextField) {
-    self.variableProps?.action.updateText(sender.text)
+    self.reduxProps?.action.updateText(sender.text)
   }
 }
 

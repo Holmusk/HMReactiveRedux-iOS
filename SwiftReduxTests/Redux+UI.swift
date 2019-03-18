@@ -195,11 +195,11 @@ extension ReduxUITests {
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<StateProps>?
     
-    var variableProps: VariableProps<StateProps, ActionProps>? {
+    var reduxProps: ReduxProps<StateProps, ActionProps>? {
       didSet {
         self.setPropCount += 1
         self.injectCallback?(self.setPropCount)
-        self.variableProps?.action()
+        self.reduxProps?.action()
       }
     }
     
@@ -213,11 +213,11 @@ extension ReduxUITests {
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<StateProps>?
     
-    var variableProps: VariableProps<StateProps, ActionProps>? {
+    var reduxProps: ReduxProps<StateProps, ActionProps>? {
       didSet {
         self.setPropCount += 1
         self.injectCallback?(self.setPropCount)
-        self.variableProps?.action()
+        self.reduxProps?.action()
       }
     }
     
@@ -236,10 +236,6 @@ extension ReduxUITests.TestViewController: TestReduxViewType {
   typealias OutProps = Int
   typealias StateProps = ReduxUITests.TestState
   typealias ActionProps = () -> Void
-  
-  func beforePropInjectionStarts(sp: StaticProps<GlobalState>) {}
-  
-  func afterPropInjectionEnds(sp: StaticProps<GlobalState>) {}
 }
 
 extension ReduxUITests.TestViewController: PropMapperType {
@@ -259,10 +255,6 @@ extension ReduxUITests.TestView: TestReduxViewType {
   typealias OutProps = Int
   typealias StateProps = ReduxUITests.TestState
   typealias ActionProps = () -> Void
-  
-  func beforePropInjectionStarts(sp: StaticProps<GlobalState>) {}
-  
-  func afterPropInjectionEnds(sp: StaticProps<GlobalState>) {}
 }
 
 extension ReduxUITests.TestView: PropMapperType {

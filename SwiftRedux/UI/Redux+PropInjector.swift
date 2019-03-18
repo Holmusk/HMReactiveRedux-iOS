@@ -140,7 +140,7 @@ public class PropInjector<GlobalState>: PropInjectorType {
       defer { semaphore.signal() }
       
       if first || !MP.compareState(previous, next) {
-        runner.runOnMainThread {cv?.variableProps = VariableProps(first, next, action)}
+        runner.runOnMainThread {cv?.reduxProps = ReduxProps(first, next, action)}
         previous = next
         first = false
       }

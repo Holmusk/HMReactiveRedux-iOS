@@ -31,15 +31,13 @@ public protocol PropContainerType: class, UniqueIDProviderType {
   /// Convenience type for static props.
   typealias Static = StaticProps<GlobalState>
   
-  /// Convenience type for variable props.
-  typealias Variables = VariableProps<StateProps, ActionProps>
-  
   /// This prop container includes static dependencies that can be used to
   /// wire up child views/view controllers.
   var staticProps: Static? { get set }
   
-  /// This prop container includes variable state/action props.
-  var variableProps: Variables? { get set }
+  /// This container includes various Redux-related props, most notably state
+  /// and action.
+  var reduxProps: ReduxProps<StateProps, ActionProps>? { get set }
 }
 
 /// Generally the Redux view also implements the prop mapper protocol, so in

@@ -24,7 +24,7 @@ extension RootController: PropMapperType {
     )
   }
   
-  static func compareState(lhs: StateProps?, rhs: StateProps?) -> Bool {
+  static func compareState(_ lhs: StateProps?, _ rhs: StateProps?) -> Bool {
     return true
   }
 }

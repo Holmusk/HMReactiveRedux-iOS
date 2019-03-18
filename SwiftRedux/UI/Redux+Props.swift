@@ -21,8 +21,8 @@ public class StaticProps<State> {
   }
 }
 
-/// Variable props container.
-public struct VariableProps<StateProps, ActionProps> {
+/// Redux props container.
+public struct ReduxProps<StateProps, ActionProps> {
   
   /// True if this is the first prop event.
   public let firstInstance: Bool
