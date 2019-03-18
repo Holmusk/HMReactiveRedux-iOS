@@ -1,5 +1,5 @@
 //
-//  ReduxUITest.swift
+//  Redux+UI.swift
 //  SwiftReduxTests
 //
 //  Created by Hai Pham on 11/27/18.
@@ -12,15 +12,15 @@ import XCTest
 @testable import SwiftRedux
 
 final class ReduxUITests: XCTestCase {
-  private var store: Store!
-  private var injector: PropInjector<State>!
+  private var store: TestStore!
+  private var injector: PropInjector<TestState>!
   private let iterations = 100
   private let runner = TestRunner()
   
   override func setUp() {
     super.setUp()
-    State.counter = -1
-    self.store = ReduxUITests.Store()
+    TestState.counter = -1
+    self.store = ReduxUITests.TestStore()
     self.injector = PropInjector(store: self.store, runner: self.runner)
   }
 }
@@ -31,7 +31,7 @@ extension ReduxUITests {
     _ injectProps: @escaping (View) -> Void,
     _ checkOthers: @escaping (View) -> Void) where
     View: TestReduxViewType,
-    View.StateProps == State,
+    View.StateProps == TestState,
     View.ActionProps == () -> Void
   {
     /// Setup
@@ -48,7 +48,7 @@ extension ReduxUITests {
     /// Then
     XCTAssertEqual(self.store.lastState().counter, self.iterations * 2)
     XCTAssertEqual(self.store.unsubscribeCount, 1)
-    XCTAssertTrue(view.staticProps?.injector is PropInjector<State>)
+    XCTAssertTrue(view.staticProps?.injector is PropInjector<TestState>)
     checkOthers(view)
   
     // Check if re-injecting would unsubscribe from the previous subscription.
@@ -58,36 +58,38 @@ extension ReduxUITests {
   
   func test_injectViewController_shouldStreamState() {
     /// Setup
-    let vc = ViewController()
+    let vc = TestViewController()
     
     /// When && Then
     self.test_injectReduxView_shouldStreamState(vc,
       {self.injector.injectProps(controller: $0, outProps: 0)},
       {XCTAssertEqual($0.setPropCount, self.iterations + 1)})
     
-    XCTAssertFalse(ViewController.compareState(lhs: State(), rhs: State()))
+    XCTAssertFalse(TestViewController.compareState(TestState(), TestState()))
   }
   
   func test_injectingView_shouldStreamState() {
     /// Setup
-    let view = View()
+    let view = TestView()
 
     /// When && Then
     self.test_injectReduxView_shouldStreamState(view,
       {self.injector.injectProps(view: $0, outProps: 0)},
       {XCTAssertEqual($0.setPropCount, self.iterations + 1)})
     
-    XCTAssertFalse(View.compareState(lhs: State(), rhs: State()))
+    XCTAssertFalse(TestView.compareState(TestState(), TestState()))
   }
-  
+}
+
+extension ReduxUITests {
   func test_reduxViewDeinit_shouldUnsubscribe() {
     /// Setup
     let dispatchGroup = DispatchGroup()
     let waitTime = UInt64(pow(10 as Double, 9) * 2)
     let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTime
     let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
-    var vc: ViewController? = ViewController()
-    var view: View? = View()
+    var vc: TestViewController? = TestViewController()
+    var view: TestView? = TestView()
     vc?.onDeinit = dispatchGroup.leave
     view?.onDeinit = dispatchGroup.leave
     
@@ -102,13 +104,15 @@ extension ReduxUITests {
     DispatchQueue.main.async{XCTAssertEqual(self.store.unsubscribeCount, 2)}
     _ = dispatchGroup.wait(timeout: deadline)
   }
-  
+}
+
+extension ReduxUITests {
   func test_mockInjector_shouldKeepTrackOfInjectionCount() {
     /// Setup
-    let mockInjector = MockInjector(forState: State.self, runner: self.runner)
+    let mockInjector = MockInjector(forState: TestState.self, runner: self.runner)
     let staticProps = MockStaticProps(injector: mockInjector)
-    let vc = ViewController()
-    let view = View()
+    let vc = TestViewController()
+    let view = TestView()
     vc.staticProps = staticProps
     view.staticProps = staticProps
 
@@ -122,14 +126,14 @@ extension ReduxUITests {
     
     /// Then
     XCTAssertTrue(mockInjector.didInject(vc, times: 1))
-    XCTAssertTrue(mockInjector.didInject(ViewController.self, times: 1))
+    XCTAssertTrue(mockInjector.didInject(TestViewController.self, times: 1))
     XCTAssertTrue(mockInjector.didInject(view, times: 1))
-    XCTAssertTrue(mockInjector.didInject(View.self, times: 1))
+    XCTAssertTrue(mockInjector.didInject(TestView.self, times: 1))
     
     XCTAssertEqual(
       mockInjector.injectCount,
-      [String(describing: ViewController.self) : 1,
-       String(describing: View.self) : 1])
+      [String(describing: TestViewController.self) : 1,
+       String(describing: TestView.self) : 1])
     
     mockInjector.reset()
     XCTAssertEqual(mockInjector.injectCount, [:])
@@ -137,38 +141,38 @@ extension ReduxUITests {
 }
 
 extension ReduxUITests {
-  struct State: Equatable {
+  struct TestState: Equatable {
     static var counter = -1
     
     let counter: Int
     
     init() {
-      State.counter += 1
-      self.counter = State.counter
+      TestState.counter += 1
+      self.counter = TestState.counter
     }
   }
   
-  final class Store: ReduxStoreType {
-    var state: State {
+  final class TestStore: ReduxStoreType {
+    var state: TestState {
       didSet {
         self.subscribers.forEach({(_, value) in _ = value(self.state)})
       }
     }
     
-    private var subscribers = [SubscriberID : ReduxStateCallback<State>]()
+    private var subscribers = [SubscriberID : ReduxStateCallback<TestState>]()
     var unsubscribeCount: Int = 0
     
     init() {
       self.state = State()
     }
     
-    var lastState: ReduxStateGetter<State> {
+    var lastState: ReduxStateGetter<TestState> {
       return {self.state}
     }
     
     var dispatch = NoopDispatcher.instance
     
-    var subscribeState: ReduxSubscriber<State> {
+    var subscribeState: ReduxSubscriber<TestState> {
       return {subscriberID, callback in
         self.subscribers[subscriberID] = callback
       
@@ -186,7 +190,7 @@ extension ReduxUITests {
 }
 
 extension ReduxUITests {
-  final class ViewController: UIViewController {
+  final class TestViewController: UIViewController {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<StateProps>?
@@ -204,7 +208,7 @@ extension ReduxUITests {
     var setPropCount = 0
   }
   
-  final class View: UIView {
+  final class TestView: UIView {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticProps<StateProps>?
@@ -227,10 +231,10 @@ extension ReduxUITests {
   }
 }
 
-extension ReduxUITests.ViewController: TestReduxViewType {
-  typealias GlobalState = ReduxUITests.State
+extension ReduxUITests.TestViewController: TestReduxViewType {
+  typealias GlobalState = ReduxUITests.TestState
   typealias OutProps = Int
-  typealias StateProps = ReduxUITests.State
+  typealias StateProps = ReduxUITests.TestState
   typealias ActionProps = () -> Void
   
   func beforePropInjectionStarts(sp: StaticProps<GlobalState>) {}
@@ -238,7 +242,7 @@ extension ReduxUITests.ViewController: TestReduxViewType {
   func afterPropInjectionEnds(sp: StaticProps<GlobalState>) {}
 }
 
-extension ReduxUITests.ViewController: PropMapperType {
+extension ReduxUITests.TestViewController: PropMapperType {
   static func mapState(state: GlobalState, outProps: OutProps) -> StateProps {
     return state
   }
@@ -250,10 +254,10 @@ extension ReduxUITests.ViewController: PropMapperType {
   }
 }
 
-extension ReduxUITests.View: TestReduxViewType {
-  typealias GlobalState = ReduxUITests.State
+extension ReduxUITests.TestView: TestReduxViewType {
+  typealias GlobalState = ReduxUITests.TestState
   typealias OutProps = Int
-  typealias StateProps = ReduxUITests.State
+  typealias StateProps = ReduxUITests.TestState
   typealias ActionProps = () -> Void
   
   func beforePropInjectionStarts(sp: StaticProps<GlobalState>) {}
@@ -261,7 +265,7 @@ extension ReduxUITests.View: TestReduxViewType {
   func afterPropInjectionEnds(sp: StaticProps<GlobalState>) {}
 }
 
-extension ReduxUITests.View: PropMapperType {
+extension ReduxUITests.TestView: PropMapperType {
   static func mapState(state: GlobalState, outProps: OutProps) -> StateProps {
     return state
   }

@@ -43,18 +43,24 @@ public final class SimpleStore<State>: ReduxStoreType {
   /// Reduce the action to produce a new state and broadcast this state to
   /// all subscribers.
   public lazy private(set) var dispatch: ReduxDispatcher = {action in
-    self._lock.modify {self._state = self._reducer(self._state, action)}
-    self._lock.access {self._subscribers.forEach({$0.value(self._state)})}
+    self._lock.modify {
+      self._state = self._reducer(self._state, action)
+      self._subscribers.forEach({$0.value(self._state)})
+    }
+    
     return EmptyAwaitable.instance
   }
   
   /// Subscribe to state updates and immediately receive the latest state.
   /// On unsubscription, remove the subscriber.
   public lazy private(set) var subscribeState: ReduxSubscriber<State> = {id, cb in
-    self._lock.modify {self._subscribers[id] = cb}
+    self._lock.modify {
+      self._subscribers[id] = cb
+      
+      /// Broadcast the latest state to this subscriber.
+      cb(self._state)
+    }
     
-    /// Broadcast the latest state to this subscriber.
-    self._lock.access {cb(self._state)}
     return ReduxSubscription(id) {self.unsubscribe(id)}
   }
   

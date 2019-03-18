@@ -124,7 +124,9 @@ public class PropInjector<GlobalState>: PropInjectorType {
     CV.GlobalState == GlobalState
   {
     let dispatch = self.store.dispatch
+    let runner = self.runner
     var previous: CV.StateProps? = nil
+    let semaphore = DispatchSemaphore(value: 1)
     var first = true
     
     // If there has been a previous subscription, unsubscribe from it to avoid
@@ -132,18 +134,15 @@ public class PropInjector<GlobalState>: PropInjectorType {
     cv.staticProps?.subscription.unsubscribe()
     
     let setProps: (CV?, GlobalState) -> Void = {cv, s in
-      // Since UI operations must happen on the main thread, we dispatch
-      // with the main queue. Setting the previous props here is ok as well
-      // since only the main queue is accessing it.
-      self.runner.runOnMainThread {
-        let action = MP.mapAction(dispatch: dispatch, state: s, outProps: op)
-        let next = MP.mapState(state: s, outProps: op)
-        
-        if first || !MP.compareState(lhs: previous, rhs: next) {
-          cv?.variableProps = VariableProps(first, next, action)
-          previous = next
-          first = false
-        }
+      let action = MP.mapAction(dispatch: dispatch, state: s, outProps: op)
+      let next = MP.mapState(state: s, outProps: op)
+      semaphore.wait()
+      defer { semaphore.signal() }
+      
+      if first || !MP.compareState(previous, next) {
+        runner.runOnMainThread {cv?.variableProps = VariableProps(first, next, action)}
+        previous = next
+        first = false
       }
     }
     

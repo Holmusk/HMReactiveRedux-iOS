@@ -53,13 +53,13 @@ public protocol PropMapperType: class {
   ///   - lhs: Previous StateProps.
   ///   - rhs: Next StateProps.
   /// - Returns: A Bool instance.
-  static func compareState(lhs: State?, rhs: State?) -> Bool
+  static func compareState(_ lhs: State?, _ rhs: State?) -> Bool
 }
 
 /// We should make state props conform to Equatable, so that some defaults
 /// can be implemented.
 public extension PropMapperType where State: Equatable {
-  public static func compareState(lhs: State?, rhs: State?) -> Bool {
+  public static func compareState(_ lhs: State?, _ rhs: State?) -> Bool {
     return lhs == rhs
   }
 }
