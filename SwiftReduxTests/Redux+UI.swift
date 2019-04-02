@@ -193,13 +193,13 @@ extension ReduxUITests {
   final class TestViewController: UIViewController {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
-    var staticProps: StaticProps<StateProps>?
+    var staticProps: StaticPropContainer<StateProps>!
     
-    var reduxProps: ReduxProps<StateProps, ActionProps>? {
+    var reduxProps: ReduxProps? {
       didSet {
         self.setPropCount += 1
         self.injectCallback?(self.setPropCount)
-        self.reduxProps?.action()
+        self.reduxProps!.action()
       }
     }
     
@@ -211,13 +211,13 @@ extension ReduxUITests {
   final class TestView: UIView {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
     let uniqueID = DefaultUniqueIDProvider.next()
-    var staticProps: StaticProps<StateProps>?
+    var staticProps: StaticPropContainer<StateProps>!
     
-    var reduxProps: ReduxProps<StateProps, ActionProps>? {
+    var reduxProps: ReduxProps? {
       didSet {
         self.setPropCount += 1
         self.injectCallback?(self.setPropCount)
-        self.reduxProps?.action()
+        self.requireReduxProps().action()
       }
     }
     

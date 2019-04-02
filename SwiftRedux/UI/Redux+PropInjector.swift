@@ -140,7 +140,7 @@ public class PropInjector<GlobalState>: PropInjectorType {
       defer { semaphore.signal() }
       
       if first || !MP.compareState(previous, next) {
-        runner.runOnMainThread {cv?.reduxProps = ReduxProps(first, next, action)}
+        runner.runOnMainThread {cv?.reduxProps = ReduxPropContainer(first, next, action)}
         previous = next
         first = false
       }
@@ -155,7 +155,7 @@ public class PropInjector<GlobalState>: PropInjectorType {
     let subscription = self.store
       .subscribeState(cv.uniqueID) {[weak cv] state in setProps(cv, state)}
     
-    cv.staticProps = StaticProps(self, subscription)
+    cv.staticProps = StaticPropContainer(self, subscription)
     return subscription
   }
 }

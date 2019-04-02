@@ -23,13 +23,13 @@ final class ViewController1: UIViewController {
   
   let uniqueID = DefaultUniqueIDProvider.next()
   
-  public var staticProps: Static? {
+  public var staticProps: StaticProps! {
     didSet {
       self.staticProps?.injector.injectProps(view: self.clearButton, outProps: ())
     }
   }
   
-  public var reduxProps: ReduxProps<StateProps, ActionProps>? {
+  public var reduxProps: ReduxProps? {
     didSet {
       guard let props = self.reduxProps else { return }
       let nextState = props.state
@@ -67,6 +67,7 @@ final class ViewController1: UIViewController {
 
   override public func viewDidLoad() {
     super.viewDidLoad()
+    print("Did load")
     self.counterTF.isEnabled = false
     self.stringTF1.isEnabled = false
     self.slideTF.isEnabled = false
@@ -86,27 +87,27 @@ final class ViewController1: UIViewController {
   }
   
   @IBAction func incrementNumber(_ sender: UIButton) {
-    self.reduxProps?.action.incrementNumber()
+    self.requireReduxProps().action.incrementNumber()
   }
   
   @IBAction func decrementNumber(_ sender: UIButton) {
-    self.reduxProps?.action.decrementNumber()
+    self.requireReduxProps().action.decrementNumber()
   }
   
   @IBAction func updateString(_ sender: UITextField) {
-    self.reduxProps?.action.updateString(sender.text)
+    self.requireReduxProps().action.updateString(sender.text)
   }
   
   @IBAction func updateSlider(_ sender: UISlider) {
-    self.reduxProps?.action.updateSlider(Double(sender.value))
+    self.requireReduxProps().action.updateSlider(Double(sender.value))
   }
   
   @IBAction func addTextItem(_ sender: UIButton) {
-    self.reduxProps?.action.addOneText()
+    self.requireReduxProps().action.addOneText()
   }
   
   @objc func goBack(_ sender: UIBarButtonItem) {
-    self.reduxProps?.action.goBack()
+    self.requireReduxProps().action.goBack()
   }
   
   @objc func reloadTable(_ sender: UIBarButtonItem) {
@@ -125,8 +126,8 @@ extension ViewController1: UITableViewDataSource {
     let cell = tableView
       .dequeueReusableCell(withIdentifier: "TableCell") as! TableCell
 
-    let textIndex = self.reduxProps?.state.textIndexes?[indexPath.row]
-    cell.textIndex = self.reduxProps?.state.textIndexes?[indexPath.row]
+    let textIndex = self.requireReduxProps().state.textIndexes?[indexPath.row]
+    cell.textIndex = self.requireReduxProps().state.textIndexes?[indexPath.row]
     _ = self.staticProps?.injector.injectProps(view: cell, outProps: textIndex!)
     return cell
   }
@@ -141,7 +142,7 @@ extension ViewController1: UITableViewDataSource {
                  forRowAt indexPath: IndexPath) {
     switch editingStyle {
     case .delete:
-      self.reduxProps?.action.deleteText(indexPath.row)
+      self.requireReduxProps().action.deleteText(indexPath.row)
       
     default:
       break

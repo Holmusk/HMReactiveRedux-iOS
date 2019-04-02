@@ -14,9 +14,9 @@ final class TableCell: UITableViewCell {
   
   var textIndex: Int?
   let uniqueID = DefaultUniqueIDProvider.next()
-  var staticProps: Static?
+  var staticProps: StaticProps!
   
-  var reduxProps: ReduxProps<StateProps, ActionProps>? {
+  var reduxProps: ReduxProps? {
     didSet {
       if let props = self.reduxProps {
         textInput.text = props.state.text
@@ -25,7 +25,7 @@ final class TableCell: UITableViewCell {
   }
   
   @IBAction func updateText(_ sender: UITextField) {
-    self.reduxProps?.action.updateText(sender.text)
+    self.requireReduxProps().action.updateText(sender.text)
   }
 }
 

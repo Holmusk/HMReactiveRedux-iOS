@@ -29,19 +29,33 @@ public protocol PropContainerType: class, UniqueIDProviderType {
   associatedtype ActionProps
   
   /// Convenience type for static props.
-  typealias Static = StaticProps<GlobalState>
+  typealias StaticProps = StaticPropContainer<GlobalState>
+  
+  /// Convenience type for variable props.
+  typealias ReduxProps = ReduxPropContainer<StateProps, ActionProps>
   
   /// This prop container includes static dependencies that can be used to
   /// wire up child views/view controllers.
-  var staticProps: Static? { get set }
+  var staticProps: StaticProps! { get set }
   
   /// This container includes various Redux-related props, most notably state
   /// and action.
-  var reduxProps: ReduxProps<StateProps, ActionProps>? { get set }
+  var reduxProps: ReduxProps? { get set }
 }
 
 /// Generally the Redux view also implements the prop mapper protocol, so in
 /// this case we can define some default generics.
 public extension PropContainerType where Self: PropMapperType {
   public typealias PropContainer = Self
+}
+
+public extension PropContainerType {
+  
+  /// Ensure reduxProps is non-nil.
+  ///
+  /// - Returns: A ReduxProps instance.
+  public func requireReduxProps() -> ReduxProps {
+    precondition(self.reduxProps != nil)
+    return self.reduxProps!
+  }
 }

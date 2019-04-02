@@ -7,7 +7,7 @@
 //
 
 /// Static props container.
-public class StaticProps<State> {
+public class StaticPropContainer<State> {
   
   /// The injector instance used to inject Redux props into compatible views.
   public let injector: PropInjector<State>
@@ -22,7 +22,7 @@ public class StaticProps<State> {
 }
 
 /// Redux props container.
-public struct ReduxProps<StateProps, ActionProps> {
+public struct ReduxPropContainer<StateProps, ActionProps> {
   
   /// True if this is the first prop event.
   public let firstInstance: Bool

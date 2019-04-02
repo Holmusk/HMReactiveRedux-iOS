@@ -28,11 +28,13 @@ public final class ReduxUIIntegrationTest: XCTestCase {
       typealias GlobalState = Int
       typealias PropContainer = TestContainer
       typealias OutProps = ()
+      typealias StateProps = Int
+      typealias ActionProps = ()
       let uniqueID = DefaultUniqueIDProvider.next()
       
-      var staticProps: Static?
+      var staticProps: StaticProps!
       
-      var reduxProps: ReduxProps<Int, ()>? {
+      var reduxProps: ReduxProps? {
         didSet {
           if let value = self.reduxProps?.state {
             onStateChange?(value)

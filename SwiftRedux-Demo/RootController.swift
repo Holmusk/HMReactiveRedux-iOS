@@ -13,16 +13,17 @@ final class RootController: UIViewController {
   @IBOutlet private weak var viewController1: UIButton!
   
   let uniqueID = DefaultUniqueIDProvider.next()
-  var staticProps: Static?
-  var reduxProps: ReduxProps<(), ActionProps>?
+  var staticProps: StaticProps!
+  var reduxProps: ReduxProps?
   
   @IBAction func goToViewController1(_ sender: UIButton) {
-    self.reduxProps?.action.goToViewController1()
+    self.requireReduxProps().action.goToViewController1()
   }
 }
 
 extension RootController: PropContainerType {
   typealias OutProps = ()
+  typealias StateProps = ()
   
   struct ActionProps {
     let goToViewController1: () -> Void

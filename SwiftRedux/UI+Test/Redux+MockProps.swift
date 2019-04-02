@@ -11,7 +11,7 @@
 ///     let staticProps = MockStaticProps(...)
 ///     vc.staticProps = staticProps
 ///
-public final class MockStaticProps<State>: StaticProps<State> {
+public final class MockStaticProps<State>: StaticPropContainer<State> {
 
   /// This initializer can be used to construct test static props.
   convenience public init(injector: PropInjector<State>) {
