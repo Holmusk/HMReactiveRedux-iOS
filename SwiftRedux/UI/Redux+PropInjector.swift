@@ -123,7 +123,7 @@ public class PropInjector<GlobalState>: PropInjectorType {
     MP.PropContainer == CV,
     CV.GlobalState == GlobalState
   {
-    let dispatch = self.store.dispatch
+    let dispatch: ReduxDispatcher = {_ = self.store.dispatch($0)}
     let runner = self.runner
     var previous: CV.StateProps? = nil
     let semaphore = DispatchSemaphore(value: 1)

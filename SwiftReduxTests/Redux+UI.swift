@@ -243,10 +243,10 @@ extension ReduxUITests.TestViewController: PropMapperType {
     return state
   }
   
-  static func mapAction(dispatch: @escaping AwaitableReduxDispatcher,
+  static func mapAction(dispatch: @escaping ReduxDispatcher,
                         state: GlobalState,
                         outProps: OutProps) -> ActionProps {
-    return {_ = dispatch(DefaultAction.noop)}
+    return {dispatch(DefaultAction.noop)}
   }
 }
 
@@ -262,10 +262,10 @@ extension ReduxUITests.TestView: PropMapperType {
     return state
   }
   
-  static func mapAction(dispatch: @escaping AwaitableReduxDispatcher,
+  static func mapAction(dispatch: @escaping ReduxDispatcher,
                         state: GlobalState,
                         outProps: OutProps) -> ActionProps {
-    return {_ = dispatch(DefaultAction.noop)}
+    return {dispatch(DefaultAction.noop)}
   }
 }
 
