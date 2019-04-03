@@ -23,7 +23,7 @@ final class ReduxSagaEffectTest: XCTestCase {
       return EmptyAwaitable.instance
     }
     
-    let effect = SagaEffect<State, Int>()
+    let effect = SagaEffect<Int>()
     let output = effect.invoke(withState: (), dispatch: dispatch)
     
     /// When
@@ -60,7 +60,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     let api5: (Int, @escaping (Int?, Error?) -> Void) -> Void = {$1(nil, error)}
     let api6: (Int, @escaping (Int?, Error?) -> Void) -> Void = {$1(nil, nil)}
     
-    let paramEffect = SagaEffect<State, Int>.just(300)
+    let paramEffect = SagaEffect.just(300)
     let effect1 = paramEffect.call(api1)
     let effect2 = paramEffect.call(api2)
     let effect3 = paramEffect.call(api3)
@@ -88,7 +88,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
 
-    let source = SagaEffect<State, Int>.call(with: .just(1)) {_ in
+    let source = SagaEffect.call(with: .just(1)) {_ in
       return Observable<Int>
         .error(SagaError.unimplemented)
         .delay(2, scheduler: scheduler)
@@ -105,7 +105,7 @@ final class ReduxSagaEffectTest: XCTestCase {
   
   func test_compactMap_shouldFilterNilValues() {
     /// Setup
-    let source = SagaEffect<State, String>.just("a")
+    let source = SagaEffect.just("a")
     let effect1 = source.compactMap(Int.init)
     let effect2 = source.compactMap({$0 + "b"})
     let output1 = effect1.invoke(withState: ())
@@ -125,7 +125,7 @@ final class ReduxSagaEffectTest: XCTestCase {
       return EmptyAwaitable.instance
     }
     
-    let output = SagaEffect<State, Int>.just(400)
+    let output = SagaEffect.just(400)
       .delay(bySeconds: 2, usingQueue: .global(qos: .background))
       .invoke(withState: (), dispatch: dispatch)
     
@@ -143,15 +143,15 @@ final class ReduxSagaEffectTest: XCTestCase {
     var valueCount = 0
     var errorCount = 0
     
-    let transformer: MonoEffectTransformer<State, Int> = {
+    let transformer: MonoEffectTransformer<Int> = {
       $0.doOnValue({_ in valueCount += 1}).doOnError({_ in errorCount += 1})
     }
     
-    let valueSource = SagaEffect<State, Int>
+    let valueSource = SagaEffect<Int>
       .call(with: .just(1), callCreator: {$1($0, nil)})
       .transform(with: transformer)
     
-    let errorSource = SagaEffect<State, Int>
+    let errorSource = SagaEffect<Int>
       .call(with: .just(1), callCreator: {$1(nil, SagaError.unimplemented)})
       .transform(with: transformer)
     
@@ -176,7 +176,7 @@ final class ReduxSagaEffectTest: XCTestCase {
       return EmptyAwaitable.instance
     }
     
-    let effect = SagaEffect<State, Int>.empty()
+    let effect = SagaEffect<Int>.empty()
     let output = effect.invoke(withState: (), dispatch: dispatch)
     
     /// When
@@ -190,7 +190,7 @@ final class ReduxSagaEffectTest: XCTestCase {
   
   func test_filterEffect_shouldFilterOutFailValues() throws {
     /// Setup
-    let source = SagaEffect<State, Int>.just(1)
+    let source = SagaEffect.just(1)
     let effect1 = source.filter({$0 % 2 == 0})
     let effect2 = source.filter({$0 % 2 == 1})
     let output1 = effect1.invoke(withState: ())
@@ -210,7 +210,7 @@ final class ReduxSagaEffectTest: XCTestCase {
       return EmptyAwaitable.instance
     }
     
-    let effect = SagaEffect<State, Int>.just(10)
+    let effect = SagaEffect.just(10)
     let output = effect.invoke(withState: (), dispatch: dispatch)
     
     /// When
@@ -227,7 +227,7 @@ final class ReduxSagaEffectTest: XCTestCase {
   
   func test_mapEffect_shouldMapInnerValue() throws {
     /// Setup
-    let effect = SagaEffect<State, Int>.just(1).map({$0 * 10})
+    let effect = SagaEffect.just(1).map({$0 * 10})
     let output = effect.invoke(withState: ())
     
     /// When
@@ -240,7 +240,7 @@ final class ReduxSagaEffectTest: XCTestCase {
   func test_putEffect_shouldDispatchPutAction() throws {
     /// Setup
     enum Action: ReduxActionType { case input(Int) }
-    typealias E = SagaEffect<State, Int>
+    typealias E = SagaEffect<Int>
     let expect = expectation(description: "Should have completed")
     var dispatchCount = 0
     var actions: [ReduxActionType] = []
@@ -290,7 +290,7 @@ final class ReduxSagaEffectTest: XCTestCase {
       return EmptyAwaitable.instance
     }
     
-    let effect = SagaEffect<State, Int>.select({_ in 100})
+    let effect = SagaEffect.select({(_: State) in 100})
     let output = effect.invoke(withState: (), dispatch: dispatch)
     
     /// When
@@ -309,7 +309,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
     
-    let effect1 = SagaEffect<State, Int>.call(with: .just(1)) {
+    let effect1 = SagaEffect.call(with: .just(1)) {
       Observable.just($0).delay(2, scheduler: scheduler)
     }
     
@@ -338,7 +338,7 @@ extension ReduxSagaEffectTest {
   }
   
   func test_takeEffect_shouldTakeAppropriateActions(
-    creator: (@escaping (Int) -> SagaEffect<State, Int>) -> SagaEffect<State, Int>,
+    creator: (@escaping (Int) -> SagaEffect<Int>) -> SagaEffect<Int>,
     outputValues: [Int])
   {
     /// Setup
@@ -349,7 +349,7 @@ extension ReduxSagaEffectTest {
       return EmptyAwaitable.instance
     }
     
-    let callEffectCreator: (Int) -> SagaEffect<State, Int> = {
+    let callEffectCreator: (Int) -> SagaEffect<Int> = {
       SagaEffect.call(with: .just($0)) {
         let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
         return Observable.just($0).delay(2, scheduler: scheduler)
@@ -403,7 +403,7 @@ extension ReduxSagaEffectTest {
     /// Setup
     let options = TakeOptions.builder().with(debounce: 2).build()
     
-    let effect = SagaEffect<State, Int>.takeEvery(
+    let effect = SagaEffect.takeEvery(
       paramExtractor: {(_: TakeAction) in 1},
       effectCreator: {.just($0)},
       options: options)

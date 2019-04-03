@@ -8,14 +8,17 @@
 
 /// Effect whose output selects some value from a Redux store's managed state.
 /// The extracted value can then be fed to other effects.
-public final class SelectEffect<State, R>: SagaEffect<State, R> {
+public final class SelectEffect<State, R>: SagaEffect<R> {
   private let _selector: (State) -> R
   
   init(_ selector: @escaping (State) -> R) {
     self._selector = selector
   }
   
-  override public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
-    return SagaOutput(.just(self._selector(input.lastState())))
+  override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
+    let lastState = input.lastState()
+    precondition(lastState is State)
+    let emission = self._selector(lastState as! State)
+    return SagaOutput(.just(emission))
   }
 }

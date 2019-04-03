@@ -14,7 +14,7 @@ extension SagaEffectConvertibleType where R: OptionalType {
   /// emit nothing.
   ///
   /// - Returns: An Effect instance.
-  public func unwrap() -> SagaEffect<State, R.Value> {
+  public func unwrap() -> SagaEffect<R.Value> {
     return self.filter({$0.isSome}).map({$0.value!})
   }
 }

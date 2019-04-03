@@ -71,7 +71,7 @@ extension ReduxSagaTest {
 extension ReduxSagaTest {
   typealias State = ()
   
-  final class TestEffect: SagaEffect<State, Any> {
+  final class TestEffect: SagaEffect<Any> {
     var invokeCount: Int
     var onActionCount: Int
     var pastActions: [ReduxActionType]
@@ -82,8 +82,7 @@ extension ReduxSagaTest {
       self.pastActions = []
     }
     
-    override func invoke(_ input: SagaInput<State>) -> SagaOutput<Any>
-    {
+    override func invoke(_ input: SagaInput) -> SagaOutput<Any> {
       self.invokeCount += 1
       
       return SagaOutput(.just(input.lastState())) {

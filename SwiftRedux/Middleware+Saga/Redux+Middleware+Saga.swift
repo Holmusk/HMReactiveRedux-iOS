@@ -9,9 +9,9 @@
 /// Hook up sagas by subscribing for inner values and dispatching action for
 /// each saga output every time a new action arrives.
 public struct SagaMiddleware<State>: MiddlewareProviderType {
-  private let effects: [SagaEffect<State, Any>]
+  private let effects: [SagaEffect<Any>]
   
-  public init<S>(effects: S) where S: Sequence, S.Element == SagaEffect<State, Any> {
+  public init<S>(effects: S) where S: Sequence, S.Element == SagaEffect<Any> {
     self.effects = Array(effects)
   }
   

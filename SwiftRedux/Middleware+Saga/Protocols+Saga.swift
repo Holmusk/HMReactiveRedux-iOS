@@ -9,16 +9,13 @@
 /// Implement this protocol to convert to an effect instance.
 public protocol SagaEffectConvertibleType {
   
-  /// The app-specific state type.
-  associatedtype State
-  
   /// The type of the effect's output value.
   associatedtype R
   
   /// Convert the current object into an Effect.
   ///
   /// - Returns: An Effect instance.
-  func asEffect() -> SagaEffect<State, R>
+  func asEffect() -> SagaEffect<R>
 }
 
 /// Implement this protocol to represent a Redux saga effect.
@@ -28,7 +25,7 @@ public protocol SagaEffectType: SagaEffectConvertibleType {
   ///
   /// - Parameter input: A Saga Input instance.
   /// - Returns: A Saga Output instance.
-  func invoke(_ input: SagaInput<State>) -> SagaOutput<R>
+  func invoke(_ input: SagaInput) -> SagaOutput<R>
 }
 
 extension SagaEffectConvertibleType {
@@ -38,8 +35,8 @@ extension SagaEffectConvertibleType {
   /// - Parameter effectCreator: The effect creator function.
   /// - Returns: An Effect instance.
   public func transform<R2>(
-    with effectCreator: SagaEffectTransformer<State, R, R2>)
-    -> SagaEffect<State, R2>
+    with effectCreator: SagaEffectTransformer<R, R2>)
+    -> SagaEffect<R2>
   {
     return effectCreator(self.asEffect())
   }
@@ -55,7 +52,7 @@ extension SagaEffectType {
   ///   - dispatch: The action dispatch function.
   /// - Returns: An Output instance.
   public func invoke(
-    withState state: State,
+    withState state: Any,
     dispatch: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance)
     -> SagaOutput<R> {
     return self.invoke(SagaInput({state}, dispatch))

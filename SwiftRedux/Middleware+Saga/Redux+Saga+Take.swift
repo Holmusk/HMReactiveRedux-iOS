@@ -10,16 +10,14 @@ import RxSwift
 
 /// Take effects are streams that filter actions and pluck out the appropriate
 /// ones to perform additional work on.
-public class TakeEffect<State, Action, P, R>: SagaEffect<State, R> where
-  Action: ReduxActionType
-{
+public class TakeEffect<Action, P, R>: SagaEffect<R> where Action: ReduxActionType {
   private let _paramExtractor: (Action) -> P?
-  private let _effectCreator: (P) -> SagaEffect<State, R>
+  private let _effectCreator: (P) -> SagaEffect<R>
   private let _options: TakeOptions
   private let _outputFlattener: (SagaOutput<SagaOutput<R>>) -> SagaOutput<R>
   
   init(_ paramExtractor: @escaping (Action) -> P?,
-       _ effectCreator: @escaping (P) -> SagaEffect<State, R>,
+       _ effectCreator: @escaping (P) -> SagaEffect<R>,
        _ options: TakeOptions,
        _ outputFlattener: @escaping (SagaOutput<SagaOutput<R>>) -> SagaOutput<R>) {
     self._paramExtractor = paramExtractor
@@ -28,7 +26,7 @@ public class TakeEffect<State, Action, P, R>: SagaEffect<State, R> where
     self._outputFlattener = outputFlattener
   }
   
-  override public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
+  override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     let paramStream = PublishSubject<P>()
     let debounce = self._options.debounce
     
@@ -44,11 +42,11 @@ public class TakeEffect<State, Action, P, R>: SagaEffect<State, R> where
 
 /// Effect whose output takes all actions that pass some conditions, then
 /// flattens and emits all values. Contrast this with take latest.
-public final class TakeEveryEffect<State, Action, P, R>:
-  TakeEffect<State, Action, P, R> where Action: ReduxActionType
+public final class TakeEveryEffect<Action, P, R>:
+  TakeEffect<Action, P, R> where Action: ReduxActionType
 {
   init(_ paramExtractor: @escaping (Action) -> P?,
-       _ outputCreator: @escaping (P) -> SagaEffect<State, R>,
+       _ outputCreator: @escaping (P) -> SagaEffect<R>,
        _ options: TakeOptions) {
     super.init(paramExtractor, outputCreator, options, {$0.flatMap({$0})})
   }
@@ -59,11 +57,11 @@ public final class TakeEveryEffect<State, Action, P, R>:
 /// value, such as in an autocomplete search implementation. We define the
 /// type of action and param extractor to filter out actions we are not
 /// interested in.
-public final class TakeLatestEffect<State, Action, P, R>:
-  TakeEffect<State, Action, P, R> where Action: ReduxActionType
+public final class TakeLatestEffect<Action, P, R>:
+  TakeEffect<Action, P, R> where Action: ReduxActionType
 {
   init(_ paramExtractor: @escaping (Action) -> P?,
-       _ outputCreator: @escaping (P) -> SagaEffect<State, R>,
+       _ outputCreator: @escaping (P) -> SagaEffect<R>,
        _ options: TakeOptions) {
     super.init(paramExtractor, outputCreator, options, {$0.switchMap({$0})})
   }

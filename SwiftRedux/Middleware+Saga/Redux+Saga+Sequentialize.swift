@@ -8,20 +8,20 @@
 
 /// Effect whose output is the result of sequentializing the outputs of two
 /// effects. Use this effect to make sure one effect happens after another.
-public final class SequentializeEffect<State, R1, R2, U>: SagaEffect<State, U> {
-  private let effect1: SagaEffect<State, R1>
-  private let effect2: SagaEffect<State, R2>
+public final class SequentializeEffect<R1, R2, U>: SagaEffect<U> {
+  private let effect1: SagaEffect<R1>
+  private let effect2: SagaEffect<R2>
   private let combineFunc: (R1, R2) throws -> U
   
-  init(_ effect1: SagaEffect<State, R1>,
-       _ effect2: SagaEffect<State, R2>,
+  init(_ effect1: SagaEffect<R1>,
+       _ effect2: SagaEffect<R2>,
        _ combineFunc: @escaping (R1, R2) throws -> U) {
     self.effect1 = effect1
     self.effect2 = effect2
     self.combineFunc = combineFunc
   }
   
-  override public func invoke(_ input: SagaInput<State>) -> SagaOutput<U> {
+  override public func invoke(_ input: SagaInput) -> SagaOutput<U> {
     return self.effect1.invoke(input).flatMap({result1 in
       self.effect2.invoke(input).map({try self.combineFunc(result1, $0)})
     })
@@ -37,10 +37,9 @@ extension SagaEffectConvertibleType {
   ///   - effect2: An Effect instance.
   ///   - selector: The selector function.
   /// - Returns: An Effect instance.
-  public func then<R2, U>(
-    _ effect2: SagaEffect<State, R2>,
-    selector: @escaping (R, R2) throws -> U)
-    -> SagaEffect<State, U>
+  public func then<R2, U>(_ effect2: SagaEffect<R2>,
+                          selector: @escaping (R, R2) throws -> U)
+    -> SagaEffect<U>
   {
     return self.asEffect()
       .transform(with: {.sequentialize($0, effect2, selector: selector)})
@@ -50,7 +49,7 @@ extension SagaEffectConvertibleType {
   ///
   /// - Parameter effect2: An Effect instance.
   /// - Returns: An Effect instance.
-  public func then<R2>(_ effect2: SagaEffect<State, R2>) -> SagaEffect<State, R2> {
+  public func then<R2>(_ effect2: SagaEffect<R2>) -> SagaEffect<R2> {
     return self.then(effect2, selector: {$1})
   }
   
@@ -58,7 +57,7 @@ extension SagaEffectConvertibleType {
   ///
   /// - Parameter value: The value to change to.
   /// - Returns: An Effect instance.
-  public func then<R2>(_ value: R2) -> SagaEffect<State, R2> {
+  public func then<R2>(_ value: R2) -> SagaEffect<R2> {
     return self.then(.just(value))
   }
 }

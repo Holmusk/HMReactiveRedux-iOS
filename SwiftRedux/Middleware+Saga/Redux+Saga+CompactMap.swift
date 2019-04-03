@@ -14,7 +14,7 @@ extension SagaEffectConvertibleType {
   ///
   /// - Parameter selector: The mapper function.
   /// - Returns: An Effect instance.
-  public func compactMap<R2>(_ mapper: @escaping (R) throws -> R2?) -> SagaEffect<State, R2> {
+  public func compactMap<R2>(_ mapper: @escaping (R) throws -> R2?) -> SagaEffect<R2> {
     return self.map(mapper).unwrap()
   }
 }

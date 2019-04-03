@@ -19,8 +19,8 @@ final class AppReduxSaga {
     }
   }
   
-  static func autocompleteSaga(_ input: String) -> SagaEffect<State, Any> {
-    return SagaEffect<State, Bool>
+  static func autocompleteSaga(_ input: String) -> SagaEffect<Any> {
+    return SagaEffect<Bool>
       .just(true).put(AppRedux.Action.progress)
       .then(input).call(Api.performAutocomplete)
       .doOnError({print($0)})
@@ -31,7 +31,7 @@ final class AppReduxSaga {
       .then(false).put(AppRedux.Action.progress)
   }
   
-  static func sagas() -> [SagaEffect<State, Any>] {
+  static func sagas() -> [SagaEffect<Any>] {
     return [
       SagaEffect.takeEvery(
         paramExtractor: extractAutocompleteInput,

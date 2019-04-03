@@ -7,14 +7,14 @@
 //
 
 /// Effect whose output simply emits some specified element.
-public final class JustEffect<State, R>: SagaEffect<State, R> {
+public final class JustEffect<R>: SagaEffect<R> {
   private let value: R
   
   init(_ value: R) {
     self.value = value
   }
   
-  override public func invoke(_ input: SagaInput<State>) -> SagaOutput<R> {
+  override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     return SagaOutput(.just(self.value))
   }
 }
