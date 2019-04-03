@@ -19,10 +19,10 @@ final class ReduxLockTest: XCTestCase {
     dispatchGroup.enter()
     
     /// When
-    XCTAssertEqual(disposableLock?.lockRead(wait: true), true)
-    XCTAssertEqual(disposableLock?.unlock(), true)
-    XCTAssertEqual(disposableLock?.lockWrite(wait: true), true)
-    XCTAssertEqual(disposableLock?.unlock(), true)
+    disposableLock?.lockRead()
+    disposableLock?.unlock()
+    disposableLock?.lockWrite()
+    disposableLock?.unlock()
     
     DispatchQueue.global(qos: .background).async {
       disposableLock = nil
@@ -36,21 +36,26 @@ final class ReduxLockTest: XCTestCase {
   }
   #endif
   
-  func test_acquiringLockWithoutForce_shouldReturnNilWhenUnavailable() {
+  func test_accessingResourceFromMultipleThreads_shouldEnsureThreadSafety() {
     /// Setup
+    let dispatchGroup = DispatchGroup()
     let lock = ReadWriteLock()
-    var readCount = 0
-    var writeCount = 0
-    defer {lock.unlock()}
+    let iterations = 100000
+    var sharedState = 0
     
     /// When
-    lock.lockWrite(wait: true)
-    lock.modify {writeCount += 1}
-    let readResult = lock.access {() -> Int in readCount += 1; return 1}
+    (0..<iterations).forEach({_ in dispatchGroup.enter()})
+    
+    (0..<iterations).forEach({_ in
+      DispatchQueue.global(qos: .background).async {
+        lock.modify { sharedState += 1 }
+        dispatchGroup.leave()
+      }
+    })
+    
+    dispatchGroup.wait()
     
     /// Then
-    XCTAssertNil(readResult)
-    XCTAssertEqual(readCount, 0)
-    XCTAssertEqual(writeCount, 0)
+    XCTAssertEqual(sharedState, iterations)
   }
 }

@@ -28,26 +28,15 @@ public final class ReadWriteLock: ReadWriteLockType {
   
   deinit {pthread_rwlock_destroy(&self._mainLock)}
   
-  @discardableResult
-  public func lockRead(wait: Bool) -> Bool {
-    let result = wait
-      ? pthread_rwlock_rdlock(&self._mainLock)
-      : pthread_rwlock_tryrdlock(&self._mainLock)
-    
-    return result == 0
+  public func lockRead() {
+    pthread_rwlock_rdlock(&self._mainLock)
   }
   
-  @discardableResult
-  public func lockWrite(wait: Bool) -> Bool {
-    let result = wait
-      ? pthread_rwlock_wrlock(&self._mainLock)
-      : pthread_rwlock_trywrlock(&self._mainLock)
-    
-    return result == 0
+  public func lockWrite() {
+    pthread_rwlock_wrlock(&self._mainLock)
   }
   
-  @discardableResult
-  public func unlock() -> Bool {
-    return pthread_rwlock_unlock(&self._mainLock) == 0
+  public func unlock() {
+    pthread_rwlock_unlock(&self._mainLock)
   }
 }

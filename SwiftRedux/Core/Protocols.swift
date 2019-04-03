@@ -53,43 +53,28 @@ public protocol UniqueIDProviderType {
 public protocol ReadWriteLockType {
   
   /// Lock reads for safe property access.
-  ///
-  /// - Parameter wait: Wait if not possible to acquire lock.
-  /// - Returns: Anything that indicates the success of lock acquisition.
-  @discardableResult
-  func lockRead(wait: Bool) -> Bool
+  func lockRead()
   
   /// Lock writes for safe property modification.
-  ///
-  /// - Parameter wait: Wait if not possible to acquire lock.
-  /// - Returns: Anything that indicates the success of lock acquisition.
-  @discardableResult
-  func lockWrite(wait: Bool) -> Bool
+  func lockWrite()
   
   /// Release the lock.
-  ///
-  /// - Returns: Anything that indicates the success of lock acquisition.
-  @discardableResult
-  func unlock() -> Bool
+  func unlock()
 }
 
 public extension ReadWriteLockType {
   
   /// Access some property in a thread-safe manner.
   func access<T>(_ accessor: () throws -> T) rethrows -> T? {
-    if self.lockRead(wait: true) {
-      defer {self.unlock()}
-      return try accessor()
-    }
-    
-    return nil
+    self.lockRead()
+    defer {self.unlock()}
+    return try accessor()
   }
   
   /// Modify some property in a thread-safe manner.
   func modify(_ modifier: () throws -> Void) rethrows {
-    if self.lockWrite(wait: true) {
-      defer {self.unlock()}
-      try modifier()
-    }
+    self.lockWrite()
+    defer {self.unlock()}
+    try modifier()
   }
 }

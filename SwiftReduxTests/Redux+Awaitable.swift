@@ -12,7 +12,7 @@ import XCTest
 @testable import SwiftRedux
 
 class AwaitableTests: XCTestCase {
-  private let timeout: Double = 1000
+  private let timeout: Double = 2000
   
   func test_awaitableError_shouldHaveCorrectDescription() {
     /// Setup && When && Then
