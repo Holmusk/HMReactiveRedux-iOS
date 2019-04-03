@@ -9,11 +9,11 @@
 /// Enhanced store that can overwrite a base store's action dispatcher.
 struct EnhancedStore<State> {
   private let _store: DelegateStore<State>
-  private let _dispatch: ReduxDispatcher
+  private let _dispatch: AwaitableReduxDispatcher
   
   /// Delegate all functionalities to a Redux store instance but customize
   /// the dispatcher.
-  init<S>(_ store: S, _ dispatch: @escaping ReduxDispatcher) where
+  init<S>(_ store: S, _ dispatch: @escaping AwaitableReduxDispatcher) where
     S: ReduxStoreType, S.State == State
   {
     self._store = DelegateStore(store)
@@ -22,7 +22,7 @@ struct EnhancedStore<State> {
 }
 
 extension EnhancedStore: ReduxStoreType {
-  public var dispatch: ReduxDispatcher {
+  public var dispatch: AwaitableReduxDispatcher {
     return self._dispatch
   }
   

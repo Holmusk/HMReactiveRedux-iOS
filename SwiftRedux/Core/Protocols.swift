@@ -34,7 +34,7 @@ public protocol ReduxStoreType: ReduxUnsubscriberProviderType {
   var lastState: ReduxStateGetter<State> { get }
   
   /// Dispatch an action and notify listeners.
-  var dispatch: ReduxDispatcher { get }
+  var dispatch: AwaitableReduxDispatcher { get }
   
   /// Set up state callback so that every time a new state arrives, call the
   /// callback function.

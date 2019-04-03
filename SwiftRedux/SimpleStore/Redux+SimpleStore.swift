@@ -42,7 +42,7 @@ public final class SimpleStore<State>: ReduxStoreType {
   
   /// Reduce the action to produce a new state and broadcast this state to
   /// all subscribers.
-  public lazy private(set) var dispatch: ReduxDispatcher = {action in
+  public lazy private(set) var dispatch: AwaitableReduxDispatcher = {action in
     self._lock.modify {
       self._state = self._reducer(self._state, action)
       self._subscribers.forEach({$0.value(self._state)})

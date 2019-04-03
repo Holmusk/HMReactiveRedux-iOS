@@ -9,10 +9,10 @@
 /// Use this tracker to track middleware wrapping with an identifier (e.g. to
 /// ensure the ordering is correct).
 public struct DispatchWrapper {
-  let dispatch: ReduxDispatcher
+  let dispatch: AwaitableReduxDispatcher
   let identifier: String
   
-  init(_ identifier: String, _ dispatch: @escaping ReduxDispatcher) {
+  init(_ identifier: String, _ dispatch: @escaping AwaitableReduxDispatcher) {
     self.identifier = identifier
     self.dispatch = dispatch
   }

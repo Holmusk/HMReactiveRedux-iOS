@@ -10,7 +10,7 @@ import XCTest
 @testable import SwiftRedux
 
 final class ReduxRouterTest: XCTestCase {
-  private var dispatch: ReduxDispatcher!
+  private var dispatch: AwaitableReduxDispatcher!
   private var dispatchCount: Int!
   private var router: ReduxRouter!
   

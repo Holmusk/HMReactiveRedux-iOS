@@ -358,7 +358,6 @@
 		EEAABD35221D174500543DE2 /* Middleware+Saga */ = {
 			isa = PBXGroup;
 			children = (
-				EE7111DA2235756300532177 /* Redux+Saga+Output.swift */,
 				EEAABD23221D174500543DE2 /* Protocols+Saga.swift */,
 				EEAABD2A221D174500543DE2 /* Redux+Middleware+Saga.swift */,
 				EEAABD24221D174500543DE2 /* Redux+Saga.swift */,
@@ -373,6 +372,7 @@
 				EEAABD2C221D174500543DE2 /* Redux+Saga+Filter.swift */,
 				EEAABD30221D174500543DE2 /* Redux+Saga+Just.swift */,
 				EEAABD31221D174500543DE2 /* Redux+Saga+Map.swift */,
+				EE7111DA2235756300532177 /* Redux+Saga+Output.swift */,
 				EEAABD33221D174500543DE2 /* Redux+Saga+Put.swift */,
 				EEAABD28221D174500543DE2 /* Redux+Saga+Select.swift */,
 				EEAABD22221D174500543DE2 /* Redux+Saga+Sequentialize.swift */,

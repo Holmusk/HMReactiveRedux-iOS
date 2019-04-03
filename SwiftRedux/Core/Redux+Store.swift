@@ -19,14 +19,21 @@ public typealias ReduxStateCallback<State> = (State) -> Void
 /// Typealias for the state getter function.
 public typealias ReduxStateGetter<State> = () -> State
 
-/// Typealias for the dispatch function.
-public typealias ReduxDispatcher = (ReduxActionType) -> Awaitable<Any>
+/// Typealias for a dispatch function whose output can be awaited on to
+/// execute immediately.
+public typealias AwaitableReduxDispatcher = (ReduxActionType) -> Awaitable<Any>
+
+/// Typealias for a dispatch function that cannot be awaited on. Essentially
+/// we only send some actions into the pipeline without knowing what happens.
+public typealias ReduxDispatcher = (ReduxActionType) -> Void
 
 /// Represents an action dispatcher that does not do anything.
 public class NoopDispatcher {
   
   /// The singleton noop dispatcher instance.
-  public static let instance: ReduxDispatcher = {_ in EmptyAwaitable.instance}
+  public static let instance: AwaitableReduxDispatcher = {_ in
+    EmptyAwaitable.instance
+  }
   
   init() {}
 }
@@ -50,7 +57,7 @@ public protocol ReduxUnsubscriberProviderType {
 /// mainly for its type concreteness.
 public struct DelegateStore<State>: ReduxStoreType {
   public let lastState: ReduxStateGetter<State>
-  public let dispatch: ReduxDispatcher
+  public let dispatch: AwaitableReduxDispatcher
   public let subscribeState: ReduxSubscriber<State>
   public let unsubscribe: ReduxUnsubscriber
   
@@ -64,7 +71,7 @@ public struct DelegateStore<State>: ReduxStoreType {
   }
   
   init(_ lastState: @escaping ReduxStateGetter<State>,
-       _ dispatch: @escaping ReduxDispatcher,
+       _ dispatch: @escaping AwaitableReduxDispatcher,
        _ subscribeState: @escaping ReduxSubscriber<State>,
        _ unsubscribe: @escaping ReduxUnsubscriber) {
     self.lastState = lastState

@@ -19,7 +19,7 @@ public final class ReduxUIIntegrationTest: XCTestCase {
         return state
       }
       
-      static func mapAction(dispatch: @escaping ReduxDispatcher,
+      static func mapAction(dispatch: @escaping AwaitableReduxDispatcher,
                             state: Int,
                             outProps: OutProps) -> ActionProps {
         return ()

@@ -11,7 +11,7 @@ import XCTest
 @testable import SwiftRedux
 
 final class ReduxSagaTest: XCTestCase {
-  private var dispatch: ReduxDispatcher!
+  private var dispatch: AwaitableReduxDispatcher!
   private var dispatchCount: Int!
   private var testEffect: TestEffect!
   

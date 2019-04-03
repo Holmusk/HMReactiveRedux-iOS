@@ -11,11 +11,11 @@ import SwiftFP
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
 public final class SagaOutput<T>: Awaitable<T> {
-  let onAction: ReduxDispatcher
+  let onAction: AwaitableReduxDispatcher
   let source: Observable<T>
   private let disposeBag: DisposeBag
   
-  init(_ source: Observable<T>, _ onAction: @escaping ReduxDispatcher = NoopDispatcher.instance) {
+  init(_ source: Observable<T>, _ onAction: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance) {
     self.onAction = onAction
     self.source = source
     self.disposeBag = DisposeBag()

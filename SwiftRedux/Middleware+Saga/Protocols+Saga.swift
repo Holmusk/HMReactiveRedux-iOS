@@ -56,7 +56,7 @@ extension SagaEffectType {
   /// - Returns: An Output instance.
   public func invoke(
     withState state: State,
-    dispatch: @escaping ReduxDispatcher = NoopDispatcher.instance)
+    dispatch: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance)
     -> SagaOutput<R> {
     return self.invoke(SagaInput({state}, dispatch))
   }

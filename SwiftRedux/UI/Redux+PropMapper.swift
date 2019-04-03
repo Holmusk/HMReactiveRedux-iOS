@@ -43,7 +43,7 @@ public protocol PropMapperType: class {
   ///   - state: A ReduxState instance.
   ///   - outProps: An OutProps instance.
   /// - Returns: An ActionProps instance.
-  static func mapAction(dispatch: @escaping ReduxDispatcher,
+  static func mapAction(dispatch: @escaping AwaitableReduxDispatcher,
                         state: GlobalState,
                         outProps: OutProps) -> Action
   

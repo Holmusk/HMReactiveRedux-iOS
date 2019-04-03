@@ -67,7 +67,6 @@ final class ViewController1: UIViewController {
 
   override public func viewDidLoad() {
     super.viewDidLoad()
-    print("Did load")
     self.counterTF.isEnabled = false
     self.stringTF1.isEnabled = false
     self.slideTF.isEnabled = false

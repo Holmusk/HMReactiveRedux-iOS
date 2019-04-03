@@ -18,7 +18,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }
@@ -120,7 +120,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }
@@ -171,7 +171,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }
@@ -205,7 +205,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }
@@ -245,7 +245,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     var dispatchCount = 0
     var actions: [ReduxActionType] = []
     
-    let dispatch: ReduxDispatcher = {
+    let dispatch: AwaitableReduxDispatcher = {
       dispatchCount += 1
       actions.append($0)
       if dispatchCount == 2 { expect.fulfill() }
@@ -285,7 +285,7 @@ final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }
@@ -344,7 +344,7 @@ extension ReduxSagaEffectTest {
     /// Setup
     var dispatchCount = 0
     
-    let dispatch: ReduxDispatcher = {_ in
+    let dispatch: AwaitableReduxDispatcher = {_ in
       dispatchCount += 1
       return EmptyAwaitable.instance
     }

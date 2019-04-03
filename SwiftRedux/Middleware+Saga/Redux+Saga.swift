@@ -29,10 +29,10 @@ public enum SagaError: LocalizedError {
 /// Input for each saga effect.
 public struct SagaInput<State> {
   let lastState: ReduxStateGetter<State>
-  let dispatch: ReduxDispatcher
+  let dispatch: AwaitableReduxDispatcher
   
   init(_ lastState: @escaping ReduxStateGetter<State>,
-       _ dispatch: @escaping ReduxDispatcher) {
+       _ dispatch: @escaping AwaitableReduxDispatcher) {
     self.lastState = lastState
     self.dispatch = dispatch
   }
