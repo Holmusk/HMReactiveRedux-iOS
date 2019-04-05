@@ -34,7 +34,7 @@ extension SagaEffectConvertibleType {
   /// - Returns: An Effect instance.
   public func call<R2>(_ callCreator: @escaping (R) -> Observable<R2>) -> SagaEffect<R2> {
     return self.asEffect().transform(with: {
-      SagaEffect<R>.call(with: $0, callCreator: callCreator)
+      SagaEffects.call(with: $0, callCreator: callCreator)
     })
   }
   
@@ -47,7 +47,7 @@ extension SagaEffectConvertibleType {
     -> SagaEffect<R2>
   {
     return self.asEffect().transform(with: {
-      SagaEffect<R>.call(with: $0, callCreator: callCreator)
+      SagaEffects.call(with: $0, callCreator: callCreator)
     })
   }
   
@@ -60,7 +60,7 @@ extension SagaEffectConvertibleType {
     -> SagaEffect<R2>
   {
     return self.asEffect().transform(with: {
-      SagaEffect.call(with: $0, callCreator: callCreator)
+      SagaEffects.call(with: $0, callCreator: callCreator)
     })
   }
 }

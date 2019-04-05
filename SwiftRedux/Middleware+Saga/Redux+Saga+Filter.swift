@@ -29,6 +29,8 @@ extension SagaEffectConvertibleType {
   /// - Parameter predicate: The predicate function.
   /// - Returns: An Effect instance.
   public func filter(_ predicate: @escaping (R) throws -> Bool) -> SagaEffect<R> {
-    return self.asEffect().transform(with: {.filter($0, predicate: predicate)})
+    return self.asEffect().transform(with: {
+      SagaEffects.filter($0, predicate: predicate)
+    })
   }
 }

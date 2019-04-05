@@ -10,7 +10,9 @@ import Foundation
 import RxSwift
 import SwiftFP
 
-extension SagaEffect {
+/// Top-level namespace for Saga effect creator functions.
+public final class SagaEffects {
+  init() {}
   
   /// Create a call effect with an Observable.
   ///
@@ -18,8 +20,8 @@ extension SagaEffect {
   ///   - param: The parameter to call with.
   ///   - callCreator: The call creator function.
   /// - Returns: An Effect instance.
-  public static func call<R2>(with param: SagaEffect<R>,
-                              callCreator: @escaping (R) -> Observable<R2>)
+  public static func call<R, R2>(with param: SagaEffect<R>,
+                                 callCreator: @escaping (R) -> Observable<R2>)
     -> CallEffect<R, R2>
   {
     return CallEffect(param, callCreator)
@@ -31,8 +33,9 @@ extension SagaEffect {
   ///   - param: The parameter to call with.
   ///   - callCreator: The call creator function.
   /// - Returns: An Effect instance.
-  public static func call<R2>(with param: SagaEffect<R>,
-                              callCreator: @escaping (R, @escaping (Try<R2>) -> Void) -> Void)
+  public static func call<R, R2>(
+    with param: SagaEffect<R>,
+    callCreator: @escaping (R, @escaping (Try<R2>) -> Void) -> Void)
     -> CallEffect<R, R2>
   {
     return call(with: param) {param in
@@ -57,8 +60,9 @@ extension SagaEffect {
   ///   - param: The parameter to call with.
   ///   - callCreator: The call creator function.
   /// - Returns: An Effect instance.
-  public static func call<R2>(with param: SagaEffect<R>,
-                              callCreator: @escaping (R, @escaping (R2?, Error?) -> Void) -> Void)
+  public static func call<R, R2>(
+    with param: SagaEffect<R>,
+    callCreator: @escaping (R, @escaping (R2?, Error?) -> Void) -> Void)
     -> CallEffect<R, R2>
   {
     return call(with: param, callCreator: {(p, c: @escaping (Try<R2>) -> Void) in
@@ -78,8 +82,9 @@ extension SagaEffect {
   ///   - source: The source effect.
   ///   - catcher: The error catcher function.
   /// - Returns: An Effect instance.
-  public static func catchError(_ source: SagaEffect<R>,
-                                catcher: @escaping (Swift.Error) throws -> SagaEffect<R>)
+  public static func catchError<R>(
+    _ source: SagaEffect<R>,
+    catcher: @escaping (Swift.Error) throws -> SagaEffect<R>)
     -> CatchErrorEffect<R>
   {
     return CatchErrorEffect(source, catcher)
@@ -91,8 +96,8 @@ extension SagaEffect {
   ///   - source: The source effect.
   ///   - selector: The side effect selector function.
   /// - Returns: An Effect instance.
-  public static func doOnValue(_ source: SagaEffect<R>,
-                               selector: @escaping (R) throws -> Void)
+  public static func doOnValue<R>(_ source: SagaEffect<R>,
+                                  selector: @escaping (R) throws -> Void)
     -> DoOnValueEffect<R>
   {
     return DoOnValueEffect(source, selector)
@@ -104,8 +109,8 @@ extension SagaEffect {
   ///   - source: The source effect.
   ///   - selector: The side effect selector function.
   /// - Returns: An Effect instance.
-  public static func doOnError(_ source: SagaEffect<R>,
-                               selector: @escaping (Error) throws -> Void)
+  public static func doOnError<R>(_ source: SagaEffect<R>,
+                                  selector: @escaping (Error) throws -> Void)
     -> DoOnErrorEffect<R>
   {
     return DoOnErrorEffect(source, selector)
@@ -114,7 +119,7 @@ extension SagaEffect {
   /// Create an empty effect.
   ///
   /// - Returns: An Effect instance.
-  public static func empty() -> EmptyEffect<R> {
+  public static func empty<R>() -> EmptyEffect<R> {
     return EmptyEffect()
   }
   
@@ -124,8 +129,8 @@ extension SagaEffect {
   ///   - source: The source effect to be filtered.
   ///   - predicate: The filter predicate function.
   /// - Returns: An Effect instance.
-  public static func filter(_ source: SagaEffect<R>,
-                            predicate: @escaping (R) throws -> Bool)
+  public static func filter<R>(_ source: SagaEffect<R>,
+                               predicate: @escaping (R) throws -> Bool)
     -> SagaEffect<R>
   {
     return FilterEffect(source, predicate)
@@ -135,7 +140,7 @@ extension SagaEffect {
   ///
   /// - Parameter value: The value to form the effect with.
   /// - Returns: An Effect instance.
-  public static func just(_ value: R) -> JustEffect<R> {
+  public static func just<R>(_ value: R) -> JustEffect<R> {
     return JustEffect(value)
   }
   
@@ -145,8 +150,8 @@ extension SagaEffect {
   ///   - source: The source effect.
   ///   - mapper: The mapper function.
   /// - Returns: An Effect instance.
-  public static func map<R2>(_ source: SagaEffect<R>,
-                             withMapper mapper: @escaping (R) throws -> R2)
+  public static func map<R, R2>(_ source: SagaEffect<R>,
+                                withMapper mapper: @escaping (R) throws -> R2)
     -> MapEffect<R, R2>
   {
     return MapEffect(source, mapper)
@@ -159,7 +164,7 @@ extension SagaEffect {
   ///   - actionCreator: The action creator function.
   ///   - queue: The queue on which to dispatch the action.
   /// - Returns: An Effect instance.
-  public static func put(
+  public static func put<R>(
     _ param: SagaEffect<R>,
     actionCreator: @escaping (R) -> ReduxActionType,
     usingQueue queue: DispatchQueue = .global(qos: .default))
@@ -175,20 +180,23 @@ extension SagaEffect {
   ///   - actionCreator: The action creator function.
   ///   - queue: The queue on which to dispatch the action.
   /// - Returns: An Effect instance.
-  public static func put(
+  public static func put<R>(
     _ param: R,
     actionCreator: @escaping (R) -> ReduxActionType,
     usingQueue queue: DispatchQueue = .global(qos: .default))
     -> PutEffect<R>
   {
-    return self.put(.just(param), actionCreator: actionCreator, usingQueue: queue)
+    return self.put(SagaEffects.just(param),
+                    actionCreator: actionCreator,
+                    usingQueue: queue)
   }
   
   /// Create a select effect.
   ///
   /// - Parameter selector: The state selector function.
   /// - Returns: An Effect instance.
-  public static func select<State>(_ selector: @escaping (State) -> R) -> SelectEffect<State, R> {
+  public static func select<State, R>(_ selector: @escaping (State) -> R)
+    -> SelectEffect<State, R> {
     return SelectEffect(selector)
   }
   
@@ -199,7 +207,7 @@ extension SagaEffect {
   ///   - effect2: The second effect that must happen after the first.
   ///   - selector: The result combine function.
   /// - Returns: An Effect instance.
-  public static func sequentialize<R1, R2>(
+  public static func sequentialize<R, R1, R2>(
     _ effect1: SagaEffect<R1>,
     _ effect2: SagaEffect<R2>,
     selector: @escaping (R1, R2) throws -> R)
@@ -215,7 +223,7 @@ extension SagaEffect {
   ///   - sec: The time in seconds to delay by.
   ///   - queue: The dispatch queue to delay on.
   /// - Returns: An Effect instance.
-  public static func delay(
+  public static func delay<R>(
     _ source: SagaEffect<R>,
     bySeconds sec: TimeInterval,
     usingQueue queue: DispatchQueue = .global(qos: .default))
@@ -231,7 +239,7 @@ extension SagaEffect {
   ///   - effectCreator: The effect creator function.
   ///   - options: Additional take options.
   /// - Returns: An Effect instance.
-  public static func takeEvery<Action, R2>(
+  public static func takeEvery<Action, R, R2>(
     paramExtractor: @escaping (Action) -> R?,
     effectCreator: @escaping (R) -> SagaEffect<R2>,
     options: TakeOptions = .default())
@@ -247,7 +255,7 @@ extension SagaEffect {
   ///   - effectCreator: The effect creator function.
   ///   - options: Additinoal take options.
   /// - Returns: An Effect instance.
-  public static func takeLatest<Action, R2>(
+  public static func takeLatest<Action, R, R2>(
     paramExtractor: @escaping (Action) -> R?,
     effectCreator: @escaping (R) -> SagaEffect<R2>,
     options: TakeOptions = .default())

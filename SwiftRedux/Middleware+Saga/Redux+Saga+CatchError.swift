@@ -33,7 +33,9 @@ extension SagaEffectConvertibleType {
     _ catcher: @escaping (Swift.Error) throws -> SagaEffect<R>)
     -> SagaEffect<R>
   {
-    return self.asEffect().transform(with: {.catchError($0, catcher: catcher)})
+    return self.asEffect().transform(with: {
+      SagaEffects.catchError($0, catcher: catcher)
+    })
   }
   
   /// Convenience method to catch error and return a fallback value instead of
@@ -42,6 +44,6 @@ extension SagaEffectConvertibleType {
   /// - Parameter catcher: The error catcher function.
   /// - Returns: An Effect instance.
   public func catchError(_ catcher: @escaping (Swift.Error) throws -> R) -> SagaEffect<R> {
-    return self.catchError({.just(try catcher($0))})
+    return self.catchError({SagaEffects.just(try catcher($0))})
   }
 }

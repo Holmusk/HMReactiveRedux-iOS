@@ -45,7 +45,7 @@ extension SagaEffectConvertibleType {
     -> SagaEffect<Any>
   {
     return self.asEffect().transform(with: {
-      SagaEffect.put($0, actionCreator: actionCreator, usingQueue: queue)
+      SagaEffects.put($0, actionCreator: actionCreator, usingQueue: queue)
     })
   }
 }

@@ -46,7 +46,9 @@ extension SagaEffectConvertibleType {
   /// - Parameter selector: The side effect selector function.
   /// - Returns: An Effect instance.
   public func doOnValue(_ selector: @escaping (R) throws -> Void) -> SagaEffect<R> {
-    return self.asEffect().transform(with: {.doOnValue($0, selector: selector)})
+    return self.asEffect().transform(with: {
+      SagaEffects.doOnValue($0, selector: selector)
+    })
   }
   
   /// Invoke a do-on-error effect on the current effect.
@@ -54,6 +56,8 @@ extension SagaEffectConvertibleType {
   /// - Parameter selector: The side effect selector function.
   /// - Returns: An Effect instance.
   public func doOnError(_ selector: @escaping (Swift.Error) throws -> Void) -> SagaEffect<R> {
-    return self.asEffect().transform(with: {.doOnError($0, selector: selector)})
+    return self.asEffect().transform(with: {
+      SagaEffects.doOnError($0, selector: selector)
+    })
   }
 }

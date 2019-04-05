@@ -29,6 +29,6 @@ extension SagaEffectConvertibleType {
   /// - Parameter mapper: The mapper function.
   /// - Returns: An Effect instance.
   public func map<R2>(_ mapper: @escaping (R) throws -> R2) -> SagaEffect<R2> {
-    return self.asEffect().transform(with: {SagaEffect.map($0, withMapper: mapper)})
+    return self.asEffect().transform(with: {SagaEffects.map($0, withMapper: mapper)})
   }
 }

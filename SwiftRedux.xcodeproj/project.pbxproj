@@ -19,6 +19,7 @@
 		D3810F5921C0CA550058FA86 /* ReduxLockTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3810F5821C0CA550058FA86 /* ReduxLockTest.swift */; };
 		D381794921AD015D007B33A6 /* SwiftRedux.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3943ECE1FA32D5600898233 /* SwiftRedux.framework */; };
 		D3943ED81FA32D5600898233 /* SwiftRedux.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3943ECE1FA32D5600898233 /* SwiftRedux.framework */; };
+		D3E02A4F2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E02A4E2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift */; };
 		E09B020DCDEFCE60EBFBCA01 /* Pods_SwiftRedux_Demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EDBA54900509BCC49BFB00 /* Pods_SwiftRedux_Demo.framework */; };
 		EE3A11A5221D7F4A0023B445 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD3A221D174500543DE2 /* Protocols.swift */; };
 		EE3A11A7221D7F4A0023B445 /* Redux+RWLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD20221D174500543DE2 /* Redux+RWLock.swift */; };
@@ -134,6 +135,7 @@
 		D3943ECE1FA32D5600898233 /* SwiftRedux.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftRedux.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3943ED71FA32D5600898233 /* SwiftReduxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftReduxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D3943EDE1FA32D5600898233 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D3E02A4E2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReduxSagaTest+TakeEffect.swift"; sourceTree = "<group>"; };
 		E7F56163AB1D6772064939F4 /* Pods-SwiftReduxTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftReduxTests.debug.xcconfig"; path = "Target Support Files/Pods-SwiftReduxTests/Pods-SwiftReduxTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EE567CEF2236BE0D00E907F4 /* Redux+UniqueID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+UniqueID.swift"; sourceTree = "<group>"; };
 		EE567CF12236BF5200E907F4 /* Redux+UniqueID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Redux+UniqueID.swift"; sourceTree = "<group>"; };
@@ -303,6 +305,8 @@
 				EEC1DE84223E035000E4AF43 /* Redux+MainThread.swift */,
 				D350C3581FA345200040556F /* Redux+Store.swift */,
 				EE567CF52236C94A00E907F4 /* Redux+Subscription.swift */,
+				D30DBF9C21AD8E2900CD1233 /* Redux+UI.swift */,
+				EE57167C223F2A23009B8D87 /* Redux+UI+Integration.swift */,
 				EE567CEF2236BE0D00E907F4 /* Redux+UniqueID.swift */,
 				D3810F5821C0CA550058FA86 /* ReduxLockTest.swift */,
 				D3300E1021B3713E00779B7F /* ReduxMiddlewareTest.swift */,
@@ -310,8 +314,7 @@
 				D3803C6421B3E4EB0055467D /* ReduxRouterTest.swift */,
 				D335E28E21B6E689000E664D /* ReduxSagaTest.swift */,
 				D334ED5E21B773CA004C538E /* ReduxSagaTest+Effect.swift */,
-				D30DBF9C21AD8E2900CD1233 /* Redux+UI.swift */,
-				EE57167C223F2A23009B8D87 /* Redux+UI+Integration.swift */,
+				D3E02A4E2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift */,
 			);
 			path = SwiftReduxTests;
 			sourceTree = "<group>";
@@ -821,6 +824,7 @@
 				EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */,
 				D334ED5F21B773CA004C538E /* ReduxSagaTest+Effect.swift in Sources */,
 				D3300E1121B3713E00779B7F /* ReduxMiddlewareTest.swift in Sources */,
+				D3E02A4F2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift in Sources */,
 				EE567CF02236BE0D00E907F4 /* Redux+UniqueID.swift in Sources */,
 				EEC1DE85223E035000E4AF43 /* Redux+MainThread.swift in Sources */,
 				EE7111D52235474B00532177 /* Redux+Core.swift in Sources */,

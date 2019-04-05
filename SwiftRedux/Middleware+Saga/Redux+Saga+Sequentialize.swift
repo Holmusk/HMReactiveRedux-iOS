@@ -42,7 +42,7 @@ extension SagaEffectConvertibleType {
     -> SagaEffect<U>
   {
     return self.asEffect()
-      .transform(with: {.sequentialize($0, effect2, selector: selector)})
+      .transform(with: {SagaEffects.sequentialize($0, effect2, selector: selector)})
   }
   
   /// Trigger another effect and ignore emission from this one.
@@ -58,6 +58,6 @@ extension SagaEffectConvertibleType {
   /// - Parameter value: The value to change to.
   /// - Returns: An Effect instance.
   public func then<R2>(_ value: R2) -> SagaEffect<R2> {
-    return self.then(.just(value))
+    return self.then(SagaEffects.just(value))
   }
 }

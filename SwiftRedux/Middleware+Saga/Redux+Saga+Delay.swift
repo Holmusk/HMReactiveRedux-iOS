@@ -42,7 +42,8 @@ extension SagaEffectConvertibleType {
                     usingQueue queue: DispatchQueue = .global(qos: .default))
     -> SagaEffect<R>
   {
-    return self.asEffect()
-      .transform(with: {.delay($0, bySeconds: sec, usingQueue: queue)})
+    return self.asEffect().transform(with: {
+      SagaEffects.delay($0, bySeconds: sec, usingQueue: queue)
+    })
   }
 }
