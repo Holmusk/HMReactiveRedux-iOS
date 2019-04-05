@@ -28,21 +28,24 @@ public protocol SagaEffectType: SagaEffectConvertibleType {
   func invoke(_ input: SagaInput) -> SagaOutput<R>
 }
 
-extension SagaEffectConvertibleType {
+/// Represents a saga effect that will emit only one event, and thus can be
+/// awaited for the result.
+public protocol SingleSagaEffectType: SagaEffectType {}
+
+public extension SagaEffectConvertibleType {
 
   /// Feed the current effect as input to create another effect.
   ///
   /// - Parameter effectCreator: The effect creator function.
   /// - Returns: An Effect instance.
-  public func transform<R2>(
-    with effectCreator: SagaEffectTransformer<R, R2>)
+  public func transform<R2>(with effectCreator: SagaEffectTransformer<R, R2>)
     -> SagaEffect<R2>
   {
     return effectCreator(self.asEffect())
   }
 }
 
-extension SagaEffectType {
+public extension SagaEffectType {
   
   /// Create an output stream from input parameters. This is useful during
   /// testing to reduce boilerplate w.r.t the creation of saga input.
@@ -56,5 +59,18 @@ extension SagaEffectType {
     dispatch: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance)
     -> SagaOutput<R> {
     return self.invoke(SagaInput({state}, dispatch))
+  }
+}
+
+// MARK: - SingleSagaEffectType
+public extension SagaEffectType where Self: SingleSagaEffectType {
+
+  /// Wait for the first result that arrives, then terminate the stream.
+  ///
+  /// - Parameter input: A SagaInput instance.
+  /// - Returns: An R value.
+  /// - Throws: Error if the resulting saga output fails to wait for result.
+  public func await(_ input: SagaInput) throws -> R {
+    return try self.invoke(input).await()
   }
 }

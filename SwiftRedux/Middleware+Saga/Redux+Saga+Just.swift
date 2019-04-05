@@ -18,3 +18,6 @@ public final class JustEffect<R>: SagaEffect<R> {
     return SagaOutput(.just(self.value))
   }
 }
+
+// MARK: - SingleSagaEffectType
+extension JustEffect: SingleSagaEffectType {}

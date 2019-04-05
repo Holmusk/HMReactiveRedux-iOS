@@ -26,6 +26,9 @@ public final class CallEffect<P, R>: SagaEffect<R> {
   }
 }
 
+// MARK: - SingleSagaEffectType
+extension CallEffect: SingleSagaEffectType {}
+
 extension SagaEffectConvertibleType {
 
   /// Invoke a call effect on the current effect.

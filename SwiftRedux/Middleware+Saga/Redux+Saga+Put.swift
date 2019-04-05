@@ -32,6 +32,9 @@ public final class PutEffect<P>: SagaEffect<Any> {
   }
 }
 
+// MARK: - SingleSagaEffectType
+extension PutEffect: SingleSagaEffectType {}
+
 extension SagaEffectConvertibleType {
   
   /// Invoke a put effect on the current effect.

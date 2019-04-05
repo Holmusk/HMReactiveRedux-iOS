@@ -22,3 +22,6 @@ public final class SelectEffect<State, R>: SagaEffect<R> {
     return SagaOutput(.just(emission))
   }
 }
+
+// MARK: - SingleSagaEffectType
+extension SelectEffect: SingleSagaEffectType {}
