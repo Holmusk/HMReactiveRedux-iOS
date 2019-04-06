@@ -21,6 +21,47 @@ public final class ReduxSagaEffectTest: XCTestCase {
     _ = SagaEffects()
   }
   
+  public func test_awaitEffect_shouldExecuteSynchronously() throws {
+    /// Setup
+    class Action: ReduxActionType {
+      let value: Int
+      
+      init(_ value: Int) {
+        self.value = value
+      }
+    }
+    
+    var dispatched = [ReduxActionType]()
+    
+    /// When
+    let result = try SagaEffects.await {input -> Int in
+      try SagaEffects.put(0, actionCreator: Action.init).await(input)
+      try SagaEffects.put(1, actionCreator: Action.init).await(input)
+      try SagaEffects.put(2, actionCreator: Action.init).await(input)
+      try SagaEffects.put(3, actionCreator: Action.init).await(input)
+      return 4
+      }.await(SagaInput({0}) {
+        dispatched.append($0); return EmptyAwaitable.instance
+      })
+    
+    /// Then
+    let dispatchedValues = dispatched.map({$0 as! Action}).map({$0.value})
+    XCTAssertEqual(result.value, 4)
+    XCTAssertEqual(dispatchedValues, [0, 1, 2, 3])
+  }
+  
+  public func test_awaitEffectWithError_shouldReturnWrappedError() throws {
+    /// Setup
+    let error = SagaError.unimplemented
+    
+    /// When
+    let input = SagaInput({0}) {_ in EmptyAwaitable.instance}
+    let result = try SagaEffects.await {_ in throw error}.await(input)
+    
+    /// Then
+    XCTAssertEqual(result.error?.localizedDescription, error.errorDescription)
+  }
+  
   public func test_baseEffect_shouldThrowUnimplementedError() throws {
     /// Setup
     var dispatchCount = 0

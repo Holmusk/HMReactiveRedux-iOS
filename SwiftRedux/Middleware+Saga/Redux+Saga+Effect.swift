@@ -24,7 +24,5 @@ public class SagaEffect<R>: SagaEffectType {
     return SagaOutput(.error(SagaError.unimplemented))
   }
   
-  public func asEffect() -> SagaEffect<R> {
-    return self
-  }
+  public func asEffect() -> SagaEffect<R> { return self }
 }

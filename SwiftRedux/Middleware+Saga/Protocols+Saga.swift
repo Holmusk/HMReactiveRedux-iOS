@@ -6,6 +6,8 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
+import SwiftFP
+
 /// Implement this protocol to convert to an effect instance.
 public protocol SagaEffectConvertibleType {
   
@@ -70,6 +72,7 @@ public extension SagaEffectType where Self: SingleSagaEffectType {
   /// - Parameter input: A SagaInput instance.
   /// - Returns: An R value.
   /// - Throws: Error if the resulting saga output fails to wait for result.
+  @discardableResult
   public func await(_ input: SagaInput) throws -> R {
     return try self.invoke(input).await()
   }

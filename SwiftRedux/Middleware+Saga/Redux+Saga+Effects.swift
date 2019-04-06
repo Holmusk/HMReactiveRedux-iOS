@@ -14,6 +14,16 @@ import SwiftFP
 public final class SagaEffects {
   init() {}
   
+  /// Create an await effect with a creator function.
+  ///
+  /// - Parameter creator: Function that await for results from multiple effects.
+  /// - Returns: An Effect instance.
+  public static func await<R>(with creator: @escaping (SagaInput) throws -> R)
+    -> AwaitEffect<R>
+  {
+    return AwaitEffect(creator)
+  }
+  
   /// Create a call effect with an Observable.
   ///
   /// - Parameters:
