@@ -10,12 +10,12 @@ import SwiftRedux
 import RxSwift
 
 final class Api {
-  static func performAutocomplete(_ input: String) -> Observable<[String]> {
+  static func performAutocomplete(_ input: String) -> Single<[String]> {
     if Bool.random() {
-      return Observable.error(SagaError.unimplemented)
+      return Single.error(SagaError.unimplemented)
     }
     
-    return Observable.just(())
+    return Single.just(())
       .delay(0.5, scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
       .map({_ in (0...3).map({"Autocompleted \(input): \($0)"})})
   }

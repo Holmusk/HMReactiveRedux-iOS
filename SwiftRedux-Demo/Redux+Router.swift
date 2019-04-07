@@ -15,27 +15,28 @@ public enum ReduxScreen: RouterScreenType {
 }
 
 public struct ReduxRouter: ReduxRouterType {
-  public typealias Screen = ReduxScreen
-  
   private weak var _controller: UINavigationController?
   
   public init(_ controller: UINavigationController) {
     self._controller = controller
   }
   
-  public func navigate(_ screen: ReduxScreen) {
+  public func navigate(_ screen: RouterScreenType) {
     print("Navigating with screen: \(screen)")
     
-    switch screen {
-    case .viewController1:
+    switch screen as? ReduxScreen {
+    case .some(.viewController1):
       let vc = UIStoryboard(name: "Main", bundle: nil)
         .instantiateViewController(withIdentifier: "ViewController1")
         as! ViewController1
       
       self._controller?.pushViewController(vc, animated: true)
       
-    case .back:
+    case .some(.back):
       self._controller?.popViewController(animated: true)
+      
+    default:
+      break
     }
   }
 }

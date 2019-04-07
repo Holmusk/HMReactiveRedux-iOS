@@ -57,13 +57,11 @@ extension ReduxRouterTest {
   }
   
   final class ReduxRouter: ReduxRouterType {
-    typealias Screen = ReduxRouterTest.Screen
-    
     var history: [Screen] = []
     var navigateCallback: ((Int) -> Void)?
     
-    func navigate(_ screen: ReduxRouterTest.Screen) {
-      self.history.append(screen)
+    func navigate(_ screen: RouterScreenType) {
+      self.history.append(screen as! Screen)
       self.navigateCallback?(self.history.count)
     }
   }
