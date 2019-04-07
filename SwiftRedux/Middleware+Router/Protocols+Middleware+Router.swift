@@ -51,7 +51,7 @@ public protocol ReduxRouterType {
 
 /// Similar to a normal Redux router, but allows navigation method to return
 /// a Bool value to indicate whether it succeeds.
-public protocol VetoableReduxRouterType {
+public protocol VetoableReduxRouterType: UniqueIDProviderType {
 
   /// Indicate the priority that this sub-router should receive. The higher
   /// the priority, the earlier this gets called.

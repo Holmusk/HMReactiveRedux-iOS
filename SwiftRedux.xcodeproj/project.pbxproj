@@ -81,6 +81,7 @@
 		EE7111DB2235756400532177 /* Redux+Saga+Output.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111DA2235756300532177 /* Redux+Saga+Output.swift */; };
 		EEC1DE83223DE98300E4AF43 /* Redux+MainThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC1DE82223DE98300E4AF43 /* Redux+MainThread.swift */; };
 		EEC1DE85223E035000E4AF43 /* Redux+MainThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC1DE84223E035000E4AF43 /* Redux+MainThread.swift */; };
+		EEF9E337225668DA0033290C /* Redux+NestedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF9E336225668DA0033290C /* Redux+NestedRouter.swift */; };
 		EEFD1AAF2234A38D00C3C00E /* SwiftRedux.podspec in Resources */ = {isa = PBXBuildFile; fileRef = EEFD1AAE2234A38D00C3C00E /* SwiftRedux.podspec */; };
 		EEFD1AB12234A53D00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB02234A53D00C3C00E /* Redux+Awaitable.swift */; };
 		EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEFD1AB22234A81C00C3C00E /* Redux+Awaitable.swift */; };
@@ -202,6 +203,7 @@
 		EEAABD52221D174B00543DE2 /* ConfirmButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmButton.swift; sourceTree = "<group>"; };
 		EEC1DE82223DE98300E4AF43 /* Redux+MainThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+MainThread.swift"; sourceTree = "<group>"; };
 		EEC1DE84223E035000E4AF43 /* Redux+MainThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+MainThread.swift"; sourceTree = "<group>"; };
+		EEF9E336225668DA0033290C /* Redux+NestedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+NestedRouter.swift"; sourceTree = "<group>"; };
 		EEFD1AAE2234A38D00C3C00E /* SwiftRedux.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SwiftRedux.podspec; sourceTree = "<group>"; };
 		EEFD1AB02234A53D00C3C00E /* Redux+Awaitable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Awaitable.swift"; sourceTree = "<group>"; };
 		EEFD1AB22234A81C00C3C00E /* Redux+Awaitable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Awaitable.swift"; sourceTree = "<group>"; };
@@ -392,8 +394,9 @@
 		EEAABD39221D174500543DE2 /* Middleware+Router */ = {
 			isa = PBXGroup;
 			children = (
-				EEAABD37221D174500543DE2 /* Redux+Middleware+Router.swift */,
 				EEAABD38221D174500543DE2 /* Protocols+Middleware+Router.swift */,
+				EEAABD37221D174500543DE2 /* Redux+Middleware+Router.swift */,
+				EEF9E336225668DA0033290C /* Redux+NestedRouter.swift */,
 			);
 			path = "Middleware+Router";
 			sourceTree = "<group>";
@@ -800,6 +803,7 @@
 				EEC1DE83223DE98300E4AF43 /* Redux+MainThread.swift in Sources */,
 				EE3A11BF221D7F4A0023B445 /* Redux+Saga+Put.swift in Sources */,
 				EE567CF42236C2C600E907F4 /* Redux+Subscription.swift in Sources */,
+				EEF9E337225668DA0033290C /* Redux+NestedRouter.swift in Sources */,
 				EE3A11C0221D7F4A0023B445 /* Redux+Saga+Empty.swift in Sources */,
 				EE3A11C1221D7F4A0023B445 /* Redux+Preset.swift in Sources */,
 				EE3A11C5221D7F4A0023B445 /* Redux+SimpleStore.swift in Sources */,
