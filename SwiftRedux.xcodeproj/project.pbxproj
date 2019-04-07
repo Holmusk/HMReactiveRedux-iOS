@@ -79,6 +79,7 @@
 		EE57167D223F2A23009B8D87 /* Redux+UI+Integration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE57167C223F2A23009B8D87 /* Redux+UI+Integration.swift */; };
 		EE7111D52235474B00532177 /* Redux+Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111D42235474B00532177 /* Redux+Core.swift */; };
 		EE7111DB2235756400532177 /* Redux+Saga+Output.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7111DA2235756300532177 /* Redux+Saga+Output.swift */; };
+		EEB0F2412259FEAC00A7AABF /* ReduxRouterTest+NestedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB0F2402259FEAC00A7AABF /* ReduxRouterTest+NestedRouter.swift */; };
 		EEC1DE83223DE98300E4AF43 /* Redux+MainThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC1DE82223DE98300E4AF43 /* Redux+MainThread.swift */; };
 		EEC1DE85223E035000E4AF43 /* Redux+MainThread.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEC1DE84223E035000E4AF43 /* Redux+MainThread.swift */; };
 		EEF9E337225668DA0033290C /* Redux+NestedRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEF9E336225668DA0033290C /* Redux+NestedRouter.swift */; };
@@ -201,6 +202,7 @@
 		EEAABD50221D174B00543DE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EEAABD51221D174B00543DE2 /* Redux+Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Router.swift"; sourceTree = "<group>"; };
 		EEAABD52221D174B00543DE2 /* ConfirmButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmButton.swift; sourceTree = "<group>"; };
+		EEB0F2402259FEAC00A7AABF /* ReduxRouterTest+NestedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReduxRouterTest+NestedRouter.swift"; sourceTree = "<group>"; };
 		EEC1DE82223DE98300E4AF43 /* Redux+MainThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+MainThread.swift"; sourceTree = "<group>"; };
 		EEC1DE84223E035000E4AF43 /* Redux+MainThread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+MainThread.swift"; sourceTree = "<group>"; };
 		EEF9E336225668DA0033290C /* Redux+NestedRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+NestedRouter.swift"; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 				D3300E1021B3713E00779B7F /* ReduxMiddlewareTest.swift */,
 				D30CC2FE205C40F0005B5EA1 /* ReduxPresetTest.swift */,
 				D3803C6421B3E4EB0055467D /* ReduxRouterTest.swift */,
+				EEB0F2402259FEAC00A7AABF /* ReduxRouterTest+NestedRouter.swift */,
 				D335E28E21B6E689000E664D /* ReduxSagaTest.swift */,
 				D334ED5E21B773CA004C538E /* ReduxSagaTest+Effect.swift */,
 				D3E02A4E2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift */,
@@ -831,6 +834,7 @@
 				D3810F5921C0CA550058FA86 /* ReduxLockTest.swift in Sources */,
 				EEFD1AB32234A81C00C3C00E /* Redux+Awaitable.swift in Sources */,
 				D334ED5F21B773CA004C538E /* ReduxSagaTest+Effect.swift in Sources */,
+				EEB0F2412259FEAC00A7AABF /* ReduxRouterTest+NestedRouter.swift in Sources */,
 				D3300E1121B3713E00779B7F /* ReduxMiddlewareTest.swift in Sources */,
 				D3E02A4F2257C1C500AA1F41 /* ReduxSagaTest+TakeEffect.swift in Sources */,
 				EE567CF02236BE0D00E907F4 /* Redux+UniqueID.swift in Sources */,
