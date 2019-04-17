@@ -15,9 +15,16 @@ import SwiftFP
 /// data as enum arguments.
 public protocol ReduxActionType {}
 
+/// Represents an object that provides an action dispatcher.
+public protocol ReduxDispatcherProviderType {
+
+  /// Dispatch an action and notify listeners.
+  var dispatch: AwaitableReduxDispatcher { get }
+}
+
 /// This represents a Redux store that can dispatch actions to mutate internal
 /// state and broadcast state updates to subscribers.
-public protocol ReduxStoreType: ReduxUnsubscriberProviderType {
+public protocol ReduxStoreType: ReduxDispatcherProviderType, ReduxUnsubscriberProviderType {
   
   /// The app-specific state type. For example:
   ///
@@ -32,9 +39,6 @@ public protocol ReduxStoreType: ReduxUnsubscriberProviderType {
   
   /// Get the last state instance.
   var lastState: ReduxStateGetter<State> { get }
-  
-  /// Dispatch an action and notify listeners.
-  var dispatch: AwaitableReduxDispatcher { get }
   
   /// Set up state callback so that every time a new state arrives, call the
   /// callback function.

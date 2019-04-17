@@ -77,3 +77,22 @@ public extension SagaEffectType where Self: SingleSagaEffectType {
     return try self.invoke(input).await()
   }
 }
+
+/// Monitors all Saga outputs and call each stored output's action dispatcher
+/// every time an action arrives. This is the only way to notify all output
+/// action dispatchers, no matter how nested it is.
+public protocol SagaMonitorType: ReduxDispatcherProviderType {
+
+  /// Store an action dispatcher with a unique ID.
+  ///
+  /// - Parameters:
+  ///   - uniqueID: A unique ID value.
+  ///   - dispatch: An action dispatcher instance.
+  func addDispatcher(_ uniqueID: UniqueIDProviderType.UniqueID,
+                     _ dispatch: AwaitableReduxDispatcher)
+  
+  /// Remove an action dispatcher at a unique ID.
+  ///
+  /// - Parameter uniqueID: A unique ID value.
+  func removeDispatcher(_ uniqueID: UniqueIDProviderType.UniqueID)
+}
