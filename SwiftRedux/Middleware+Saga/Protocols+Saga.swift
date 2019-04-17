@@ -89,7 +89,7 @@ public protocol SagaMonitorType: ReduxDispatcherProviderType {
   ///   - uniqueID: A unique ID value.
   ///   - dispatch: An action dispatcher instance.
   func addDispatcher(_ uniqueID: UniqueIDProviderType.UniqueID,
-                     _ dispatch: AwaitableReduxDispatcher)
+                     _ dispatch: @escaping AwaitableReduxDispatcher)
   
   /// Remove an action dispatcher at a unique ID.
   ///
