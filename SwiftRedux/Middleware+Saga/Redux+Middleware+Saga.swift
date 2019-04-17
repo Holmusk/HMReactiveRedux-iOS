@@ -9,10 +9,18 @@
 /// Hook up sagas by subscribing for inner values and dispatching action for
 /// each saga output every time a new action arrives.
 public struct SagaMiddleware<State>: MiddlewareProviderType {
+  private let monitor: SagaMonitorType
   private let effects: [SagaEffect<Any>]
   
-  public init<S>(effects: S) where S: Sequence, S.Element == SagaEffect<Any> {
+  public init<S>(monitor: SagaMonitorType, effects: S) where
+    S: Sequence, S.Element == SagaEffect<Any>
+  {
+    self.monitor = monitor
     self.effects = Array(effects)
+  }
+  
+  public init<S>(effects: S) where S: Sequence, S.Element == SagaEffect<Any> {
+    self.init(monitor: SagaMonitor(), effects: effects)
   }
   
   public var middleware: ReduxMiddleware<State> {
@@ -26,6 +34,7 @@ public struct SagaMiddleware<State>: MiddlewareProviderType {
         
         return DispatchWrapper(newWrapperId) {action in
           let dispatchResult = try! wrapper.dispatch(action).await()
+          _ = try! self.monitor.dispatch(action).await()
           sagaOutputs.forEach({_ = $0.onAction(action)})
           return JustAwaitable(dispatchResult)
         }
