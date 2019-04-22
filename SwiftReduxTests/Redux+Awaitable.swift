@@ -124,4 +124,27 @@ class AwaitableTests: XCTestCase {
       XCTAssertEqual($0 as! AwaitableError, .timedOut(millis: self.timeout))
     }
   }
+  
+  func test_batchAwaitable_shouldBatchResults() throws {
+    /// Setup
+    let iteration = 10
+    let waitTimeNano = UInt64(1 * pow(10.0, 6))
+    let deadlineTime = DispatchTime.now().uptimeNanoseconds + waitTimeNano
+    
+    let batchJob = BatchAwaitable((0..<iteration).map {i in
+      AsyncAwaitable<Int> {callback in
+        let deadline = DispatchTime(uptimeNanoseconds: deadlineTime)
+        
+        DispatchQueue.global(qos: .background).asyncAfter(deadline: deadline) {
+          callback(Try.success(i))
+        }
+      }
+    })
+      
+    /// When
+    let results = try batchJob.await()
+    
+    /// Then
+    XCTAssertEqual(results, (0..<iteration).map({$0}))
+  }
 }

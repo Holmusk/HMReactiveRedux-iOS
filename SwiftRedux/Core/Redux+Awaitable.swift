@@ -133,3 +133,21 @@ public final class AsyncAwaitable<Result> : Awaitable<Result> {
     }
   }
 }
+
+/// An awaitable job that batches the await results from an Array of children
+/// awaitables. The result will be delivered in-order.
+public final class BatchAwaitable<SingleResult> : Awaitable<[SingleResult]> {
+  private let awaitables: [Awaitable<SingleResult>]
+  
+  public init(_ awaitables: [Awaitable<SingleResult>]) {
+    self.awaitables = awaitables
+  }
+  
+  override public func await() throws -> [SingleResult] {
+    return try self.awaitables.map({try $0.await()})
+  }
+  
+  override public func await(timeoutMillis: Double) throws -> [SingleResult] {
+    return try self.awaitables.map({try $0.await(timeoutMillis: timeoutMillis)})
+  }
+}
