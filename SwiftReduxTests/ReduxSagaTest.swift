@@ -27,7 +27,7 @@ public final class ReduxSagaTest: XCTestCase {
     override func invoke(_ input: SagaInput) -> SagaOutput<Any> {
       self.invokeCount += 1
       
-      return SagaOutput(MockSagaMonitor(), .just(input.lastState())) {
+      return SagaOutput(SagaMonitor(), .just(input.lastState())) {
         self.onActionCount += 1
         self.pastActions.append($0)
         return EmptyAwaitable.instance
@@ -53,6 +53,17 @@ public final class ReduxSagaTest: XCTestCase {
 
     self.dispatch = SagaMiddleware(effects: [self.testEffect])
       .middleware(input)(wrapper).dispatch
+  }
+  
+  public func test_sagaInputConvenienceConstructors_shouldWork() throws {
+    /// Setup
+    let input = SagaInput(SagaMonitor(), {()})
+    
+    /// When
+    let result = try input.dispatch(DefaultAction.noop).await()
+    
+    /// Then
+    XCTAssertTrue(result is ())
   }
 
   public func test_sagaError_shouldHaveDescriptions() {
@@ -80,7 +91,7 @@ public final class ReduxSagaTest: XCTestCase {
   
   public func test_transformingOutput_shouldWork() throws {
     /// Setup
-    let output = SagaOutput(MockSagaMonitor(), .just(0))
+    let output = SagaOutput(SagaMonitor(), .just(0))
       .map({$0 + 1})
       .debounce(bySeconds: 1)
       .printValue()

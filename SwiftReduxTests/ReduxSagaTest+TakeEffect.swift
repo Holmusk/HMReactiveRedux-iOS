@@ -30,12 +30,13 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
+    let monitor = SagaMonitor()
+    let input = SagaInput(monitor, {()}, dispatch)
     
     let callEffectCreator: (Int) -> SagaEffect<Int> = {
       SagaEffects.call(with: SagaEffects.just($0)) {
         let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
-        return Single.just($0).delay(2, scheduler: scheduler)
+        return Single.just($0).delay(1, scheduler: scheduler)
       }
     }
     
@@ -45,11 +46,11 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     
     /// When
     output.subscribe({values.append($0)})
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(TakeAction.b)
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(DefaultAction.noop)
-    _ = output.onAction(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.b)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(DefaultAction.noop)
+    _ = monitor.dispatch(TakeAction.a)
     
     /// Then
     let waitTime = UInt64(pow(10 as Double, 9) * 3)
@@ -64,6 +65,11 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     
     dispatchGroup.wait()
     XCTAssertEqual(values, outputValues)
+    XCTAssertGreaterThan(monitor.dispatcherCount(), 0)
+    
+    DispatchQueue.main.async {
+      XCTAssertEqual(monitor.dispatcherCount(), 0)
+    }
   }
   
   public func test_takeEveryEffect_shouldTakeAllAction() {
@@ -91,17 +97,18 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
       effectCreator: {SagaEffects.just($0)},
       options: options)
     
-    let input = SagaInput(MockSagaMonitor(), {()})
+    let monitor = SagaMonitor()
+    let input = SagaInput(monitor, {()})
     let output = effect.invoke(input)
     var values = [Int]()
     
     /// When
     output.subscribe({values.append($0)})
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(TakeAction.a)
-    _ = output.onAction(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
+    _ = monitor.dispatch(TakeAction.a)
     
     /// Then
     let waitTime = UInt64(pow(10 as Double, 9) * 3)

@@ -23,6 +23,10 @@ public final class SagaMonitor {
     self._dispatchers = [:]
     self._lock = ReadWriteLock()
   }
+  
+  func dispatcherCount() -> Int {
+    return self._lock.access { self._dispatchers.count }
+  }
 }
 
 // MARK: - ReduxDispatcherProviderType
