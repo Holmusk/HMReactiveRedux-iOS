@@ -17,7 +17,7 @@ public struct SagaMiddleware<State> {
     self.middleware = {input in
       {wrapper in
         let lastState = input.lastState
-        let sagaInput = SagaInput(lastState, wrapper.dispatch)
+        let sagaInput = SagaInput(monitor, lastState, wrapper.dispatch)
         let sagaOutputs = effects.map({$0.invoke(sagaInput)})
         let newWrapperId = "\(wrapper.identifier)-saga"
         sagaOutputs.forEach({$0.subscribe({_ in})})

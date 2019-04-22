@@ -12,18 +12,39 @@ import SwiftFP
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
 public final class SagaOutput<T>: Awaitable<T> {
+  let monitor: SagaMonitorType
   let onAction: AwaitableReduxDispatcher
   let source: Observable<T>
   private let disposeBag: DisposeBag
   
-  init(_ source: Observable<T>, _ onAction: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance) {
-    self.onAction = onAction
-    self.source = source
+  /// Create a Saga output instance. We need to register this output with a
+  /// Saga monitor to trigger action dispatcher when one arrives.
+  ///
+  /// - Parameters:
+  ///   - monitor: A Saga monitor instance.
+  ///   - source: An Observable instance.
+  ///   - onAction: An action dispatcher.
+  init(_ monitor: SagaMonitorType,
+       _ source: Observable<T>,
+       _ onAction: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance) {
     self.disposeBag = DisposeBag()
+    self.monitor = monitor
+    self.onAction = onAction
+    let uniqueID = DefaultUniqueIDProvider.next()
+    
+    self.source = source.do(
+      onNext: nil,
+      onError: nil,
+      onCompleted: nil,
+      onSubscribe: nil,
+      onSubscribed: nil
+    ) {monitor.removeDispatcher(uniqueID)}
+    
+    monitor.addDispatcher(uniqueID, onAction)
   }
   
   func with<R>(source: Observable<R>) -> SagaOutput<R> {
-    return SagaOutput<R>(source, self.onAction)
+    return SagaOutput<R>(self.monitor, source, self.onAction)
   }
   
   func map<R>(_ fn: @escaping (T) throws -> R) -> SagaOutput<R> {

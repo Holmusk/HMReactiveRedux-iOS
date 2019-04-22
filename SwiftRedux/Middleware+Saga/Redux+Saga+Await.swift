@@ -20,7 +20,7 @@ public final class AwaitEffect<T>: SagaEffect<Try<T>> {
   }
   
   override public func invoke(_ input: SagaInput) -> SagaOutput<Try<T>> {
-    return SagaOutput(.just(Try {try self._creator(input)}))
+    return SagaOutput(input.monitor, .just(Try {try self._creator(input)}))
   }
 }
 

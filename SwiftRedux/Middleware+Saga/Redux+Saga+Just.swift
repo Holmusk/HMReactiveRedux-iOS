@@ -15,7 +15,7 @@ public final class JustEffect<R>: SagaEffect<R> {
   }
   
   override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
-    return SagaOutput(.just(self.value))
+    return SagaOutput(input.monitor, .just(self.value))
   }
 }
 

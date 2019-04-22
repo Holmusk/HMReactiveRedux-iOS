@@ -9,6 +9,6 @@
 /// Empty effect whose output does not stream anything.
 public final class EmptyEffect<R>: SagaEffect<R> {
   override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
-    return SagaOutput(.empty())
+    return SagaOutput(input.monitor, .empty())
   }
 }

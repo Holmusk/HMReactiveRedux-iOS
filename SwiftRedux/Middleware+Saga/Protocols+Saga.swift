@@ -47,23 +47,6 @@ public extension SagaEffectConvertibleType {
   }
 }
 
-public extension SagaEffectType {
-  
-  /// Create an output stream from input parameters. This is useful during
-  /// testing to reduce boilerplate w.r.t the creation of saga input.
-  ///
-  /// - Parameters:
-  ///   - state: A State instance.
-  ///   - dispatch: The action dispatch function.
-  /// - Returns: An Output instance.
-  public func invoke(
-    withState state: Any,
-    dispatch: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance)
-    -> SagaOutput<R> {
-    return self.invoke(SagaInput({state}, dispatch))
-  }
-}
-
 // MARK: - SingleSagaEffectType
 public extension SagaEffectType where Self: SingleSagaEffectType {
 

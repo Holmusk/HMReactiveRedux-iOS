@@ -21,7 +21,7 @@ public class SagaEffect<R>: SagaEffectType {
   init() {}
   
   public func invoke(_ input: SagaInput) -> SagaOutput<R> {
-    return SagaOutput(.error(SagaError.unimplemented))
+    return SagaOutput(input.monitor, .error(SagaError.unimplemented))
   }
   
   public func asEffect() -> SagaEffect<R> { return self }

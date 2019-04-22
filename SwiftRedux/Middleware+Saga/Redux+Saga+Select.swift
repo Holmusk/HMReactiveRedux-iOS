@@ -19,7 +19,7 @@ public final class SelectEffect<State, R>: SagaEffect<R> {
     let lastState = input.lastState()
     precondition(lastState is State)
     let emission = self._selector(lastState as! State)
-    return SagaOutput(.just(emission))
+    return SagaOutput(input.monitor, .just(emission))
   }
   
   /// Await for the first result that arrives. Since this can never throw an

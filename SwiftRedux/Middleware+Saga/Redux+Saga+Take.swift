@@ -31,10 +31,10 @@ public class TakeEffect<Action, P, R>: SagaEffect<R> where Action: ReduxActionTy
     let debounce = self._options.debounce
     
     return self._outputFlattener(
-      SagaOutput(paramStream, {
+      SagaOutput(input.monitor, paramStream) {
         ($0 as? Action).flatMap(self._paramExtractor).map(paramStream.onNext)
         return EmptyAwaitable.instance
-      })
+      }
         .debounce(bySeconds: debounce)
         .map({self._effectCreator($0).invoke(input)}))
   }
