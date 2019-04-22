@@ -60,4 +60,20 @@ public final class ReduxSagaMonitorTest: XCTestCase {
     /// Then
     XCTAssertEqual(Int(dispatchedCount), iteration / 2 * iteration)
   }
+  
+  public func test_awaitingDispatch_shouldEnsureAllDispatchersFinish() throws {
+    /// Setup
+    let iteration = 100
+    let monitor = SagaMonitor()
+    
+    (0..<iteration).forEach({i in
+      monitor.addDispatcher(Int64(i)) {_ in JustAwaitable(i)}
+    })
+    
+    /// When
+    let results = try monitor.dispatch(DefaultAction.noop).await()
+    
+    /// Then
+    XCTAssertEqual((results as! [Int]).sorted(), (0..<iteration).map({$0}))
+  }
 }

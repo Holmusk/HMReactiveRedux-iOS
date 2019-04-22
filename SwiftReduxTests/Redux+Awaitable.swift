@@ -142,9 +142,11 @@ class AwaitableTests: XCTestCase {
     })
       
     /// When
-    let results = try batchJob.await()
+    let results1 = try batchJob.await()
+    let results2 = try batchJob.await(timeoutMillis: 1000)
     
     /// Then
-    XCTAssertEqual(results, (0..<iteration).map({$0}))
+    XCTAssertEqual(results1, (0..<iteration).map({$0}))
+    XCTAssertEqual(results1, results2)
   }
 }

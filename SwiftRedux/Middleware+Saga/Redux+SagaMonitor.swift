@@ -14,8 +14,9 @@ public final class SagaMonitor {
   
   public lazy private(set) var dispatch: AwaitableReduxDispatcher = {action in
     self._lock.modify {
-      self._dispatchers.forEach {_, value in _ = value(action) }
-      return EmptyAwaitable.instance
+      let awaitables = self._dispatchers.map({_, value in value(action)})
+      let results = try? BatchAwaitable(awaitables).await()
+      return JustAwaitable(results as Any)
     }
   }
   
