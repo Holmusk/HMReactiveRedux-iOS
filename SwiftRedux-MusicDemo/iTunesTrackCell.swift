@@ -15,8 +15,6 @@ public final class iTunesTrackCell: UITableViewCell {
   @IBOutlet private weak var artistName: UILabel!
   @IBOutlet private weak var rootButton: UIButton!
   
-  public let uniqueID = DefaultUniqueIDProvider.next()
-  
   public var staticProps: StaticProps!
   
   public var reduxProps: ReduxProps? {

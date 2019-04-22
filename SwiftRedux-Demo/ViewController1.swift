@@ -21,8 +21,6 @@ final class ViewController1: UIViewController {
   @IBOutlet private weak var clearButton: ConfirmButton!
   @IBOutlet private weak var textTable: UITableView!
   
-  let uniqueID = DefaultUniqueIDProvider.next()
-  
   public var staticProps: StaticProps! {
     didSet {
       self.staticProps?.injector.injectProps(view: self.clearButton, outProps: ())

@@ -16,8 +16,6 @@ public final class iTunesController: UIViewController {
   @IBOutlet weak var progressIndicatorLeading: NSLayoutConstraint!
   @IBOutlet weak var progressIndicatorTrailing: NSLayoutConstraint!
   
-  public let uniqueID = DefaultUniqueIDProvider.next()
-  
   public var staticProps: StaticProps!
   
   public var reduxProps: ReduxProps? {

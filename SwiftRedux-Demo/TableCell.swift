@@ -13,7 +13,6 @@ final class TableCell: UITableViewCell {
   @IBOutlet private weak var textInput: UITextField!
   
   var textIndex: Int?
-  let uniqueID = DefaultUniqueIDProvider.next()
   var staticProps: StaticProps!
   
   var reduxProps: ReduxProps? {

@@ -151,11 +151,12 @@ public class PropInjector<GlobalState>: PropInjectorType {
     // state to a subscriber on subscription (so at least the injection is
     // triggered once).
     setProps(cv, self.store.lastState())
+    let uniqueID = DefaultUniqueIDProvider.next()
     
     let subscription = self.store
-      .subscribeState(cv.uniqueID) {[weak cv] state in setProps(cv, state)}
+      .subscribeState(uniqueID) {[weak cv] state in setProps(cv, state)}
     
-    cv.staticProps = StaticPropContainer(self, subscription)
+    cv.staticProps = StaticPropContainer(uniqueID, self, subscription)
     return subscription
   }
 }

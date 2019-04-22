@@ -15,6 +15,6 @@ public final class MockStaticProps<State>: StaticPropContainer<State> {
 
   /// This initializer can be used to construct test static props.
   convenience public init(injector: PropInjector<State>) {
-    self.init(injector, ReduxSubscription.noop)
+    self.init(DefaultUniqueIDProvider.next(), injector, ReduxSubscription.noop)
   }
 }

@@ -12,7 +12,6 @@ import UIKit
 final class RootController: UIViewController {
   @IBOutlet private weak var viewController1: UIButton!
   
-  let uniqueID = DefaultUniqueIDProvider.next()
   var staticProps: StaticProps!
   var reduxProps: ReduxProps?
   

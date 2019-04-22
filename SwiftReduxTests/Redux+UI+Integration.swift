@@ -30,7 +30,6 @@ public final class ReduxUIIntegrationTest: XCTestCase {
       typealias OutProps = ()
       typealias StateProps = Int
       typealias ActionProps = ()
-      let uniqueID = DefaultUniqueIDProvider.next()
       
       var staticProps: StaticProps!
       

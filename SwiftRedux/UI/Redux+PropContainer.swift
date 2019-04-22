@@ -43,6 +43,12 @@ public protocol PropContainerType: class, UniqueIDProviderType {
   var reduxProps: ReduxProps? { get set }
 }
 
+extension PropContainerType where Self: UniqueIDProviderType {
+  public var uniqueID: Self.UniqueID {
+    return self.staticProps.uniqueID
+  }
+}
+
 /// Generally the Redux view also implements the prop mapper protocol, so in
 /// this case we can define some default generics.
 public extension PropContainerType where Self: PropMapperType {

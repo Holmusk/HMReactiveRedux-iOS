@@ -115,6 +115,13 @@
 			remoteGlobalIDString = D3943ECD1FA32D5600898233;
 			remoteInfo = SwiftRedux;
 		};
+		D357E2BA226E562C00752B71 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3943EC51FA32D5600898233 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3943ECD1FA32D5600898233;
+			remoteInfo = SwiftRedux;
+		};
 		D3943ED91FA32D5600898233 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D3943EC51FA32D5600898233 /* Project object */;
@@ -617,6 +624,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D357E2BB226E562C00752B71 /* PBXTargetDependency */,
 			);
 			name = "SwiftRedux-MusicDemo";
 			productName = "SwiftRedux-MusicDemo";
@@ -926,6 +934,11 @@
 			isa = PBXTargetDependency;
 			target = D3943ECD1FA32D5600898233 /* SwiftRedux */;
 			targetProxy = D350C3741FA390C40040556F /* PBXContainerItemProxy */;
+		};
+		D357E2BB226E562C00752B71 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3943ECD1FA32D5600898233 /* SwiftRedux */;
+			targetProxy = D357E2BA226E562C00752B71 /* PBXContainerItemProxy */;
 		};
 		D3943EDA1FA32D5600898233 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

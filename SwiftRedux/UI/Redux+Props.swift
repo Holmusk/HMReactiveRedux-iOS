@@ -7,7 +7,8 @@
 //
 
 /// Static props container.
-public class StaticPropContainer<State> {
+public class StaticPropContainer<State> : UniqueIDProviderType {
+  public let uniqueID: UniqueID
   
   /// The injector instance used to inject Redux props into compatible views.
   public let injector: PropInjector<State>
@@ -15,7 +16,10 @@ public class StaticPropContainer<State> {
   /// Remember to unsubscribe before re-injecting again.
   let subscription: ReduxSubscription
   
-  internal init(_ injector: PropInjector<State>, _ subscription: ReduxSubscription) {
+  public init(_ uniqueID: UniqueID,
+              _ injector: PropInjector<State>,
+              _ subscription: ReduxSubscription) {
+    self.uniqueID = uniqueID
     self.injector = injector
     self.subscription = subscription
   }

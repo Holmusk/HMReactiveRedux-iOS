@@ -11,7 +11,6 @@ import SafeNest
 import UIKit
 
 final class ConfirmButton: UIButton {
-  let uniqueID = DefaultUniqueIDProvider.next()
   var staticProps: StaticProps!
   var reduxProps: ReduxProps?
   

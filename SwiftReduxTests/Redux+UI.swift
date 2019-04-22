@@ -49,6 +49,7 @@ extension ReduxUITests {
     XCTAssertEqual(self.store.lastState().counter, self.iterations * 2)
     XCTAssertEqual(self.store.unsubscribeCount, 1)
     XCTAssertTrue(view.staticProps?.injector is PropInjector<TestState>)
+    XCTAssertEqual(view.uniqueID, view.staticProps?.uniqueID)
     checkOthers(view)
   
     // Check if re-injecting would unsubscribe from the previous subscription.
@@ -192,7 +193,6 @@ extension ReduxUITests {
 extension ReduxUITests {
   final class TestViewController: UIViewController {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
-    let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticPropContainer<StateProps>!
     
     var reduxProps: ReduxProps? {
@@ -210,7 +210,6 @@ extension ReduxUITests {
   
   final class TestView: UIView {
     deinit { print("Deinit \(self)"); self.onDeinit?() }
-    let uniqueID = DefaultUniqueIDProvider.next()
     var staticProps: StaticPropContainer<StateProps>!
     
     var reduxProps: ReduxProps? {
