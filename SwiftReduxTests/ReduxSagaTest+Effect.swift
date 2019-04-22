@@ -8,6 +8,7 @@
 
 import SwiftFP
 import RxSwift
+import RxTest
 import XCTest
 @testable import SwiftRedux
 
@@ -40,9 +41,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
       SagaEffects.put(2, actionCreator: Action.init).await(input)
       SagaEffects.put(3, actionCreator: Action.init).await(input)
       return SagaEffects.select({(state: Int) in state}).await(input)
-      }.await(SagaInput({4}) {
-        dispatched.append($0); return EmptyAwaitable.instance
-      })
+      }.await(SagaInput(MockSagaMonitor(), {4}) {dispatched.append($0)})
     
     /// Then
     let dispatchedValues = dispatched.map({$0 as! Action}).map({$0.value})
@@ -55,7 +54,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     let error = SagaError.unimplemented
     
     /// When
-    let input = SagaInput({0}) {_ in EmptyAwaitable.instance}
+    let input = SagaInput(MockSagaMonitor(), {0})
     let result = try SagaEffects.await {_ in throw error}.await(input)
     
     /// Then
@@ -65,14 +64,10 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_baseEffect_shouldThrowUnimplementedError() throws {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     
     let effect = SagaEffect<Int>()
-    let output = effect.invoke(withState: (), dispatch: dispatch)
+    let output = effect.invoke(SagaInput(MockSagaMonitor(), {()}, dispatch))
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -89,8 +84,8 @@ public final class ReduxSagaEffectTest: XCTestCase {
   
   public func test_callEffect_shouldPerformAsyncWork() throws {
     /// Setup
-    let dispatch = NoopDispatcher.instance
     let error = SagaError.unimplemented
+    let input = SagaInput(MockSagaMonitor(), {()})
     
     let api1: (Int, @escaping (Try<Int>) -> Void) -> Void = {param, callback in
       let delayTime = UInt64(2 * pow(10 as Double, 9))
@@ -116,12 +111,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
     let effect5 = paramEffect.call(api5)
     let effect6 = paramEffect.call(api6)
     
-    let output1 = effect1.invoke(withState: (), dispatch: dispatch)
-    let output2 = effect2.invoke(withState: (), dispatch: dispatch)
-    let output3 = effect3.invoke(withState: (), dispatch: dispatch)
-    let output4 = effect4.invoke(withState: (), dispatch: dispatch)
-    let output5 = effect5.invoke(withState: (), dispatch: dispatch)
-    let output6 = effect6.invoke(withState: (), dispatch: dispatch)
+    let output1 = effect1.invoke(input)
+    let output2 = effect2.invoke(input)
+    let output3 = effect3.invoke(input)
+    let output4 = effect4.invoke(input)
+    let output5 = effect5.invoke(input)
+    let output6 = effect6.invoke(input)
     
     /// When && Then
     XCTAssertEqual(try output1.await(timeoutMillis: self.timeout), 300)
@@ -143,8 +138,9 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
     
     let caught = source.catchError({_ in 100})
-    let output1 = source.invoke(withState: ())
-    let output2 = caught.invoke(withState: ())
+    let input = SagaInput(MockSagaMonitor(), {()})
+    let output1 = source.invoke(input)
+    let output2 = caught.invoke(input)
     
     /// When && Then
     XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
@@ -153,11 +149,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
   
   public func test_compactMap_shouldFilterNilValues() {
     /// Setup
+    let input = SagaInput(MockSagaMonitor(), {()})
     let source = SagaEffects.just("a")
     let effect1 = source.compactMap(Int.init)
     let effect2 = source.compactMap({$0 + "b"})
-    let output1 = effect1.invoke(withState: ())
-    let output2 = effect2.invoke(withState: ())
+    let output1 = effect1.invoke(input)
+    let output2 = effect2.invoke(input)
     
     /// When && Then
     XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
@@ -167,15 +164,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_delayEffect_shouldDelayEmission() throws {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     
     let output = SagaEffects.just(400)
-      .delay(bySeconds: 2, usingQueue: .global(qos: .background))
-      .invoke(withState: (), dispatch: dispatch)
+      .delay(bySeconds: 1, usingQueue: .global(qos: .background))
+      .invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -203,12 +197,13 @@ public final class ReduxSagaEffectTest: XCTestCase {
       .call(with: SagaEffects.just(1), callCreator: {$1(nil, SagaError.unimplemented)})
       .transform(with: transformer)
     
-    let valueOutput = valueSource.invoke(withState: ())
-    let errorOutput = errorSource.invoke(withState: ())
+    let input = SagaInput(MockSagaMonitor(), {()})
+    let valueOutput = valueSource.invoke(input)
+    let errorOutput = errorSource.invoke(input)
     
     /// When
     _ = try valueOutput.await()
-    do {_ = try errorOutput.await()} catch {}
+    do {_ = try errorOutput.await()} catch {()}
     
     /// Then
     XCTAssertEqual(valueCount, 1)
@@ -218,14 +213,10 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_emptyEffect_shouldNotEmitAnything() throws {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
-    
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     let effect: SagaEffect<Int> = SagaEffects.empty()
-    let output = effect.invoke(withState: (), dispatch: dispatch)
+    let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -238,11 +229,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
   
   public func test_filterEffect_shouldFilterOutFailValues() throws {
     /// Setup
+    let input = SagaInput(MockSagaMonitor(), {()})
     let source = SagaEffects.just(1)
     let effect1 = source.filter({$0 % 2 == 0})
     let effect2 = source.filter({$0 % 2 == 1})
-    let output1 = effect1.invoke(withState: ())
-    let output2 = effect2.invoke(withState: ())
+    let output1 = effect1.invoke(input)
+    let output2 = effect2.invoke(input)
     
     /// When && Then
     XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
@@ -252,14 +244,10 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_justEffect_shouldEmitOnlyOneValue() throws {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
-    
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     let effect = SagaEffects.just(10)
-    let output = effect.invoke(withState: (), dispatch: dispatch)
+    let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -275,8 +263,9 @@ public final class ReduxSagaEffectTest: XCTestCase {
   
   public func test_mapEffect_shouldMapInnerValue() throws {
     /// Setup
+    let input = SagaInput(MockSagaMonitor(), {()})
     let effect = SagaEffects.just(1).map({$0 * 10})
-    let output = effect.invoke(withState: ())
+    let output = effect.invoke(input)
     
     /// When
     let value = try output.await(timeoutMillis: self.timeout)
@@ -292,18 +281,18 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatchCount = 0
     var actions: [ReduxActionType] = []
     
-    let dispatch: AwaitableReduxDispatcher = {
+    let dispatch: ReduxDispatcher = {
       dispatchCount += 1
       actions.append($0)
       if dispatchCount == 2 { expect.fulfill() }
-      return EmptyAwaitable.instance
     }
     
     let queue = DispatchQueue.global(qos: .background)
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     let effect1 = SagaEffects.just(200).put(Action.input, usingQueue: queue)
     let effect2 = SagaEffects.put(200, actionCreator: Action.input, usingQueue: queue)
-    let output1 = effect1.invoke(withState: (), dispatch: dispatch)
-    let output2 = effect2.invoke(withState: (), dispatch: dispatch)
+    let output1 = effect1.invoke(input)
+    let output2 = effect2.invoke(input)
     
     /// When
     _ = output1.onAction(DefaultAction.noop)
@@ -331,14 +320,10 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_selectEffect_shouldEmitOnlySelectedStateValue() throws {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
-    
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     let effect = SagaEffects.select({(_: State) in 100})
-    let output = effect.invoke(withState: (), dispatch: dispatch)
+    let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -360,8 +345,9 @@ public final class ReduxSagaEffectTest: XCTestCase {
       Single.just($0).delay(2, scheduler: scheduler)
     }
     
+    let input = SagaInput(MockSagaMonitor(), {()})
     let sequence = effect1.then(2)
-    let output = sequence.invoke(withState: ())
+    let output = sequence.invoke(input)
     
     /// When
     let value = try output.await(timeoutMillis: self.timeout)

@@ -29,11 +29,8 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
   {
     /// Setup
     var dispatchCount = 0
-    
-    let dispatch: AwaitableReduxDispatcher = {_ in
-      dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
+    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
+    let input = SagaInput(MockSagaMonitor(), {()}, dispatch)
     
     let callEffectCreator: (Int) -> SagaEffect<Int> = {
       SagaEffects.call(with: SagaEffects.just($0)) {
@@ -43,7 +40,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     }
     
     let effect = creator(callEffectCreator)
-    let output = effect.invoke(withState: (), dispatch: dispatch)
+    let output = effect.invoke(input)
     var values: [Int] = []
     
     /// When
@@ -94,7 +91,8 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
       effectCreator: {SagaEffects.just($0)},
       options: options)
     
-    let output = effect.invoke(withState: ())
+    let input = SagaInput(MockSagaMonitor(), {()})
+    let output = effect.invoke(input)
     var values = [Int]()
     
     /// When

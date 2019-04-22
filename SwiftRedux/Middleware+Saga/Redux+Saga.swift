@@ -48,7 +48,7 @@ public struct SagaInput {
   
   init(_ monitor: SagaMonitorType,
        _ lastState: @escaping ReduxStateGetter<Any>,
-       _ dispatch: @escaping ReduxDispatcher) {
+       _ dispatch: @escaping ReduxDispatcher = {_ in}) {
     self.monitor = monitor
     self.lastState = lastState
     self.dispatch = { dispatch($0); return EmptyAwaitable.instance }

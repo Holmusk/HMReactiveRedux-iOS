@@ -13,7 +13,7 @@ import XCTest
 public final class ReduxSagaTest: XCTestCase {
   typealias State = ()
   
-  final class TestEffect: SagaEffect<Any> {
+  private final class TestEffect: SagaEffect<Any> {
     var invokeCount: Int
     var onActionCount: Int
     var pastActions: [ReduxActionType]
@@ -27,7 +27,7 @@ public final class ReduxSagaTest: XCTestCase {
     override func invoke(_ input: SagaInput) -> SagaOutput<Any> {
       self.invokeCount += 1
       
-      return SagaOutput(.just(input.lastState())) {
+      return SagaOutput(MockSagaMonitor(), .just(input.lastState())) {
         self.onActionCount += 1
         self.pastActions.append($0)
         return EmptyAwaitable.instance
@@ -80,7 +80,7 @@ public final class ReduxSagaTest: XCTestCase {
   
   public func test_transformingOutput_shouldWork() throws {
     /// Setup
-    let output = SagaOutput(.just(0))
+    let output = SagaOutput(MockSagaMonitor(), .just(0))
       .map({$0 + 1})
       .debounce(bySeconds: 1)
       .printValue()
