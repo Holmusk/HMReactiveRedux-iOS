@@ -334,6 +334,24 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
   }
   
+  public func test_justPutEffect_shouldDispatchAction() {
+    /// Setup
+    struct Action: Equatable, ReduxActionType {
+      let value: Int
+    }
+    
+    var dispatched = [ReduxActionType]()
+    let input = SagaInput(SagaMonitor(), {()}) { dispatched.append($0) }
+    let actions = (0..<100).map(Action.init)
+    
+    /// Setup
+    actions.forEach({SagaEffects.put($0).await(input)})
+    
+    /// When
+    let expectedActions = dispatched.compactMap({$0 as? Action})
+    XCTAssertEqual(expectedActions, actions)
+  }
+  
   public func test_selectEffect_shouldEmitOnlySelectedStateValue() throws {
     /// Setup
     var dispatchCount = 0

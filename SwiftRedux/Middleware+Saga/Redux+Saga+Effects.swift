@@ -209,6 +209,20 @@ public final class SagaEffects {
                     usingQueue: queue)
   }
   
+  /// Convenience function to create a put effect that simply puts some action.
+  ///
+  /// - Parameters:
+  ///   - action: The action to be dispatched.
+  ///   - queue: The queue on which to dispatch the action.
+  /// - Returns: An Effect instance.
+  public static func put(
+    _ action: ReduxActionType,
+    usingQueue queue: DispatchQueue = .global(qos: .default))
+    -> PutEffect<()>
+  {
+    return SagaEffects.put((), actionCreator: {action})
+  }
+  
   /// Create a select effect.
   ///
   /// - Parameter selector: The state selector function.
