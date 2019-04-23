@@ -86,6 +86,14 @@ public final class SagaEffects {
     })
   }
   
+  /// Create a call effect that simply accepts an external source.
+  ///
+  /// - Parameter source: The source stream.
+  /// - Returns: An Effect instance.
+  public static func call<R>(_ source: Single<R>) -> JustCallEffect<R> {
+    return JustCallEffect(source)
+  }
+  
   /// Create a catch error effect.
   ///
   /// - Parameters:

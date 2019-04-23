@@ -128,6 +128,18 @@ public final class ReduxSagaEffectTest: XCTestCase {
     XCTAssertThrowsError(try output6.await(timeoutMillis: self.timeout))
   }
   
+  public func test_justCallEffect_shouldReturnCorrectResult() throws {
+    /// Setup
+    let source = Single.just(1)
+    let input = SagaInput(SagaMonitor(), {()})
+    
+    /// When
+    let result = try SagaEffects.call(source).await(input)
+    
+    /// Then
+    XCTAssertEqual(result, 1)
+  }
+  
   public func test_catchErrorEffect_shouldReturnFallback() throws {
     /// Setup
     let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)

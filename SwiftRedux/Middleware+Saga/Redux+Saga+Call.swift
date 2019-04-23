@@ -28,6 +28,22 @@ public final class CallEffect<P, R>: SagaEffect<R> {
 // MARK: - SingleSagaEffectType
 extension CallEffect: SingleSagaEffectType {}
 
+/// Effect whose output simply accepts an external source.
+public final class JustCallEffect<R>: SagaEffect<R> {
+  private let source: Single<R>
+  
+  init(_ source: Single<R>) {
+    self.source = source
+  }
+  
+  override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
+    return SagaOutput(input.monitor, self.source.asObservable())
+  }
+}
+
+// MARK: - SingleSagaEffectType
+extension JustCallEffect: SingleSagaEffectType {}
+
 extension SagaEffectConvertibleType {
 
   /// Invoke a call effect on the current effect.
