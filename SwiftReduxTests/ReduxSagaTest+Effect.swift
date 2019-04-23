@@ -280,7 +280,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_mapEffect_shouldMapInnerValue() throws {
     /// Setup
     let input = SagaInput(SagaMonitor(), {()})
-    let effect = SagaEffects.just(1).map({$0 * 10})
+    let effect = SagaEffects.just(1).map({$0 * 10}).cast(to: Int.self)
     let output = effect.invoke(input)
     
     /// When

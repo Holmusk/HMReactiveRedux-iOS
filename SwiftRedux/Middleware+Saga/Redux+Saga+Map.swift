@@ -31,4 +31,12 @@ extension SagaEffectConvertibleType {
   public func map<R2>(_ mapper: @escaping (R) throws -> R2) -> SagaEffect<R2> {
     return self.asEffect().transform(with: {SagaEffects.map($0, withMapper: mapper)})
   }
+  
+  /// Cast the emission to another type.
+  ///
+  /// - Parameter type: The type to cast emission to.
+  /// - Returns: An Effect instance.
+  public func cast<R2>(to type: R2.Type) -> SagaEffect<R2> {
+    return self.map({$0 as! R2})
+  }
 }

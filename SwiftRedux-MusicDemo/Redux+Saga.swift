@@ -6,6 +6,7 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
+import SwiftFP
 import SwiftRedux
 
 public final class AppSaga {
@@ -28,17 +29,22 @@ public final class AppSaga {
     }
   }
   
-  public static func autocompleteSaga(_ api: AppRepositoryType, _ input: String)
+  public static func autocompleteSaga(_ api: AppRepositoryType, _ query: String)
     -> SagaEffect<Any>
   {
-    return SagaEffects
-      .put(true, actionCreator: AppAction.updateAutocompleteProgress)
-      .then(input).call(api.searchITunes)
-      .delay(bySeconds: 1)
-      .put(AppAction.updateITunesResults, usingQueue: .global(qos: .background))
-      .catchError({_ in ()})
-      .then(false)
-      .put(AppAction.updateAutocompleteProgress)
+    return SagaEffects.await {input in
+      SagaEffects.put(AppAction.updateAutocompleteProgress(true)).await(input)
+      
+      do {
+        let result = try SagaEffects
+          .call(with: SagaEffects.just(query), callCreator: api.searchITunes)
+          .await(input)
+        
+        SagaEffects.put(AppAction.updateITunesResults(result)).await(input)
+      } catch {}
+      
+      SagaEffects.put(AppAction.updateAutocompleteProgress(false)).await(input)
+    }.cast(to: Any.self)
   }
   
   /// Verbose saga to demonstrate full use of helper functions.
