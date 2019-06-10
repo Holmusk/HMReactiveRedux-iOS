@@ -138,7 +138,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     let queue = DispatchQueue.global(qos: .background)
     let monitor = SagaMonitor()
     let input = SagaInput(monitor, {()}, dispatch)
-    let effect1 = SagaEffects.just(200).put(Action.input, usingQueue: queue)
+    let effect1 = SagaEffects.put(Action.input(200), usingQueue: queue)
     let effect2 = SagaEffects.put(200, actionCreator: Action.input, usingQueue: queue)
     let output1 = effect1.invoke(input)
     let output2 = effect2.invoke(input)

@@ -44,21 +44,3 @@ public final class PutEffect<P>: SagaEffect<Any> {
 
 // MARK: - SingleSagaEffectType
 extension PutEffect: SingleSagaEffectType {}
-
-extension SagaEffectConvertibleType {
-  
-  /// Invoke a put effect on the current effect.
-  ///
-  /// - Parameters:
-  ///   - actionCreator: The action creator function.
-  ///   - queue: The dispatch queue on which to put.
-  /// - Returns: An Effect instance.
-  public func put(_ actionCreator: @escaping (R) -> ReduxActionType,
-                  usingQueue queue: DispatchQueue = .global(qos: .default))
-    -> SagaEffect<Any>
-  {
-    return self.asEffect().transform(with: {
-      SagaEffects.put($0, actionCreator: actionCreator, usingQueue: queue)
-    })
-  }
-}

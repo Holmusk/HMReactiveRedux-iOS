@@ -78,22 +78,20 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
   public func test_takeEveryEffect_shouldTakeAllAction() {
     self.test_takeEffect_shouldTakeAppropriateActions(
       creator: { fn in
-        SagaEffects.take(paramExtractor: {(a: TakeAction) in a.payload}).flatMap(fn)},
+        SagaEffects.take({(a: TakeAction) in a.payload}).flatMap(fn)},
       outputValues: [1, 1, 1])
   }
   
   public func test_takeLatestEffect_shouldTakeLatestAction() {
     self.test_takeEffect_shouldTakeAppropriateActions(
       creator: { fn in
-        SagaEffects.take(paramExtractor: {(a: TakeAction) in a.payload}).switchMap(fn)},
+        SagaEffects.take({(a: TakeAction) in a.payload}).switchMap(fn)},
       outputValues: [1])
   }
   
   public func test_takeEffectDebounce_shouldThrottleEmissions() {
     /// Setup
-    let effect = SagaEffects
-      .take(paramExtractor: {(_: TakeAction) in 1})
-      .debounce(bySeconds: 2)
+    let effect = SagaEffects.take({(_: TakeAction) in 1}).debounce(bySeconds: 2)
     
     let monitor = SagaMonitor()
     let input = SagaInput(monitor, {()})
