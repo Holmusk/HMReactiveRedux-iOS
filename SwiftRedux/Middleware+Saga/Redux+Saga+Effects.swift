@@ -104,36 +104,17 @@ public final class SagaEffects {
     return SelectEffect(selector)
   }
   
-  /// Create a take every effect.
+  /// Create a take effect.
   ///
   /// - Parameters:
   ///   - paramExtractor: The param extractor function.
-  ///   - effectCreator: The effect creator function.
   ///   - options: Additional take options.
   /// - Returns: An Effect instance.
-  public static func takeEvery<Action, R, R2>(
+  public static func take<Action, R>(
     paramExtractor: @escaping (Action) -> R?,
-    effectCreator: @escaping (R) -> SagaEffect<R2>,
     options: TakeOptions = .default())
-    -> TakeEveryEffect<Action, R, R2> where Action: ReduxActionType
+    -> TakeEffect<Action, R> where Action: ReduxActionType
   {
-    return TakeEveryEffect(paramExtractor, effectCreator, options)
-  }
-  
-  /// Create a take latest effect.
-  ///
-  /// - Parameters:
-  ///   - paramExtractor: The param extractor function.
-  ///   - effectCreator: The effect creator function.
-  ///   - options: Additinoal take options.
-  /// - Returns: An Effect instance.
-  public static func takeLatest<Action, R, R2>(
-    paramExtractor: @escaping (Action) -> R?,
-    effectCreator: @escaping (R) -> SagaEffect<R2>,
-    options: TakeOptions = .default())
-    -> TakeLatestEffect<Action, R, R2> where
-    Action: ReduxActionType
-  {
-    return TakeLatestEffect(paramExtractor, effectCreator, options)
+    return TakeEffect(paramExtractor, options)
   }
 }
