@@ -15,7 +15,6 @@ public final class SagaOutput<T>: Awaitable<T> {
   let monitor: SagaMonitorType
   let onAction: AwaitableReduxDispatcher
   let source: Observable<T>
-  private let disposeBag: DisposeBag
   
   /// Create a Saga output instance. We need to register this output with a
   /// Saga monitor to trigger action dispatcher when one arrives.
@@ -27,7 +26,6 @@ public final class SagaOutput<T>: Awaitable<T> {
   init(_ monitor: SagaMonitorType,
        _ source: Observable<T>,
        _ onAction: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance) {
-    self.disposeBag = DisposeBag()
     self.monitor = monitor
     self.onAction = onAction
     let uniqueID = DefaultUniqueIDProvider.next()
@@ -81,28 +79,16 @@ public final class SagaOutput<T>: Awaitable<T> {
     return self.with(source: self.source.debounce(sec, scheduler: scheduler))
   }
   
-  func doOnValue(_ fn: @escaping (T) throws -> Void) -> SagaOutput<T> {
-    return self.with(source: self.source.do(onNext: fn))
-  }
-  
-  func doOnError(_ fn: @escaping (Swift.Error) throws -> Void) -> SagaOutput<T> {
-    return self.with(source: self.source.do(onNext: nil, onError: fn))
-  }
-  
   func filter(_ fn: @escaping (T) throws -> Bool) -> SagaOutput<T> {
     return self.with(source: self.source.filter(fn))
-  }
-  
-  func printValue() -> SagaOutput<T> {
-    return self.doOnValue({print($0)})
   }
   
   func observeOn(_ scheduler: SchedulerType) -> SagaOutput<T> {
     return self.with(source: self.source.observeOn(scheduler))
   }
   
-  func subscribe(_ callback: @escaping (T) -> Void) {
-    self.source.subscribe(onNext: callback).disposed(by: self.disposeBag)
+  func subscribe(_ callback: @escaping (T) -> Void) -> Disposable {
+    return self.source.subscribe(onNext: callback)
   }
   
   override public func await() throws -> T {

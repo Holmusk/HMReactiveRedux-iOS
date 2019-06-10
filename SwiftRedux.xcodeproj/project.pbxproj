@@ -43,7 +43,6 @@
 		EE3A11B7221D7F4A0023B445 /* Redux+Saga+Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD2B221D174500543DE2 /* Redux+Saga+Delay.swift */; };
 		EE3A11B8221D7F4A0023B445 /* Redux+Saga+Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD2C221D174500543DE2 /* Redux+Saga+Filter.swift */; };
 		EE3A11B9221D7F4A0023B445 /* Redux+Saga+Effects.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD2D221D174500543DE2 /* Redux+Saga+Effects.swift */; };
-		EE3A11BA221D7F4A0023B445 /* Redux+Saga+Do.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD2E221D174500543DE2 /* Redux+Saga+Do.swift */; };
 		EE3A11BB221D7F4A0023B445 /* Redux+Saga+Call.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD2F221D174500543DE2 /* Redux+Saga+Call.swift */; };
 		EE3A11BC221D7F4A0023B445 /* Redux+Saga+Just.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD30221D174500543DE2 /* Redux+Saga+Just.swift */; };
 		EE3A11BD221D7F4A0023B445 /* Redux+Saga+Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAABD31221D174500543DE2 /* Redux+Saga+Map.swift */; };
@@ -193,7 +192,6 @@
 		EEAABD2B221D174500543DE2 /* Redux+Saga+Delay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Delay.swift"; sourceTree = "<group>"; };
 		EEAABD2C221D174500543DE2 /* Redux+Saga+Filter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Filter.swift"; sourceTree = "<group>"; };
 		EEAABD2D221D174500543DE2 /* Redux+Saga+Effects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Effects.swift"; sourceTree = "<group>"; };
-		EEAABD2E221D174500543DE2 /* Redux+Saga+Do.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Do.swift"; sourceTree = "<group>"; };
 		EEAABD2F221D174500543DE2 /* Redux+Saga+Call.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Call.swift"; sourceTree = "<group>"; };
 		EEAABD30221D174500543DE2 /* Redux+Saga+Just.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Just.swift"; sourceTree = "<group>"; };
 		EEAABD31221D174500543DE2 /* Redux+Saga+Map.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Redux+Saga+Map.swift"; sourceTree = "<group>"; };
@@ -413,7 +411,6 @@
 				EEAABD25221D174500543DE2 /* Redux+Saga+CatchError.swift */,
 				EEAABD29221D174500543DE2 /* Redux+Saga+CompactMap.swift */,
 				EEAABD2B221D174500543DE2 /* Redux+Saga+Delay.swift */,
-				EEAABD2E221D174500543DE2 /* Redux+Saga+Do.swift */,
 				EEAABD27221D174500543DE2 /* Redux+Saga+Effect.swift */,
 				EEAABD2D221D174500543DE2 /* Redux+Saga+Effects.swift */,
 				EEAABD34221D174500543DE2 /* Redux+Saga+Empty.swift */,
@@ -859,7 +856,6 @@
 				EE3A11B8221D7F4A0023B445 /* Redux+Saga+Filter.swift in Sources */,
 				EE7111DB2235756400532177 /* Redux+Saga+Output.swift in Sources */,
 				EE3A11B9221D7F4A0023B445 /* Redux+Saga+Effects.swift in Sources */,
-				EE3A11BA221D7F4A0023B445 /* Redux+Saga+Do.swift in Sources */,
 				EE567CF22236BF5200E907F4 /* Redux+UniqueID.swift in Sources */,
 				EE3A11BB221D7F4A0023B445 /* Redux+Saga+Call.swift in Sources */,
 				EE3A11BC221D7F4A0023B445 /* Redux+Saga+Just.swift in Sources */,

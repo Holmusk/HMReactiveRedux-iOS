@@ -6,6 +6,8 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
+import RxSwift
+
 /// Hook up sagas by subscribing for inner values and dispatching action for
 /// each saga output every time a new action arrives.
 public struct SagaMiddleware<State> {
@@ -14,13 +16,15 @@ public struct SagaMiddleware<State> {
   public init<S>(monitor: SagaMonitorType, effects: S) where
     S: Sequence, S.Element == SagaEffect<Any>
   {
+    let disposeBag = DisposeBag()
+    
     self.middleware = {input in
       {wrapper in
         let lastState = input.lastState
         let sagaInput = SagaInput(monitor, lastState, wrapper.dispatch)
         let sagaOutputs = effects.map({$0.invoke(sagaInput)})
         let newWrapperId = "\(wrapper.identifier)-saga"
-        sagaOutputs.forEach({$0.subscribe({_ in})})
+        sagaOutputs.forEach({$0.subscribe({_ in}).disposed(by: disposeBag)})
         
         return DispatchWrapper(newWrapperId) {action in
           let dispatchResult = try! wrapper.dispatch(action).await()

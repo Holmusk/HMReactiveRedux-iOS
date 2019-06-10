@@ -108,32 +108,6 @@ public final class SagaEffects {
     return CatchErrorEffect(source, catcher)
   }
   
-  /// Create a do-on-value effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect.
-  ///   - selector: The side effect selector function.
-  /// - Returns: An Effect instance.
-  public static func doOnValue<R>(_ source: SagaEffect<R>,
-                                  selector: @escaping (R) throws -> Void)
-    -> DoOnValueEffect<R>
-  {
-    return DoOnValueEffect(source, selector)
-  }
-  
-  /// Create a do-on-error effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect.
-  ///   - selector: The side effect selector function.
-  /// - Returns: An Effect instance.
-  public static func doOnError<R>(_ source: SagaEffect<R>,
-                                  selector: @escaping (Error) throws -> Void)
-    -> DoOnErrorEffect<R>
-  {
-    return DoOnErrorEffect(source, selector)
-  }
-  
   /// Create an empty effect.
   ///
   /// - Returns: An Effect instance.

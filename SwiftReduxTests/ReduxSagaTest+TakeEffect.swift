@@ -23,6 +23,13 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     }
   }
   
+  private var disposeBag: DisposeBag!
+  
+  override public func setUp() {
+    super.setUp()
+    disposeBag = DisposeBag()
+  }
+  
   private func test_takeEffect_shouldTakeAppropriateActions(
     creator: (@escaping (Int) -> SagaEffect<Int>) -> SagaEffect<Int>,
     outputValues: [Int])
@@ -45,7 +52,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     var values: [Int] = []
     
     /// When
-    output.subscribe({values.append($0)})
+    output.subscribe({values.append($0)}).disposed(by: self.disposeBag)
     _ = monitor.dispatch(TakeAction.a)
     _ = monitor.dispatch(TakeAction.b)
     _ = monitor.dispatch(TakeAction.a)
@@ -66,10 +73,8 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     dispatchGroup.wait()
     XCTAssertEqual(values, outputValues)
     XCTAssertGreaterThan(monitor.dispatcherCount(), 0)
-    
-    DispatchQueue.main.async {
-      XCTAssertEqual(monitor.dispatcherCount(), 0)
-    }
+    disposeBag = nil
+    XCTAssertEqual(monitor.dispatcherCount(), 0)
   }
   
   public func test_takeEveryEffect_shouldTakeAllAction() {
@@ -103,7 +108,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     var values = [Int]()
     
     /// When
-    output.subscribe({values.append($0)})
+    output.subscribe({values.append($0)}).disposed(by: self.disposeBag)
     _ = monitor.dispatch(TakeAction.a)
     _ = monitor.dispatch(TakeAction.a)
     _ = monitor.dispatch(TakeAction.a)
