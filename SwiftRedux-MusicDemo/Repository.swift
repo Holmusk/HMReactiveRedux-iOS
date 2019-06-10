@@ -6,10 +6,11 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
+import RxSwift
 import Foundation
 
 public protocol AppRepositoryType {
-  func searchITunes(_ input: String, _ cb: @escaping (iTunesResult?, Error?) -> Void)
+  func searchITunes(_ input: String) -> Single<iTunesResult>
 }
 
 public struct AppRepository {
@@ -27,15 +28,19 @@ public struct AppRepository {
 extension AppRepository: AppRepositoryType {
   
   /// Call the iTunes API and decode the result into a custom data structure.
-  public func searchITunes(_ input: String, _ cb: @escaping (iTunesResult?, Error?) -> Void) {
-    self._api.searchITunes(input) {(d, err) in
-      do {
-        let data = try d.getOrThrow("")
-        let results = try self._decoder.decode(iTunesResult.self, from: data)
-        cb(results, nil)
-      } catch let e {
-        cb(nil, err ?? e)
+  public func searchITunes(_ input: String) -> Single<iTunesResult> {
+    return Single.create(subscribe: { event in
+      self._api.searchITunes(input) {(d, err) in
+        do {
+          let data = try d.getOrThrow("")
+          let results = try self._decoder.decode(iTunesResult.self, from: data)
+          event(.success(results))
+        } catch {
+          event(.error(error))
+        }
       }
-    }
+      
+      return Disposables.create {}
+    })
   }
 }

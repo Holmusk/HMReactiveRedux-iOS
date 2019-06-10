@@ -71,51 +71,6 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
   }
   
-  public func test_callEffect_shouldPerformAsyncWork() throws {
-    /// Setup
-    let error = SagaError.unimplemented
-    let input = SagaInput(SagaMonitor(), {()})
-    
-    let api1: (Int, @escaping (Try<Int>) -> Void) -> Void = {param, callback in
-      let delayTime = UInt64(2 * pow(10 as Double, 9))
-      let finalTime = DispatchTime.now().uptimeNanoseconds + delayTime
-      
-      DispatchQueue.global(qos: .background).asyncAfter(
-        deadline: DispatchTime(uptimeNanoseconds: finalTime),
-        execute: {callback(.success(param))
-      })
-    }
-    
-    let api2: (Int, @escaping (Try<Int>) -> Void) -> Void = {$1(.failure(error))}
-    let api3: (Int) -> Single<Int> = {_ in .error(error)}
-    let api4: (Int, @escaping (Int?, Error?) -> Void) -> Void = {$1($0, nil)}
-    let api5: (Int, @escaping (Int?, Error?) -> Void) -> Void = {$1(nil, error)}
-    let api6: (Int, @escaping (Int?, Error?) -> Void) -> Void = {$1(nil, nil)}
-    
-    let paramEffect = SagaEffects.just(300)
-    let effect1 = paramEffect.call(api1)
-    let effect2 = paramEffect.call(api2)
-    let effect3 = paramEffect.call(api3)
-    let effect4 = paramEffect.call(api4)
-    let effect5 = paramEffect.call(api5)
-    let effect6 = paramEffect.call(api6)
-    
-    let output1 = effect1.invoke(input)
-    let output2 = effect2.invoke(input)
-    let output3 = effect3.invoke(input)
-    let output4 = effect4.invoke(input)
-    let output5 = effect5.invoke(input)
-    let output6 = effect6.invoke(input)
-    
-    /// When && Then
-    XCTAssertEqual(try output1.await(timeoutMillis: self.timeout), 300)
-    XCTAssertEqual(try output4.await(timeoutMillis: self.timeout), 300)
-    XCTAssertThrowsError(try output2.await(timeoutMillis: self.timeout))
-    XCTAssertThrowsError(try output3.await(timeoutMillis: self.timeout))
-    XCTAssertThrowsError(try output5.await(timeoutMillis: self.timeout))
-    XCTAssertThrowsError(try output6.await(timeoutMillis: self.timeout))
-  }
-  
   public func test_justCallEffect_shouldReturnCorrectResult() throws {
     /// Setup
     let source = Single.just(1)

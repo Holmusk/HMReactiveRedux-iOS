@@ -14,98 +14,11 @@ import SwiftFP
 public final class SagaEffects {
   init() {}
   
-  /// Create an await effect with a creator function.
-  ///
-  /// - Parameter creator: Function that await for results from multiple effects.
-  /// - Returns: An Effect instance.
-  public static func await<R>(with creator: @escaping (SagaInput) -> R)
-    -> AwaitEffect<R>
-  {
-    return AwaitEffect(creator)
-  }
-  
-  /// Create a call effect with an Observable.
-  ///
-  /// - Parameters:
-  ///   - param: The parameter to call with.
-  ///   - callCreator: The call creator function.
-  /// - Returns: An Effect instance.
-  public static func call<R, R2>(with param: SagaEffect<R>,
-                                 callCreator: @escaping (R) -> Single<R2>)
-    -> CallEffect<R, R2>
-  {
-    return CallEffect(param, callCreator)
-  }
-  
-  /// Create a call effect with a callback-style async function.
-  ///
-  /// - Parameters:
-  ///   - param: The parameter to call with.
-  ///   - callCreator: The call creator function.
-  /// - Returns: An Effect instance.
-  public static func call<R, R2>(
-    with param: SagaEffect<R>,
-    callCreator: @escaping (R, @escaping (Try<R2>) -> Void) -> Void)
-    -> CallEffect<R, R2>
-  {
-    return call(with: param) {param in
-      return Observable.create({obs in
-        callCreator(param, {
-          do {
-            obs.onNext(try $0.getOrThrow())
-            obs.onCompleted()
-          } catch let e {
-            obs.onError(e)
-          }
-        })
-        
-        return Disposables.create()
-      }).asSingle()
-    }
-  }
-  
-  /// Create a call effect with a callback-style async function.
-  ///
-  /// - Parameters:
-  ///   - param: The parameter to call with.
-  ///   - callCreator: The call creator function.
-  /// - Returns: An Effect instance.
-  public static func call<R, R2>(
-    with param: SagaEffect<R>,
-    callCreator: @escaping (R, @escaping (R2?, Error?) -> Void) -> Void)
-    -> CallEffect<R, R2>
-  {
-    return call(with: param, callCreator: {(p, c: @escaping (Try<R2>) -> Void) in
-      callCreator(p) {r, e in
-        if let error = e {
-          c(Try.failure(error))
-        } else {
-          c(Try<R>.from(r))
-        }
-      }
-    })
-  }
-  
-  /// Create a call effect that simply accepts an external source.
-  ///
-  /// - Parameter source: The source stream.
-  /// - Returns: An Effect instance.
-  public static func call<R>(_ source: Single<R>) -> JustCallEffect<R> {
-    return JustCallEffect(source)
-  }
-  
-  /// Create an empty effect.
-  ///
-  /// - Returns: An Effect instance.
-  public static func empty<R>() -> EmptyEffect<R> {
-    return EmptyEffect()
-  }
-  
   /// Create a just effect.
   ///
   /// - Parameter value: The value to form the effect with.
   /// - Returns: An Effect instance.
-  public static func just<R>(_ value: R) -> JustEffect<R> {
+  static func just<R>(_ value: R) -> JustEffect<R> {
     return JustEffect(value)
   }
   
@@ -116,7 +29,7 @@ public final class SagaEffects {
   ///   - actionCreator: The action creator function.
   ///   - queue: The queue on which to dispatch the action.
   /// - Returns: An Effect instance.
-  public static func put<R>(
+  static func put<R>(
     _ param: SagaEffect<R>,
     actionCreator: @escaping (R) -> ReduxActionType,
     usingQueue queue: DispatchQueue = .global(qos: .default))
@@ -132,7 +45,7 @@ public final class SagaEffects {
   ///   - actionCreator: The action creator function.
   ///   - queue: The queue on which to dispatch the action.
   /// - Returns: An Effect instance.
-  public static func put<R>(
+  static func put<R>(
     _ param: R,
     actionCreator: @escaping (R) -> ReduxActionType,
     usingQueue queue: DispatchQueue = .global(qos: .default))
@@ -141,6 +54,31 @@ public final class SagaEffects {
     return self.put(SagaEffects.just(param),
                     actionCreator: actionCreator,
                     usingQueue: queue)
+  }
+  
+  /// Create an await effect with a creator function.
+  ///
+  /// - Parameter creator: Function that await for results from multiple effects.
+  /// - Returns: An Effect instance.
+  public static func await<R>(with creator: @escaping (SagaInput) -> R)
+    -> AwaitEffect<R>
+  {
+    return AwaitEffect(creator)
+  }
+  
+  /// Create a call effect that simply accepts an external source.
+  ///
+  /// - Parameter source: The source stream.
+  /// - Returns: An Effect instance.
+  public static func call<R>(_ source: Single<R>) -> JustCallEffect<R> {
+    return JustCallEffect(source)
+  }
+  
+  /// Create an empty effect.
+  ///
+  /// - Returns: An Effect instance.
+  public static func empty<R>() -> EmptyEffect<R> {
+    return EmptyEffect()
   }
   
   /// Convenience function to create a put effect that simply puts some action.

@@ -41,10 +41,8 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     let input = SagaInput(monitor, {()}, dispatch)
     
     let callEffectCreator: (Int) -> SagaEffect<Int> = {
-      SagaEffects.call(with: SagaEffects.just($0)) {
-        let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
-        return Single.just($0).delay(1, scheduler: scheduler)
-      }
+      let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
+      return SagaEffects.call(Single.just($0).delay(1, scheduler: scheduler))
     }
     
     let effect = creator(callEffectCreator)

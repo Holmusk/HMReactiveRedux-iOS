@@ -36,28 +36,11 @@ public final class AppSaga {
       SagaEffects.put(AppAction.updateAutocompleteProgress(true)).await(input)
       
       do {
-        let result = try SagaEffects
-          .call(with: SagaEffects.just(query), callCreator: api.searchITunes)
-          .await(input)
-        
+        let result = try SagaEffects.call(api.searchITunes(query)).await(input)
         SagaEffects.put(AppAction.updateITunesResults(result)).await(input)
       } catch {}
       
       SagaEffects.put(AppAction.updateAutocompleteProgress(false)).await(input)
     }
-  }
-  
-  /// Verbose saga to demonstrate full use of helper functions.
-  public static func verboseAutocompleteSaga(_ api: AppRepositoryType, _ input: String)
-    -> SagaEffect<Any>
-  {
-    /// Create an Effect wrapper from the input string.
-    let inputEffect = SagaEffects.just(input)
-    
-    /// Create a CallEffect to invoke the search API on the query.
-    let callEffect = SagaEffects.call(with: inputEffect, callCreator: api.searchITunes)
-    
-    /// Create a PutEffect to deposit search results into the Redux Store.
-    return SagaEffects.put(callEffect, actionCreator: AppAction.updateITunesResults)
   }
 }

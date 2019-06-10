@@ -53,22 +53,8 @@ public final class SagaOutput<T>: Awaitable<T> {
     return self.with(source: self.source.map(fn).flatMap({$0.source}))
   }
   
-  func flatMap<R>(_ fn: @escaping (T) throws -> Observable<R>) -> SagaOutput<R> {
-    return self.with(source: self.source.flatMap(fn))
-  }
-  
   func switchMap<R>(_ fn: @escaping (T) throws -> SagaOutput<R>) -> SagaOutput<R> {
     return self.with(source: self.source.map(fn).flatMapLatest({$0.source}))
-  }
-  
-  func catchError(_ fn: @escaping (Swift.Error) throws -> SagaOutput<T>) -> SagaOutput<T> {
-    return self.with(source: self.source.catchError({try fn($0).source}))
-  }
-  
-  func delay(bySeconds sec: TimeInterval,
-             usingQueue dispatchQueue: DispatchQueue) -> SagaOutput<T> {
-    let scheduler = ConcurrentDispatchQueueScheduler(queue: dispatchQueue)
-    return self.with(source: self.source.delay(sec, scheduler: scheduler))
   }
   
   func debounce(
@@ -79,10 +65,6 @@ public final class SagaOutput<T>: Awaitable<T> {
     guard sec > 0 else { return self }
     let scheduler = ConcurrentDispatchQueueScheduler(queue: dispatchQueue)
     return self.with(source: self.source.debounce(sec, scheduler: scheduler))
-  }
-  
-  func filter(_ fn: @escaping (T) throws -> Bool) -> SagaOutput<T> {
-    return self.with(source: self.source.filter(fn))
   }
   
   func observeOn(_ scheduler: SchedulerType) -> SagaOutput<T> {
