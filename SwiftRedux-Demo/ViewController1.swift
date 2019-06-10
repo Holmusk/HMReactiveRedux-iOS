@@ -6,7 +6,6 @@
 //  Copyright © 2017 Hai Pham. All rights reserved.
 //
 
-import MRProgress
 import SwiftRedux
 import SafeNest
 
@@ -39,10 +38,10 @@ final class ViewController1: UIViewController {
       
       if props.state.progress.getOrElse(false) {
         if props.state.progress != oldValue?.state.progress {
-          MRProgressOverlayView.showOverlayAdded(to: self.view, animated: true)
+          UIApplication.shared.isNetworkActivityIndicatorVisible = true
         }
       } else {
-        MRProgressOverlayView.dismissOverlay(for: self.view, animated: true)
+        UIApplication.shared.isNetworkActivityIndicatorVisible = false
       }
       
       let prevIndexes = oldValue?.state.textIndexes ?? []

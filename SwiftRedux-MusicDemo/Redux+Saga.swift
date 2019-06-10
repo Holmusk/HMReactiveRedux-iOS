@@ -12,7 +12,7 @@ import SwiftRedux
 public final class AppSaga {
   
   /// The app's saga branches.
-  public static func sagas(_ api: AppRepositoryType) -> [SagaEffect<Any>] {
+  public static func sagas(_ api: AppRepositoryType) -> [SagaEffect<()>] {
     return [
       SagaEffects.takeLatest(
         paramExtractor: self.autocompleteParam,
@@ -30,7 +30,7 @@ public final class AppSaga {
   }
   
   public static func autocompleteSaga(_ api: AppRepositoryType, _ query: String)
-    -> SagaEffect<Any>
+    -> SagaEffect<()>
   {
     return SagaEffects.await {input in
       SagaEffects.put(AppAction.updateAutocompleteProgress(true)).await(input)
@@ -44,7 +44,7 @@ public final class AppSaga {
       } catch {}
       
       SagaEffects.put(AppAction.updateAutocompleteProgress(false)).await(input)
-    }.cast(to: Any.self)
+    }
   }
   
   /// Verbose saga to demonstrate full use of helper functions.

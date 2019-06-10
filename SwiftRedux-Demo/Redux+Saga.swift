@@ -19,19 +19,20 @@ final class AppReduxSaga {
     }
   }
   
-  static func autocompleteSaga(_ input: String) -> SagaEffect<Any> {
-    return SagaEffects
-      .just(true).put(AppRedux.Action.progress)
-      .then(input).call(Api.performAutocomplete)
-      .doOnError({print($0)})
-      .catchError({["Error was caught: \($0)"]})
-      .doOnValue({print($0)})
-      .delay(bySeconds: 0.5)
-      .put(AppRedux.Action.texts)
-      .then(false).put(AppRedux.Action.progress)
+  static func autocompleteSaga(_ query: String) -> SagaEffect<()> {
+    return SagaEffects.await { input in
+      SagaEffects.put(AppRedux.Action.progress(true)).await(input)
+      
+      do {
+        let result = try SagaEffects.call(Api.performAutocomplete(query)).await(input)
+        SagaEffects.put(AppRedux.Action.texts(result)).await(input)
+      } catch {}
+      
+      SagaEffects.put(AppRedux.Action.progress(false)).await(input)
+    }
   }
   
-  static func sagas() -> [SagaEffect<Any>] {
+  static func sagas() -> [SagaEffect<()>] {
     return [
       SagaEffects.takeEvery(
         paramExtractor: extractAutocompleteInput,

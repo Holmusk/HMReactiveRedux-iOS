@@ -13,7 +13,7 @@ import XCTest
 public final class ReduxSagaTest: XCTestCase {
   typealias State = ()
   
-  private final class TestEffect: SagaEffect<Any> {
+  private final class TestEffect: SagaEffect<()> {
     var invokeCount: Int
     var onActionCount: Int
     var pastActions: [ReduxActionType]
@@ -24,10 +24,10 @@ public final class ReduxSagaTest: XCTestCase {
       self.pastActions = []
     }
     
-    override func invoke(_ input: SagaInput) -> SagaOutput<Any> {
+    override func invoke(_ input: SagaInput) -> SagaOutput<()> {
       self.invokeCount += 1
       
-      return SagaOutput(SagaMonitor(), .just(input.lastState())) {
+      return SagaOutput(SagaMonitor(), .just(())) {
         self.onActionCount += 1
         self.pastActions.append($0)
         return EmptyAwaitable.instance
@@ -50,9 +50,7 @@ public final class ReduxSagaTest: XCTestCase {
     
     self.dispatchCount = 0
     self.testEffect = TestEffect()
-
-    self.dispatch = SagaMiddleware(effects: [self.testEffect])
-      .middleware(input)(wrapper).dispatch
+    self.dispatch = SagaMiddleware(effects: [self.testEffect]).middleware(input)(wrapper).dispatch
   }
   
   public func test_sagaInputConvenienceConstructors_shouldWork() throws {

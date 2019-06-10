@@ -18,7 +18,7 @@ public final class SagaEffects {
   ///
   /// - Parameter creator: Function that await for results from multiple effects.
   /// - Returns: An Effect instance.
-  public static func await<R>(with creator: @escaping (SagaInput) throws -> R)
+  public static func await<R>(with creator: @escaping (SagaInput) -> R)
     -> AwaitEffect<R>
   {
     return AwaitEffect(creator)
@@ -94,38 +94,11 @@ public final class SagaEffects {
     return JustCallEffect(source)
   }
   
-  /// Create a catch error effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect.
-  ///   - catcher: The error catcher function.
-  /// - Returns: An Effect instance.
-  public static func catchError<R>(
-    _ source: SagaEffect<R>,
-    catcher: @escaping (Swift.Error) throws -> SagaEffect<R>)
-    -> CatchErrorEffect<R>
-  {
-    return CatchErrorEffect(source, catcher)
-  }
-  
   /// Create an empty effect.
   ///
   /// - Returns: An Effect instance.
   public static func empty<R>() -> EmptyEffect<R> {
     return EmptyEffect()
-  }
-  
-  /// Create a filter effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect to be filtered.
-  ///   - predicate: The filter predicate function.
-  /// - Returns: An Effect instance.
-  public static func filter<R>(_ source: SagaEffect<R>,
-                               predicate: @escaping (R) throws -> Bool)
-    -> SagaEffect<R>
-  {
-    return FilterEffect(source, predicate)
   }
   
   /// Create a just effect.
@@ -134,19 +107,6 @@ public final class SagaEffects {
   /// - Returns: An Effect instance.
   public static func just<R>(_ value: R) -> JustEffect<R> {
     return JustEffect(value)
-  }
-  
-  /// Create a map effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect.
-  ///   - mapper: The mapper function.
-  /// - Returns: An Effect instance.
-  public static func map<R, R2>(_ source: SagaEffect<R>,
-                                withMapper mapper: @escaping (R) throws -> R2)
-    -> MapEffect<R, R2>
-  {
-    return MapEffect(source, mapper)
   }
   
   /// Create a put effect.
@@ -204,38 +164,6 @@ public final class SagaEffects {
   public static func select<State, R>(_ selector: @escaping (State) -> R)
     -> SelectEffect<State, R> {
     return SelectEffect(selector)
-  }
-  
-  /// Create a sequentialize effect.
-  ///
-  /// - Parameters:
-  ///   - effect1: The first effect.
-  ///   - effect2: The second effect that must happen after the first.
-  ///   - selector: The result combine function.
-  /// - Returns: An Effect instance.
-  public static func sequentialize<R, R1, R2>(
-    _ effect1: SagaEffect<R1>,
-    _ effect2: SagaEffect<R2>,
-    selector: @escaping (R1, R2) throws -> R)
-    -> SequentializeEffect<R1, R2, R>
-  {
-    return SequentializeEffect(effect1, effect2, selector)
-  }
-  
-  /// Create a delay effect.
-  ///
-  /// - Parameters:
-  ///   - source: The source effect to be delayed.
-  ///   - sec: The time in seconds to delay by.
-  ///   - queue: The dispatch queue to delay on.
-  /// - Returns: An Effect instance.
-  public static func delay<R>(
-    _ source: SagaEffect<R>,
-    bySeconds sec: TimeInterval,
-    usingQueue queue: DispatchQueue = .global(qos: .default))
-    -> DelayEffect<R>
-  {
-    return DelayEffect(source, sec, queue)
   }
   
   /// Create a take every effect.

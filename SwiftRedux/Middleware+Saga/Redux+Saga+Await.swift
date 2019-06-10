@@ -12,15 +12,15 @@ import SwiftFP
 /// Effect whose output emits the value calculated by a creator function. It is
 /// important that all Saga effects involved in that function must return only
 /// one element - i.e. all single-value Saga effects.
-public final class AwaitEffect<T>: SagaEffect<Try<T>> {
-  private let _creator: (SagaInput) throws -> T
+public final class AwaitEffect<T>: SagaEffect<T> {
+  private let _creator: (SagaInput) -> T
   
-  init(_ creator: @escaping (SagaInput) throws -> T) {
+  init(_ creator: @escaping (SagaInput) -> T) {
     self._creator = creator
   }
   
-  override public func invoke(_ input: SagaInput) -> SagaOutput<Try<T>> {
-    return SagaOutput(input.monitor, .just(Try {try self._creator(input)}))
+  override public func invoke(_ input: SagaInput) -> SagaOutput<T> {
+    return SagaOutput(input.monitor, .just(self._creator(input)))
   }
 }
 

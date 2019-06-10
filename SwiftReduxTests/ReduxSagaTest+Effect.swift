@@ -45,20 +45,8 @@ public final class ReduxSagaEffectTest: XCTestCase {
     
     /// Then
     let dispatchedValues = dispatched.map({$0 as! Action}).map({$0.value})
-    XCTAssertEqual(result.value, 4)
+    XCTAssertEqual(result, 4)
     XCTAssertEqual(dispatchedValues, [0, 1, 2, 3])
-  }
-  
-  public func test_awaitEffectWithError_shouldReturnWrappedError() throws {
-    /// Setup
-    let error = SagaError.unimplemented
-    
-    /// When
-    let input = SagaInput(SagaMonitor(), {0})
-    let result = try SagaEffects.await {_ in throw error}.await(input)
-    
-    /// Then
-    XCTAssertEqual(result.error?.localizedDescription, error.errorDescription)
   }
   
   public func test_baseEffect_shouldThrowUnimplementedError() throws {
@@ -140,60 +128,6 @@ public final class ReduxSagaEffectTest: XCTestCase {
     XCTAssertEqual(result, 1)
   }
   
-  public func test_catchErrorEffect_shouldReturnFallback() throws {
-    /// Setup
-    let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
-
-    let source = SagaEffects.call(with: SagaEffects.just(1)) {_ in
-      return Single<Int>
-        .error(SagaError.unimplemented)
-        .delay(2, scheduler: scheduler)
-    }
-    
-    let caught = source.catchError({_ in 100})
-    let input = SagaInput(SagaMonitor(), {()})
-    let output1 = source.invoke(input)
-    let output2 = caught.invoke(input)
-    
-    /// When && Then
-    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
-    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), 100)
-  }
-  
-  public func test_compactMap_shouldFilterNilValues() {
-    /// Setup
-    let input = SagaInput(SagaMonitor(), {()})
-    let source = SagaEffects.just("a")
-    let effect1 = source.compactMap(Int.init)
-    let effect2 = source.compactMap({$0 + "b"})
-    let output1 = effect1.invoke(input)
-    let output2 = effect2.invoke(input)
-    
-    /// When && Then
-    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
-    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), "ab")
-  }
-  
-  public func test_delayEffect_shouldDelayEmission() throws {
-    /// Setup
-    var dispatchCount = 0
-    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
-    
-    let output = SagaEffects.just(400)
-      .delay(bySeconds: 1, usingQueue: .global(qos: .background))
-      .invoke(input)
-    
-    /// When
-    _ = dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
-    
-    /// Then
-    XCTAssertEqual(dispatchCount, 1)
-    XCTAssertEqual(try output.await(timeoutMillis: self.timeout), 400)
-  }
-  
   public func test_emptyEffect_shouldNotEmitAnything() throws {
     /// Setup
     var dispatchCount = 0
@@ -210,20 +144,6 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Then
     XCTAssertEqual(dispatchCount, 1)
     XCTAssertThrowsError(try output.await(timeoutMillis: self.timeout / 2))
-  }
-  
-  public func test_filterEffect_shouldFilterOutFailValues() throws {
-    /// Setup
-    let input = SagaInput(SagaMonitor(), {()})
-    let source = SagaEffects.just(1)
-    let effect1 = source.filter({$0 % 2 == 0})
-    let effect2 = source.filter({$0 % 2 == 1})
-    let output1 = effect1.invoke(input)
-    let output2 = effect2.invoke(input)
-    
-    /// When && Then
-    XCTAssertThrowsError(try output1.await(timeoutMillis: self.timeout))
-    XCTAssertEqual(try output2.await(timeoutMillis: self.timeout), 1)
   }
   
   public func test_justEffect_shouldEmitOnlyOneValue() throws {
@@ -245,19 +165,6 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Then
     XCTAssertEqual(dispatchCount, 1)
     [value1, value2, value3].forEach({XCTAssertEqual($0, 10)})
-  }
-  
-  public func test_mapEffect_shouldMapInnerValue() throws {
-    /// Setup
-    let input = SagaInput(SagaMonitor(), {()})
-    let effect = SagaEffects.just(1).map({$0 * 10}).cast(to: Int.self)
-    let output = effect.invoke(input)
-    
-    /// When
-    let value = try output.await(timeoutMillis: self.timeout)
-    
-    /// Then
-    XCTAssertEqual(value, 10)
   }
   
   public func test_putEffect_shouldDispatchPutAction() throws {
@@ -341,24 +248,5 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Then
     XCTAssertEqual(dispatchCount, 1)
     [value1, value2, value3].forEach({XCTAssertEqual($0, 100)})
-  }
-  
-  public func test_sequentializeEffect_shouldEnsureExecutionOrder() throws {
-    /// Setup
-    let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
-    
-    let effect1 = SagaEffects.call(with: SagaEffects.just(1)) {
-      Single.just($0).delay(2, scheduler: scheduler)
-    }
-    
-    let input = SagaInput(SagaMonitor(), {()})
-    let sequence = effect1.then(2)
-    let output = sequence.invoke(input)
-    
-    /// When
-    let value = try output.await(timeoutMillis: self.timeout)
-    
-    /// Then
-    XCTAssertEqual(value, 2)
   }
 }

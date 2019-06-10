@@ -15,6 +15,7 @@ public final class SagaOutput<T>: Awaitable<T> {
   let monitor: SagaMonitorType
   let onAction: AwaitableReduxDispatcher
   let source: Observable<T>
+  private let disposeBag: DisposeBag
   
   /// Create a Saga output instance. We need to register this output with a
   /// Saga monitor to trigger action dispatcher when one arrives.
@@ -28,6 +29,7 @@ public final class SagaOutput<T>: Awaitable<T> {
        _ onAction: @escaping AwaitableReduxDispatcher = NoopDispatcher.instance) {
     self.monitor = monitor
     self.onAction = onAction
+    disposeBag = DisposeBag()
     let uniqueID = DefaultUniqueIDProvider.next()
     
     self.source = source.do(
@@ -89,6 +91,10 @@ public final class SagaOutput<T>: Awaitable<T> {
   
   func subscribe(_ callback: @escaping (T) -> Void) -> Disposable {
     return self.source.subscribe(onNext: callback)
+  }
+  
+  func subscribeByDefault(_ callback: @escaping (T) -> Void) {
+    self.subscribe(callback).disposed(by: self.disposeBag)
   }
   
   override public func await() throws -> T {
