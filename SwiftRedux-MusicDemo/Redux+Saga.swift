@@ -15,32 +15,25 @@ public final class AppSaga {
   public static func sagas(_ api: AppRepositoryType) -> [SagaEffect<()>] {
     return [
       SagaEffects
-        .take(self.autocompleteParam)
+        .take {(action: AppAction) -> String? in
+          switch action {
+          case .updateAutocompleteInput(let input): return input
+          default: return nil
+          }
+        }
         .debounce(bySeconds: 0.5)
-        .switchMap({self.autocompleteSaga(api, $0)})
+        .switchMap({ query in
+          return SagaEffects.await {input in
+            SagaEffects.put(AppAction.updateAutocompleteProgress(true)).await(input)
+            
+            do {
+              let result = try SagaEffects.call(api.searchITunes(query)).await(input)
+              SagaEffects.put(AppAction.updateITunesResults(result)).await(input)
+            } catch {}
+            
+            SagaEffects.put(AppAction.updateAutocompleteProgress(false)).await(input)
+          }
+        })
     ]
-  }
-  
-  /// Extract the autocomplete query from an action.
-  public static func autocompleteParam(_ action: AppAction) -> String? {
-    switch action {
-    case .updateAutocompleteInput(let input): return input
-    default: return nil
-    }
-  }
-  
-  public static func autocompleteSaga(_ api: AppRepositoryType, _ query: String)
-    -> SagaEffect<()>
-  {
-    return SagaEffects.await {input in
-      SagaEffects.put(AppAction.updateAutocompleteProgress(true)).await(input)
-      
-      do {
-        let result = try SagaEffects.call(api.searchITunes(query)).await(input)
-        SagaEffects.put(AppAction.updateITunesResults(result)).await(input)
-      } catch {}
-      
-      SagaEffects.put(AppAction.updateAutocompleteProgress(false)).await(input)
-    }
   }
 }

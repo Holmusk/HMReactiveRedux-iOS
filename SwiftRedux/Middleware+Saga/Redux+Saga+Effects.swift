@@ -60,9 +60,7 @@ public final class SagaEffects {
   ///
   /// - Parameter creator: Function that await for results from multiple effects.
   /// - Returns: An Effect instance.
-  public static func await<R>(with creator: @escaping (SagaInput) -> R)
-    -> AwaitEffect<R>
-  {
+  public static func await<R>(with creator: @escaping (SagaInput) -> R) -> AwaitEffect<R> {
     return AwaitEffect(creator)
   }
   
@@ -112,5 +110,17 @@ public final class SagaEffects {
     -> TakeEffect<Action, R> where Action: ReduxActionType
   {
     return TakeEffect(fn)
+  }
+  
+  /// Create a take effect with some type helpers.
+  ///
+  /// - Parameters:
+  ///   - type: The Action type.
+  ///   - fn: The param extractor function.
+  /// - Returns: An Effect instance.
+  public static func take<Action, R>(type: Action.Type, _ fn: @escaping (Action) -> R?)
+    -> TakeEffect<Action, R> where Action: ReduxActionType
+  {
+    return self.take(fn)
   }
 }

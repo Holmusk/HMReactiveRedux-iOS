@@ -17,12 +17,15 @@ public typealias MonoEffectTransformer<R> = SagaEffectTransformer<R, R>
 /// Base class for a side effect that is able to produce an output stream
 /// based on the current state of the Redux store. Subclasses must override
 /// the main invocation method to customize the saga output.
-public class SagaEffect<R>: SagaEffectType {
+public class SagaEffect<R> {
   init() {}
   
   public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     return SagaOutput(input.monitor, .error(SagaError.unimplemented))
   }
-  
+}
+
+// MARK: - SagaEffectType
+extension SagaEffect: SagaEffectType {
   public func asEffect() -> SagaEffect<R> { return self }
 }
