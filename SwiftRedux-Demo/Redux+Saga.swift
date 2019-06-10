@@ -34,10 +34,10 @@ final class AppReduxSaga {
   
   static func sagas() -> [SagaEffect<()>] {
     return [
-      SagaEffects.takeEvery(
-        paramExtractor: extractAutocompleteInput,
-        effectCreator: autocompleteSaga,
-        options: TakeOptions.builder().with(debounce: 0.5).build())
+      SagaEffects
+        .take(extractAutocompleteInput)
+        .debounce(bySeconds: 0.5)
+        .switchMap(autocompleteSaga)
     ]
   }
 }

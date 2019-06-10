@@ -91,11 +91,9 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
   
   public func test_takeEffectDebounce_shouldThrottleEmissions() {
     /// Setup
-    let options = TakeOptions.builder().with(debounce: 2).build()
-    
-    let effect = SagaEffects.take(
-      paramExtractor: {(_: TakeAction) in 1},
-      options: options)
+    let effect = SagaEffects
+      .take(paramExtractor: {(_: TakeAction) in 1})
+      .debounce(bySeconds: 2)
     
     let monitor = SagaMonitor()
     let input = SagaInput(monitor, {()})

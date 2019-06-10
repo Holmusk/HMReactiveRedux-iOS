@@ -106,15 +106,11 @@ public final class SagaEffects {
   
   /// Create a take effect.
   ///
-  /// - Parameters:
-  ///   - paramExtractor: The param extractor function.
-  ///   - options: Additional take options.
+  /// - Parameter fn: The param extractor function.
   /// - Returns: An Effect instance.
-  public static func take<Action, R>(
-    paramExtractor: @escaping (Action) -> R?,
-    options: TakeOptions = .default())
+  public static func take<Action, R>(_ fn: @escaping (Action) -> R?)
     -> TakeEffect<Action, R> where Action: ReduxActionType
   {
-    return TakeEffect(paramExtractor, options)
+    return TakeEffect(fn)
   }
 }

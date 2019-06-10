@@ -14,10 +14,10 @@ public final class AppSaga {
   /// The app's saga branches.
   public static func sagas(_ api: AppRepositoryType) -> [SagaEffect<()>] {
     return [
-      SagaEffects.takeLatest(
-        paramExtractor: self.autocompleteParam,
-        effectCreator: {self.autocompleteSaga(api, $0)},
-        options: TakeOptions.builder().with(debounce: 0.5).build())
+      SagaEffects
+        .take(self.autocompleteParam)
+        .debounce(bySeconds: 0.5)
+        .switchMap({self.autocompleteSaga(api, $0)})
     ]
   }
   

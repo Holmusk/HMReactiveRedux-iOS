@@ -57,13 +57,9 @@ public final class SagaOutput<T>: Awaitable<T> {
     return self.with(source: self.source.map(fn).flatMapLatest({$0.source}))
   }
   
-  func debounce(
-    bySeconds sec: TimeInterval,
-    usingQueue dispatchQueue: DispatchQueue = .global(qos: .default))
-    -> SagaOutput<T>
-  {
+  func debounce(bySeconds sec: TimeInterval,
+                usingScheduler scheduler: SchedulerType) -> SagaOutput<T> {
     guard sec > 0 else { return self }
-    let scheduler = ConcurrentDispatchQueueScheduler(queue: dispatchQueue)
     return self.with(source: self.source.debounce(sec, scheduler: scheduler))
   }
   

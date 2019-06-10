@@ -86,15 +86,4 @@ public final class ReduxSagaTest: XCTestCase {
       [.noop, .noop, .noop, .noop]
     )
   }
-  
-  public func test_transformingOutput_shouldWork() throws {
-    /// Setup
-    let output = SagaOutput(SagaMonitor(), .just(0)).map({$0 + 1}).debounce(bySeconds: 1)
-    
-    /// When
-    let value = try output.await(timeoutMillis: 10000)
-    
-    /// Then
-    XCTAssertEqual(value, 1)
-  }
 }

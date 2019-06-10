@@ -12,21 +12,17 @@ import RxSwift
 /// ones to perform additional work on.
 public class TakeEffect<Action, P>: SagaEffect<P> where Action: ReduxActionType {
   private let _paramExtractor: (Action) -> P?
-  private let _options: TakeOptions
   
-  init(_ paramExtractor: @escaping (Action) -> P?,
-       _ options: TakeOptions) {
+  init(_ paramExtractor: @escaping (Action) -> P?) {
     self._paramExtractor = paramExtractor
-    self._options = options
   }
   
   override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     let paramStream = PublishSubject<P>()
-    let debounce = self._options.debounce
     
     return SagaOutput(input.monitor, paramStream) {
       ($0 as? Action).flatMap(self._paramExtractor).map(paramStream.onNext)
       return EmptyAwaitable.instance
-      }.debounce(bySeconds: debounce)
+    }
   }
 }
