@@ -16,10 +16,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public typealias State = ()
   
   private let timeout: Double = 10_000
+  private var disposeBag: DisposeBag!
   
   override public func setUp() {
     super.setUp()
     _ = SagaEffects()
+    disposeBag = DisposeBag()
   }
   
   public func test_awaitEffect_shouldExecuteSynchronously() throws {
@@ -99,6 +101,32 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Then
     XCTAssertEqual(dispatchCount, 1)
     XCTAssertThrowsError(try output.await(timeoutMillis: self.timeout / 2))
+  }
+  
+  public func test_fromEffect_shouldStreamCorrectValues() throws {
+    /// Setup
+    let scheduler = TestScheduler(initialClock: 0)
+    let observer = scheduler.createObserver(Try<Int>.self)
+    
+    let source = Observable<Int>
+      .interval(Double(1), scheduler: scheduler)
+      .take(10)
+      .map({(value: Int) -> Int in
+        if value % 2 == 0 { return value }
+        throw SagaError.unavailable
+      })
+    
+    let effect = SagaEffects.from(source)
+    let input = SagaInput(SagaMonitor(), {()}, NoopDispatcher.instance)
+    effect.invoke(input).source.subscribe(observer).disposed(by: self.disposeBag)
+    
+    /// When
+    scheduler.advanceTo(200_000_000_000)
+    
+    /// Then
+    let events = observer.events
+    XCTAssertEqual(events.count, 3)
+    XCTAssertEqual(events.compactMap({$0.value.element?.value}).count, 1)
   }
   
   public func test_justEffect_shouldEmitOnlyOneValue() throws {

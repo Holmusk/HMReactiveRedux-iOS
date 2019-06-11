@@ -79,6 +79,14 @@ public final class SagaEffects {
     return EmptyEffect()
   }
   
+  /// Create a from effect using a source Observable.
+  ///
+  /// - Parameter source: The source stream.
+  /// - Returns: An Effect instance.
+  public static func from<O>(_ source: O) -> FromEffect<O> where O: ObservableConvertibleType {
+    return FromEffect(source)
+  }
+  
   /// Convenience function to create a put effect that simply puts some action.
   ///
   /// - Parameters:
