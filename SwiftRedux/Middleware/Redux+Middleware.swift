@@ -6,6 +6,12 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
+/// Function that maps one dispatch to another.
+public typealias DispatchMapper = (DispatchWrapper) -> DispatchWrapper
+
+/// Redux store middleware which has access to the store's functionalities.
+public typealias ReduxMiddleware<State> = (MiddlewareInput<State>) -> DispatchMapper
+
 /// Use this tracker to track middleware wrapping with an identifier (e.g. to
 /// ensure the ordering is correct).
 public struct DispatchWrapper {
@@ -21,18 +27,26 @@ public struct DispatchWrapper {
 /// Convenience container to expose basic store functionalities to allow
 /// middlewares.
 public struct MiddlewareInput<State> {
+  public let dispatcher: AwaitableReduxDispatcher
   public let lastState: ReduxStateGetter<State>
   
-  init(_ lastState: @escaping ReduxStateGetter<State>) {
+  init(_ dispatcher: @escaping AwaitableReduxDispatcher,
+       _ lastState: @escaping ReduxStateGetter<State>) {
+    self.dispatcher = dispatcher
     self.lastState = lastState
   }
 }
 
-/// Function that maps one dispatch to another.
-public typealias DispatchMapper = (DispatchWrapper) -> DispatchWrapper
-
-/// Redux store middleware which has access to the store's functionalities.
-public typealias ReduxMiddleware<State> = (MiddlewareInput<State>) -> DispatchMapper
+/// A lazily initialized dispatcher to help create the middleware input.
+private final class LazyDispatcher {
+  var lateinitDispatcher: AwaitableReduxDispatcher!
+  public private(set) var dispatch: AwaitableReduxDispatcher
+  
+  init() {
+    self.dispatch = {_ in EmptyAwaitable.instance}
+    self.dispatch = {self.lateinitDispatcher!($0)}
+  }
+}
 
 /// Combine middlewares into one single middleware, and wrap the store's
 /// dispatch with the combined middleware.
@@ -45,7 +59,8 @@ func combineMiddlewares<S>(_ middlewares: [ReduxMiddleware<S.State>])
   -> (S) -> DispatchWrapper where S: ReduxStoreType
 {
   return {store in
-    let input = MiddlewareInput(store.lastState)
+    let lazyDispatcher = LazyDispatcher()
+    let input = MiddlewareInput(lazyDispatcher.dispatch, store.lastState)
     let rootWrapper = DispatchWrapper("root", store.dispatch)
     
     if let firstMiddleware = middlewares.first {
@@ -55,7 +70,9 @@ func combineMiddlewares<S>(_ middlewares: [ReduxMiddleware<S.State>])
         {input in {a(input)(b(input)($0))}}
       })
     
-      return combined(input)(rootWrapper)
+      let finalWrapper = combined(input)(rootWrapper)
+      lazyDispatcher.lateinitDispatcher = finalWrapper.dispatch
+      return DispatchWrapper(finalWrapper.identifier, lazyDispatcher.dispatch)
     }
     
     return rootWrapper

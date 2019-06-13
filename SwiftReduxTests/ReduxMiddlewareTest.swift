@@ -9,18 +9,24 @@
 import XCTest
 @testable import SwiftRedux
 
-final class ReduxMiddlewareTest: XCTestCase {
+public final class ReduxMiddlewareTest: XCTestCase {
+  struct State {
+    let a: Int
+    
+    func increment() -> State {
+      return State(a: self.a + 1)
+    }
+  }
+  
   private var store: SimpleStore<State>!
   
-  override func setUp() {
+  override public func setUp() {
     super.setUp()
     let initState = State(a: 0)
     self.store = SimpleStore.create(initState, {s, a in s.increment()})
   }
-}
 
-extension ReduxMiddlewareTest {
-  func test_applyingMiddlewares_shouldWrapBaseStore() {
+  public func test_applyingMiddlewares_shouldWrapBaseStore() {
     /// Setup
     var data: [Int] = []
     var subscribedValue = 0
@@ -68,21 +74,54 @@ extension ReduxMiddlewareTest {
     subscription.unsubscribe()
   }
   
-  func test_wrappingWithNoMiddlewares_shouldReturnBaseDispatch() {
+  public func test_dispatchingWithInputDispatcher_shouldGoThroughAllMiddlewares() {
+    /// Setup
+    var dispatchCount: Int64 = 0
+    var dispatchedWithInput: Int64 = 0
+    
+    let middlewares: [ReduxMiddleware<State>] = [
+      {input in
+        {wrapper in DispatchWrapper("\(wrapper.identifier)-1", {
+          OSAtomicIncrement64(&dispatchCount)
+          _ = try! wrapper.dispatch($0).await()
+          return EmptyAwaitable.instance
+        })}
+      },
+      {input in
+        {wrapper in DispatchWrapper("\(wrapper.identifier)-2", {
+          OSAtomicIncrement64(&dispatchCount)
+          _ = try! wrapper.dispatch($0).await()
+          return EmptyAwaitable.instance
+        })}
+      },
+      {input in
+        {wrapper in DispatchWrapper("\(wrapper.identifier)-3", {
+          OSAtomicIncrement64(&dispatchCount)
+          
+          if OSAtomicIncrement64(&dispatchedWithInput) == 1 {
+            _ = try! input.dispatcher($0).await()
+          }
+          
+          _ = try! wrapper.dispatch($0).await()
+          return EmptyAwaitable.instance
+        })}
+      }
+    ]
+    
+    let newStore = applyMiddlewares(middlewares)(self.store)
+    
+    /// When
+    _ = try! newStore.dispatch(DefaultAction.noop).await()
+    
+    /// Then
+    XCTAssertEqual(dispatchCount, 6)
+  }
+  
+  public func test_wrappingWithNoMiddlewares_shouldReturnBaseDispatch() {
     /// Setup && When
     let wrapper = combineMiddlewares([])(self.store)
     
     /// Then
     XCTAssertEqual(wrapper.identifier, "root")
-  }
-}
-
-extension ReduxMiddlewareTest {
-  struct State {
-    let a: Int
-    
-    func increment() -> State {
-      return State(a: self.a + 1)
-    }
   }
 }

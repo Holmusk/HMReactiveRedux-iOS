@@ -16,7 +16,7 @@ final class ReduxRouterTest: XCTestCase {
   
   override func setUp() {
     super.setUp()
-    let input = MiddlewareInput({()})
+    let input = MiddlewareInput(NoopDispatcher.instance, {()})
     
     let wrapper = DispatchWrapper("", {_ in
       self.dispatchCount += 1

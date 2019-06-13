@@ -41,7 +41,7 @@ public final class ReduxSagaTest: XCTestCase {
   
   override public func setUp() {
     super.setUp()
-    let input = MiddlewareInput({()})
+    let input = MiddlewareInput(NoopDispatcher.instance, {()})
     
     let wrapper = DispatchWrapper("") {_ in
       self.dispatchCount += 1
