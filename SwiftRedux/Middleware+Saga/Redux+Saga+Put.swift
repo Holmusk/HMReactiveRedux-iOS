@@ -28,7 +28,7 @@ public final class PutEffect<P>: SagaEffect<Any> {
     return _param.invoke(input)
       .map(self._actionCreator)
       .observeOn(ConcurrentDispatchQueueScheduler(queue: self._dispatchQueue))
-      .map(input.dispatch)
+      .map(input.dispatcher)
   }
   
   /// Await for the first result that arrives. Since this can never throw an

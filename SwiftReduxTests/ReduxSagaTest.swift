@@ -50,7 +50,7 @@ public final class ReduxSagaTest: XCTestCase {
     
     self.dispatchCount = 0
     self.testEffect = TestEffect()
-    self.dispatch = SagaMiddleware(effects: [self.testEffect]).middleware(input)(wrapper).dispatch
+    self.dispatch = SagaMiddleware(effects: [self.testEffect]).middleware(input)(wrapper).dispatcher
   }
   
   public func test_sagaInputConvenienceConstructors_shouldWork() throws {
@@ -58,7 +58,7 @@ public final class ReduxSagaTest: XCTestCase {
     let input = SagaInput(SagaMonitor(), {()})
     
     /// When
-    let result = try input.dispatch(DefaultAction.noop).await()
+    let result = try input.dispatcher(DefaultAction.noop).await()
     
     /// Then
     XCTAssertTrue(result is ())

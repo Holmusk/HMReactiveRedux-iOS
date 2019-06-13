@@ -31,13 +31,13 @@ public struct SagaMiddleware<State> {
     
     return {wrapper in
       let lastState = input.lastState
-      let sagaInput = SagaInput(monitor, lastState, wrapper.dispatch)
+      let sagaInput = SagaInput(monitor, lastState, input.dispatcher)
       let sagaOutputs = effects.map({$0.invoke(sagaInput)})
       let newWrapperId = "\(wrapper.identifier)-saga"
       sagaOutputs.forEach({$0.subscribeByDefault({_ in})})
       
       return DispatchWrapper(newWrapperId) {action in
-        let dispatchResult = try! wrapper.dispatch(action).await()
+        let dispatchResult = try! wrapper.dispatcher(action).await()
         _ = try! monitor.dispatch(action).await()
         sagaOutputs.forEach({_ = $0.onAction(action)})
         return JustAwaitable(dispatchResult)

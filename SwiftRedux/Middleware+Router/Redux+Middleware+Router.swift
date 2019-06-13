@@ -37,7 +37,7 @@ public struct RouterMiddleware<State> {
             DispatchQueue.main.async {router.navigate(screen)}
           }
           
-          return wrapper.dispatch(action)
+          return wrapper.dispatcher(action)
         }
       }
     }

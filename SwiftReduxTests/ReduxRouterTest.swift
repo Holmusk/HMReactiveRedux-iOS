@@ -27,7 +27,7 @@ final class ReduxRouterTest: XCTestCase {
     self.dispatchCount = 0
 
     self.dispatch = RouterMiddleware(router: self.router)
-      .middleware(input)(wrapper).dispatch
+      .middleware(input)(wrapper).dispatcher
   }
 }
 

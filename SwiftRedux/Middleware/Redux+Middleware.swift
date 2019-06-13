@@ -15,12 +15,12 @@ public typealias ReduxMiddleware<State> = (MiddlewareInput<State>) -> DispatchMa
 /// Use this tracker to track middleware wrapping with an identifier (e.g. to
 /// ensure the ordering is correct).
 public struct DispatchWrapper {
-  let dispatch: AwaitableReduxDispatcher
+  let dispatcher: AwaitableReduxDispatcher
   let identifier: String
   
-  init(_ identifier: String, _ dispatch: @escaping AwaitableReduxDispatcher) {
+  init(_ identifier: String, _ dispatcher: @escaping AwaitableReduxDispatcher) {
     self.identifier = identifier
-    self.dispatch = dispatch
+    self.dispatcher = dispatcher
   }
 }
 
@@ -71,7 +71,7 @@ func combineMiddlewares<S>(_ middlewares: [ReduxMiddleware<S.State>])
       })
     
       let finalWrapper = combined(input)(rootWrapper)
-      lazyDispatcher.lateinitDispatcher = finalWrapper.dispatch
+      lazyDispatcher.lateinitDispatcher = finalWrapper.dispatcher
       return DispatchWrapper(finalWrapper.identifier, lazyDispatcher.dispatch)
     }
     
@@ -90,7 +90,7 @@ public func applyMiddlewares<Store>(
 {
   return {store in
     let wrapper = combineMiddlewares(middlewares)(store)
-    let enhanced = EnhancedStore(store, wrapper.dispatch)
+    let enhanced = EnhancedStore(store, wrapper.dispatcher)
     return DelegateStore(enhanced)
   }
 }

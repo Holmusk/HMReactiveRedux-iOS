@@ -35,7 +35,7 @@ public final class ReduxMiddlewareTest: XCTestCase {
       {input in
         {wrapper in DispatchWrapper("\(wrapper.identifier)-1", {
           data.append(1)
-          _ = wrapper.dispatch($0)
+          _ = wrapper.dispatcher($0)
           return EmptyAwaitable.instance
           
         })}
@@ -43,14 +43,14 @@ public final class ReduxMiddlewareTest: XCTestCase {
       {input in
         {wrapper in DispatchWrapper("\(wrapper.identifier)-2", {
           data.append(2)
-          _ = wrapper.dispatch($0)
+          _ = wrapper.dispatcher($0)
           return EmptyAwaitable.instance
         })}
       },
       {input in
         {wrapper in DispatchWrapper("\(wrapper.identifier)-3", {
           data.append(3)
-          _ = wrapper.dispatch($0)
+          _ = wrapper.dispatcher($0)
           return EmptyAwaitable.instance
         })}
       }
@@ -83,14 +83,14 @@ public final class ReduxMiddlewareTest: XCTestCase {
       {input in
         {wrapper in DispatchWrapper("\(wrapper.identifier)-1", {
           OSAtomicIncrement64(&dispatchCount)
-          _ = try! wrapper.dispatch($0).await()
+          _ = try! wrapper.dispatcher($0).await()
           return EmptyAwaitable.instance
         })}
       },
       {input in
         {wrapper in DispatchWrapper("\(wrapper.identifier)-2", {
           OSAtomicIncrement64(&dispatchCount)
-          _ = try! wrapper.dispatch($0).await()
+          _ = try! wrapper.dispatcher($0).await()
           return EmptyAwaitable.instance
         })}
       },
@@ -102,7 +102,7 @@ public final class ReduxMiddlewareTest: XCTestCase {
             _ = try! input.dispatcher($0).await()
           }
           
-          _ = try! wrapper.dispatch($0).await()
+          _ = try! wrapper.dispatcher($0).await()
           return EmptyAwaitable.instance
         })}
       }
