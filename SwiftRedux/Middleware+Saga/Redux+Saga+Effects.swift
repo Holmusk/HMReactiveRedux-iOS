@@ -72,6 +72,14 @@ public final class SagaEffects {
     return JustCallEffect(source)
   }
   
+  /// Create a delay effect.
+  ///
+  /// - Parameter delay: The time to delay by.
+  /// - Returns: An Effect instance.
+  public static func delay(bySeconds delay: TimeInterval) -> DelayEffect {
+    return DelayEffect(delay)
+  }
+  
   /// Create an empty effect.
   ///
   /// - Returns: An Effect instance.

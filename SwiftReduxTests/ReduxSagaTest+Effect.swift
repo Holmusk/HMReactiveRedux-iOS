@@ -85,6 +85,28 @@ public final class ReduxSagaEffectTest: XCTestCase {
     XCTAssertEqual(result, 1)
   }
   
+  public func test_delayEffect_shouldDelayAwaitBlock() {
+    /// Setup
+    var elapsed: UInt64 = 0
+    
+    let effect = SagaEffects.await(with: {input in
+      let start = DispatchTime.now().uptimeNanoseconds
+      SagaEffects.put(DefaultAction.noop).await(input)
+      SagaEffects.delay(bySeconds: 0.5).await(input)
+      SagaEffects.put(DefaultAction.noop).await(input)
+      elapsed = DispatchTime.now().uptimeNanoseconds - start
+    })
+    
+    /// When
+    var dispatched = [ReduxActionType]()
+    let input = SagaInput(SagaMonitor(), {()}, {dispatched.append($0)})
+    try? effect.await(input)
+    
+    /// Then
+    XCTAssertEqual(dispatched.count, 2)
+    XCTAssertLessThanOrEqual(UInt64(0.5 * pow(10, 9)), elapsed)
+  }
+  
   public func test_emptyEffect_shouldNotEmitAnything() throws {
     /// Setup
     var dispatchCount = 0
