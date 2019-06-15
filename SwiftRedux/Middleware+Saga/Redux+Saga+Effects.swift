@@ -82,8 +82,9 @@ public final class SagaEffects {
   
   /// Create an empty effect.
   ///
+  /// - Parameter type: The type of emission.
   /// - Returns: An Effect instance.
-  public static func empty<R>() -> EmptyEffect<R> {
+  public static func empty<R>(forType type: R.Type) -> EmptyEffect<R> {
     return EmptyEffect()
   }
   

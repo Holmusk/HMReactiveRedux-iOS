@@ -6,27 +6,34 @@
 //  Copyright © 2019 Hai Pham. All rights reserved.
 //
 
+import Foundation
+
 /// Default Saga monitor implementation.
 public final class SagaMonitor {
   private typealias UniqueID = UniqueIDProviderType.UniqueID
-  private var _dispatchers: [UniqueID : AwaitableReduxDispatcher]
-  private let _lock: ReadWriteLockType
+  private var dispatchers: [UniqueID : AwaitableReduxDispatcher]
+  private let lock: NSRecursiveLock
   
-  public lazy private(set) var dispatch: AwaitableReduxDispatcher = {action in
-    self._lock.modify {
-      let awaitables = self._dispatchers.map({_, value in value(action)})
+  public private(set) var dispatch: AwaitableReduxDispatcher
+  
+  public init() {
+    self.dispatchers = [:]
+    self.lock = NSRecursiveLock()
+    self.dispatch = {_ in EmptyAwaitable.instance}
+    
+    self.dispatch = {action in
+      self.lock.lock()
+      defer { self.lock.unlock() }
+      let awaitables = self.dispatchers.map({_, value in value(action)})
       let results = try? BatchAwaitable(awaitables).await()
       return JustAwaitable(results as Any)
     }
   }
   
-  public init() {
-    self._dispatchers = [:]
-    self._lock = ReadWriteLock()
-  }
-  
   func dispatcherCount() -> Int {
-    return self._lock.access { self._dispatchers.count }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    return self.dispatchers.count
   }
 }
 
@@ -37,10 +44,14 @@ extension SagaMonitor: ReduxDispatcherProviderType {}
 extension SagaMonitor: SagaMonitorType {
   public func addDispatcher(_ uniqueID: UniqueIDProviderType.UniqueID,
                             _ dispatch: @escaping AwaitableReduxDispatcher) {
-    self._lock.modify { self._dispatchers[uniqueID] = dispatch }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    self.dispatchers[uniqueID] = dispatch
   }
   
   public func removeDispatcher(_ uniqueID: Int64) {
-    self._lock.modify { _ = self._dispatchers.removeValue(forKey: uniqueID) }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    _ = self.dispatchers.removeValue(forKey: uniqueID)
   }
 }

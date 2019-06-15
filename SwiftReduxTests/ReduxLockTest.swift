@@ -13,8 +13,8 @@ final class ReduxLockTest: XCTestCase {
   #if DEBUG
   func test_readWriteLock_shouldDestroyLockOnDeinit() {
     /// Setup
-    var _lock = pthread_rwlock_t()
-    var disposableLock: ReadWriteLock? = .init(&_lock)
+    var lock = pthread_rwlock_t()
+    var disposableLock: ReadWriteLock? = .init(&lock)
     let dispatchGroup = DispatchGroup()
     dispatchGroup.enter()
     
@@ -32,7 +32,7 @@ final class ReduxLockTest: XCTestCase {
     dispatchGroup.wait()
     
     /// Then
-    XCTAssertNotEqual(pthread_rwlock_destroy(&_lock), 0)
+    XCTAssertNotEqual(pthread_rwlock_destroy(&lock), 0)
   }
   #endif
   

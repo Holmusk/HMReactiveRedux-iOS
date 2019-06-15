@@ -113,7 +113,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     let monitor = SagaMonitor()
     let input = SagaInput(monitor, {()}, dispatch)
-    let effect: SagaEffect<Int> = SagaEffects.empty()
+    let effect = SagaEffects.empty(forType: Int.self)
     let output = effect.invoke(input)
     
     /// When

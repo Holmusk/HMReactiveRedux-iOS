@@ -11,48 +11,6 @@ import XCTest
 @testable import SwiftRedux
 
 public final class ReduxSagaTest: XCTestCase {
-  typealias State = ()
-  
-  private final class TestEffect: SagaEffect<()> {
-    var invokeCount: Int
-    var onActionCount: Int
-    var pastActions: [ReduxActionType]
-    
-    override init() {
-      self.invokeCount = 0
-      self.onActionCount = 0
-      self.pastActions = []
-    }
-    
-    override func invoke(_ input: SagaInput) -> SagaOutput<()> {
-      self.invokeCount += 1
-      
-      return SagaOutput(SagaMonitor(), .just(())) {
-        self.onActionCount += 1
-        self.pastActions.append($0)
-        return EmptyAwaitable.instance
-      }
-    }
-  }
-  
-  private var dispatch: AwaitableReduxDispatcher!
-  private var dispatchCount: Int!
-  private var testEffect: TestEffect!
-  
-  override public func setUp() {
-    super.setUp()
-    let input = MiddlewareInput(NoopDispatcher.instance, {()})
-    
-    let wrapper = DispatchWrapper("") {_ in
-      self.dispatchCount += 1
-      return EmptyAwaitable.instance
-    }
-    
-    self.dispatchCount = 0
-    self.testEffect = TestEffect()
-    self.dispatch = SagaMiddleware(effects: [self.testEffect]).middleware(input)(wrapper).dispatcher
-  }
-  
   public func test_sagaInputConvenienceConstructors_shouldWork() throws {
     /// Setup
     let input = SagaInput(SagaMonitor(), {()})
@@ -71,19 +29,50 @@ public final class ReduxSagaTest: XCTestCase {
   }
   
   public func test_receivingAction_shouldInvokeSagaEffects() {
-    /// Setup && When
-    _ = self.dispatch(DefaultAction.noop)
-    _ = self.dispatch(DefaultAction.noop)
-    _ = self.dispatch(DefaultAction.noop)
-    _ = self.dispatch(DefaultAction.noop)
+    /// Setup
+    enum LifecycleAction: ReduxActionType {
+      case initialize
+      case deinitialize
+    }
+    
+    enum InnerAction: ReduxActionType {
+      case a
+      case b
+    }
+    
+    var innerDispatchCount: Int64 = 0
+    
+    let effect = SagaEffects
+      .take({(action: LifecycleAction) -> Bool? in
+        switch action {
+        case .initialize: return true
+        case .deinitialize: return false
+        }
+      })
+      .switchMap({(valid: Bool) -> SagaEffect<()> in
+        if valid {
+          return SagaEffects
+            .take({(action: InnerAction) in ()})
+            .switchMap({_ in SagaEffects.await(with: {_ in
+              OSAtomicIncrement64(&innerDispatchCount)
+            })})
+        }
+        
+        return SagaEffects.empty(forType: Void.self)
+      })
+    
+    let store = applyMiddlewares([
+      SagaMiddleware(effects: [effect]).middleware
+      ])(SimpleStore.create((), {(_, _) in ()}))
+    
+    /// When
+    _ = try? store.dispatch(LifecycleAction.initialize).await()
+    _ = try? store.dispatch(InnerAction.a).await()
+    _ = try? store.dispatch(InnerAction.b).await()
+    _ = try? store.dispatch(LifecycleAction.deinitialize).await()
+    (0...1000).forEach({_ in _ = try? store.dispatch(InnerAction.a).await()})
     
     /// Then
-    XCTAssertEqual(self.testEffect.invokeCount, 1)
-    XCTAssertEqual(self.testEffect.onActionCount, 4)
-    
-    XCTAssertEqual(
-      self.testEffect.pastActions as! [DefaultAction],
-      [.noop, .noop, .noop, .noop]
-    )
+    XCTAssertEqual(innerDispatchCount, 2)
   }
 }
