@@ -10,18 +10,14 @@ import RxSwift
 
 /// Effect whose output selects some value from a Redux store's managed state.
 /// The extracted value can then be fed to other effects.
-public final class SelectEffect<State, R>: SagaEffect<R> {
-  private let selector: (State) -> R
+public final class SelectEffect<State>: SagaEffect<State> {
+  override init() {}
   
-  init(_ selector: @escaping (State) -> R) {
-    self.selector = selector
-  }
-  
-  override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
+  override public func invoke(_ input: SagaInput) -> SagaOutput<State> {
     let single = Single.create(subscribe: {(obs: (SingleEvent<R>) -> Void) -> Disposable in
       let lastState = input.lastState()
       precondition(lastState is State)
-      obs(.success(self.selector(lastState as! State)))
+      obs(.success(lastState as! State))
       return Disposables.create()
     })
     

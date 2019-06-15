@@ -4,8 +4,8 @@ xcode_workspace: SwiftRedux.xcworkspace
 xcode_scheme: SwiftRedux
 xcode_sdk: iphonesimulator12.1
 before_install:
-  - gem install cocoapods --pre
-  - gem install slather --pre
+  - gem install cocoapods
+  - gem install slather
   - gem install xcpretty
   - pod install
 

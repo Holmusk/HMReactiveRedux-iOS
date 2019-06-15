@@ -13,8 +13,6 @@ import XCTest
 @testable import SwiftRedux
 
 public final class ReduxSagaEffectTest: XCTestCase {
-  public typealias State = ()
-  
   private let timeout: Double = 10_000
   private var disposeBag: DisposeBag!
   
@@ -44,7 +42,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
       SagaEffects.put(Action(1)).await(input)
       SagaEffects.put(Action(2)).await(input)
       SagaEffects.put(Action(3)).await(input)
-      return SagaEffects.select(fromType: Int.self, {$0}).await(input)
+      return SagaEffects.select(type: Int.self).await(input)
       }.await(input)
     
     /// Then
@@ -169,12 +167,12 @@ public final class ReduxSagaEffectTest: XCTestCase {
     XCTAssertEqual(expectedActions, actions)
   }
   
-  public func test_selectEffect_shouldEmitOnlySelectedStateValue() throws {
+  public func test_selectEffect_shouldEmitStateValue() throws {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let input = SagaInput(dispatcher: dispatch, lastState: {()})
-    let effect = SagaEffects.select(fromType: State.self, {_ in 100})
+    let input = SagaInput(dispatcher: dispatch, lastState: {100})
+    let effect = SagaEffects.select(type: Int.self)
     let output = effect.invoke(input)
     
     /// When

@@ -15,8 +15,8 @@ public final class SagaMiddleware<State> {
   private var _middleware: ReduxMiddleware<State>!
   private let disposeBag: DisposeBag
   
-  init(scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background),
-       effects: [SagaEffect<()>]) {
+  public init(scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background),
+              effects: [SagaEffect<()>]) {
     self.disposeBag = DisposeBag()
     
     self._middleware = {input in
