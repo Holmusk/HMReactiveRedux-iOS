@@ -62,7 +62,7 @@ public final class ReduxSagaTest: XCTestCase {
       })
     
     let store = applyMiddlewares([
-      SagaMiddleware(effects: [effect]).middleware
+      SagaMiddleware(scheduler: MainScheduler.instance, effects: [effect]).middleware
       ])(SimpleStore.create((), {(_, _) in ()}))
     
     /// When

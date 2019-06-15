@@ -20,7 +20,7 @@ public class TakeActionEffect<Action, P>: SagaEffect<P> where Action: ReduxActio
   override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     let paramStream = PublishSubject<P>()
     
-    return SagaOutput(input.monitor, paramStream) {
+    return SagaOutput(input.monitor, paramStream.observeOn(input.scheduler)) {
       ($0 as? Action).flatMap(self._paramExtractor).map(paramStream.onNext)
       return EmptyAwaitable.instance
     }

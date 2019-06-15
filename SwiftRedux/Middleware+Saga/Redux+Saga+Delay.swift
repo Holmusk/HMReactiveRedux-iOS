@@ -12,20 +12,14 @@ import RxSwift
 /// block.
 public final class DelayEffect: SagaEffect<()> {
   private let delay: TimeInterval
-  private let scheduler: SchedulerType
   
-  init(_ delay: TimeInterval, _ scheduler: SchedulerType) {
+  init(_ delay: TimeInterval) {
     self.delay = delay
-    self.scheduler = scheduler
-  }
-  
-  convenience init(_ delay: TimeInterval) {
-    self.init(delay, SerialDispatchQueueScheduler(qos: .default))
   }
   
   override public func invoke(_ input: SagaInput) -> SagaOutput<R> {
     return SagaOutput(input.monitor, Observable<Int>
-      .timer(self.delay, scheduler: self.scheduler)
+      .timer(self.delay, scheduler: input.scheduler)
       .map({_ in ()}))
   }
 }
