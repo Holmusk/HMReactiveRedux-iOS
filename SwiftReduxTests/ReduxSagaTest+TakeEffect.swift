@@ -37,8 +37,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     
     let callEffectCreator: (Int) -> SagaEffect<Int> = {
       let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
@@ -51,11 +50,11 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     
     /// When
     output.subscribe({values.append($0)}).disposed(by: self.disposeBag)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(TakeAction.b)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.b)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(TakeAction.a)
     
     /// Then
     let waitTime = UInt64(pow(10 as Double, 9) * 3)
@@ -70,9 +69,9 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     
     dispatchGroup.wait()
     XCTAssertEqual(values, outputValues)
-    XCTAssertGreaterThan(monitor.dispatcherCount(), 0)
+    XCTAssertGreaterThan(input.monitor.dispatcherCount(), 0)
     disposeBag = nil
-    XCTAssertEqual(monitor.dispatcherCount(), 0)
+    XCTAssertEqual(input.monitor.dispatcherCount(), 0)
   }
   
   public func test_takeEveryEffect_shouldTakeAllAction() {
@@ -92,19 +91,17 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
   public func test_takeEffectDebounce_shouldThrottleEmissions() {
     /// Setup
     let effect = SagaEffects.takeAction(type: TakeAction.self, {_ in 1}).debounce(bySeconds: 2)
-    
-    let monitor = SagaMonitor()
-    let input = SagaInput(lastState: {()}, monitor: monitor)
+    let input = SagaInput(lastState: {()})
     let output = effect.invoke(input)
     var values = [Int]()
     
     /// When
     output.subscribe({values.append($0)}).disposed(by: self.disposeBag)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(TakeAction.a)
-    _ = monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
+    _ = input.monitor.dispatch(TakeAction.a)
     
     /// Then
     let waitTime = UInt64(pow(10 as Double, 9) * 3)

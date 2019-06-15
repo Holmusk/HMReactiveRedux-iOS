@@ -37,9 +37,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatched = [ReduxActionType]()
     
     /// When
-    let input = SagaInput(dispatcher: {dispatched.append($0)},
-                          lastState: {4},
-                          monitor: SagaMonitor())
+    let input = SagaInput(dispatcher: {dispatched.append($0)}, lastState: {4})
     
     let result = try SagaEffects.await {input -> Int in
       SagaEffects.put(0, actionCreator: Action.init).await(input)
@@ -59,15 +57,13 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    
     let effect = SagaEffect<Int>()
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
@@ -81,7 +77,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_justCallEffect_shouldReturnCorrectResult() throws {
     /// Setup
     let source = Single.just(1)
-    let input = SagaInput(lastState: {()}, monitor: SagaMonitor())
+    let input = SagaInput(lastState: {()})
     
     /// When
     let result = try SagaEffects.call(source).await(input)
@@ -104,11 +100,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     
     /// When
     var dispatched = [ReduxActionType]()
-
-    let input = SagaInput(dispatcher: {dispatched.append($0)},
-                          lastState: {()},
-                          monitor: SagaMonitor())
-    
+    let input = SagaInput(dispatcher: {dispatched.append($0)}, lastState: {()})
     try? effect.await(input)
     
     /// Then
@@ -120,14 +112,13 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     let effect = SagaEffects.empty(forType: Int.self)
     let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
     
     /// Then
     XCTAssertEqual(dispatchCount, 1)
@@ -148,11 +139,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
       })
     
     let effect = SagaEffects.from(source)
-
-    let input = SagaInput(dispatcher: NoopDispatcher.instance,
-                          lastState: {()},
-                          monitor: SagaMonitor())
-    
+    let input = SagaInput(dispatcher: NoopDispatcher.instance, lastState: {()})
     effect.invoke(input).source.subscribe(observer).disposed(by: self.disposeBag)
     
     /// When
@@ -168,14 +155,13 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     let effect = SagaEffects.just(10)
     let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
     let value1 = try output.await(timeoutMillis: self.timeout)
     let value2 = try output.await(timeoutMillis: self.timeout)
     let value3 = try output.await(timeoutMillis: self.timeout)
@@ -199,16 +185,15 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
     
     let queue = DispatchQueue.global(qos: .background)
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     let effect1 = SagaEffects.put(Action.input(200), usingQueue: queue)
     let effect2 = SagaEffects.put(200, actionCreator: Action.input, usingQueue: queue)
     let output1 = effect1.invoke(input)
     let output2 = effect2.invoke(input)
     
     /// When
-    _ = monitor.dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
     _ = try output1.await(timeoutMillis: self.timeout)
     _ = try output2.await(timeoutMillis: self.timeout)
     waitForExpectations(timeout: self.timeout, handler: nil)
@@ -236,11 +221,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
     
     var dispatched = [ReduxActionType]()
-    
-    let input = SagaInput(dispatcher: { dispatched.append($0) },
-                          lastState: {()},
-                          monitor: SagaMonitor())
-    
+    let input = SagaInput(dispatcher: { dispatched.append($0) }, lastState: {()})
     let actions = (0..<100).map(Action.init)
     
     /// Setup
@@ -255,14 +236,13 @@ public final class ReduxSagaEffectTest: XCTestCase {
     /// Setup
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let monitor = SagaMonitor()
-    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()})
     let effect = SagaEffects.select(fromType: State.self, {_ in 100})
     let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
-    _ = monitor.dispatch(DefaultAction.noop)
+    _ = input.monitor.dispatch(DefaultAction.noop)
     let value1 = try output.await(timeoutMillis: self.timeout)
     let value2 = try output.await(timeoutMillis: self.timeout)
     let value3 = try output.await(timeoutMillis: self.timeout)

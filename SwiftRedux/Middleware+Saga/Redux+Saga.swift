@@ -35,28 +35,26 @@ public enum SagaError: LocalizedError {
 
 /// Input for each saga effect.
 public struct SagaInput {
+  public let monitor: SagaMonitor
   let dispatcher: AwaitableReduxDispatcher
   let lastState: ReduxStateGetter<Any>
-  let monitor: SagaMonitorType
   let scheduler: SchedulerType
   
   public init(dispatcher: @escaping AwaitableReduxDispatcher,
               lastState: @escaping ReduxStateGetter<Any>,
-              monitor: SagaMonitorType,
               scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background)) {
+    self.monitor = SagaMonitor()
     self.dispatcher = dispatcher
     self.lastState = lastState
-    self.monitor = monitor
     self.scheduler = scheduler
   }
   
   public init(dispatcher: @escaping ReduxDispatcher = {_ in},
               lastState: @escaping ReduxStateGetter<Any>,
-              monitor: SagaMonitorType,
               scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background)) {
+    self.monitor = SagaMonitor()
     self.dispatcher = { dispatcher($0); return EmptyAwaitable.instance }
     self.lastState = lastState
-    self.monitor = monitor
     self.scheduler = scheduler
   }
 }

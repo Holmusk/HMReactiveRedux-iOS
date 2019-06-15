@@ -15,7 +15,7 @@ public final class SagaMiddleware<State> {
   public private(set) var middleware: ReduxMiddleware<State>
   private let disposeBag: DisposeBag
   
-  init(monitor: SagaMonitorType, scheduler: SchedulerType, effects: [SagaEffect<()>]) {
+  init(scheduler: SchedulerType, effects: [SagaEffect<()>]) {
     self.disposeBag = DisposeBag()
     self.middleware = {_ in {$0}}
     
@@ -23,7 +23,6 @@ public final class SagaMiddleware<State> {
       return {wrapper in
         let sagaInput = SagaInput(dispatcher: input.dispatcher,
                                   lastState: input.lastState,
-                                  monitor: monitor,
                                   scheduler: scheduler)
         
         let sagaOutputs = effects.map({$0.invoke(sagaInput)})
@@ -33,7 +32,7 @@ public final class SagaMiddleware<State> {
         /// outputs and prevent their subscriptions from being disposed of.
         let newWrapper = DispatchWrapper(newWrapperId) {action in
           let dispatchResult = try! wrapper.dispatcher(action).await()
-          _ = try! monitor.dispatch(action).await()
+          _ = try! sagaInput.monitor.dispatch(action).await()
           return JustAwaitable(dispatchResult)
         }
         
@@ -41,10 +40,6 @@ public final class SagaMiddleware<State> {
         return newWrapper
       }
     }
-  }
-  
-  convenience public init(scheduler: SchedulerType, effects: [SagaEffect<()>]) {
-    self.init(monitor: SagaMonitor(), scheduler: scheduler, effects: effects)
   }
   
   convenience public init(effects: [SagaEffect<()>]) {
