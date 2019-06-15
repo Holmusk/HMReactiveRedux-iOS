@@ -9,26 +9,24 @@
 import RxSwift
 
 /// Effect whose output puts some external value into the Redux store's managed
-/// state. We may also want to specify the dispatch queue on which to dispatch
-/// the action so that specific order (e.g. serial) may be achieved.
+/// state.
 public final class PutEffect<P>: SagaEffect<Any> {
-  private let _actionCreator: (P) -> ReduxActionType
-  private let _param: SagaEffect<P>
-  private let _dispatchQueue: DispatchQueue
+  private let action: ReduxActionType
   
-  init(_ param: SagaEffect<P>,
-       _ actionCreator: @escaping (P) -> ReduxActionType,
-       _ dispatchQueue: DispatchQueue) {
-    self._actionCreator = actionCreator
-    self._param = param
-    self._dispatchQueue = dispatchQueue
+  init(_ action: ReduxActionType) {
+    self.action = action
   }
   
   override public func invoke(_ input: SagaInput) -> SagaOutput<Any> {
-    return _param.invoke(input)
-      .map(self._actionCreator)
-      .observeOn(ConcurrentDispatchQueueScheduler(queue: self._dispatchQueue))
-      .map(input.dispatcher)
+    let action = self.action
+    
+    let single = Single.create(subscribe: {(obs: (SingleEvent<Any>) -> Void) -> Disposable in
+      let result = try! input.dispatcher(action).await()
+      obs(.success(result))
+      return Disposables.create()
+    })
+    
+    return SagaOutput(input.monitor, single.asObservable())
   }
   
   /// Await for the first result that arrives. Since this can never throw an

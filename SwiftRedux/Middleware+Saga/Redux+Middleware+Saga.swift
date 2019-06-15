@@ -12,14 +12,13 @@ import RxSwift
 /// each saga output every time a new action arrives. We can also specify a
 /// scheduler to perform asynchronous work on.
 public final class SagaMiddleware<State> {
-  public private(set) var middleware: ReduxMiddleware<State>
+  private var _middleware: ReduxMiddleware<State>!
   private let disposeBag: DisposeBag
   
   init(scheduler: SchedulerType, effects: [SagaEffect<()>]) {
     self.disposeBag = DisposeBag()
-    self.middleware = {_ in {$0}}
     
-    self.middleware = {input in
+    self._middleware = {input in
       return {wrapper in
         let sagaInput = SagaInput(dispatcher: input.dispatcher,
                                   lastState: input.lastState,
@@ -49,4 +48,8 @@ public final class SagaMiddleware<State> {
 }
 
 // MARK: - MiddlewareProviderType
-extension SagaMiddleware: MiddlewareProviderType {}
+extension SagaMiddleware: MiddlewareProviderType {
+  public var middleware: ReduxMiddleware<State> {
+    return self._middleware!
+  }
+}

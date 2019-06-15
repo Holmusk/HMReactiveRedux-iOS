@@ -48,16 +48,19 @@ final class LazyDispatcher {
     didSet { self.lateinitDispatcher.map(self.didSetDispatcher) }
   }
   
-  private(set) var dispatch: AwaitableReduxDispatcher
+  var dispatch: AwaitableReduxDispatcher {
+    return self._dispatch!
+  }
+  
   private var buffer: [ReduxActionType]
   private let semaphore: DispatchSemaphore
+  private var _dispatch: AwaitableReduxDispatcher!
   
   init() {
-    self.dispatch = {_ in EmptyAwaitable.instance}
     self.buffer = []
     self.semaphore = DispatchSemaphore(value: 1)
     
-    self.dispatch = {
+    self._dispatch = {
       self.semaphore.wait()
       defer { self.semaphore.signal() }
       

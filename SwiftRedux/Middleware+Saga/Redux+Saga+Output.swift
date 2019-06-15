@@ -43,10 +43,6 @@ public final class SagaOutput<T>: Awaitable<T> {
     return SagaOutput<R>(self.monitor, source)
   }
   
-  func map<R>(_ fn: @escaping (T) throws -> R) -> SagaOutput<R> {
-    return self.with(source: self.source.map(fn))
-  }
-  
   func flatMap<R>(_ fn: @escaping (T) throws -> SagaOutput<R>) -> SagaOutput<R> {
     return self.with(source: self.source.map(fn).flatMap({$0.source}))
   }
@@ -57,12 +53,7 @@ public final class SagaOutput<T>: Awaitable<T> {
   
   func debounce(bySeconds sec: TimeInterval,
                 usingScheduler scheduler: SchedulerType) -> SagaOutput<T> {
-    guard sec > 0 else { return self }
     return self.with(source: self.source.debounce(sec, scheduler: scheduler))
-  }
-  
-  func observeOn(_ scheduler: SchedulerType) -> SagaOutput<T> {
-    return self.with(source: self.source.observeOn(scheduler))
   }
   
   func subscribe(_ callback: @escaping (T) -> Void) -> Disposable {

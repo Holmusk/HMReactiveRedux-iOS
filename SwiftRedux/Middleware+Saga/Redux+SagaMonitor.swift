@@ -13,15 +13,13 @@ public final class SagaMonitor {
   private typealias UniqueID = UniqueIDProviderType.UniqueID
   private var dispatchers: [UniqueID : AwaitableReduxDispatcher]
   private let lock: NSRecursiveLock
-  
-  public private(set) var dispatch: AwaitableReduxDispatcher
+  private var _dispatch: AwaitableReduxDispatcher!
   
   public init() {
     self.dispatchers = [:]
     self.lock = NSRecursiveLock()
-    self.dispatch = {_ in EmptyAwaitable.instance}
     
-    self.dispatch = {action in
+    self._dispatch = {action in
       self.lock.lock()
       defer { self.lock.unlock() }
       let awaitables = self.dispatchers.map({_, value in value(action)})
@@ -38,7 +36,11 @@ public final class SagaMonitor {
 }
 
 // MARK: - ReduxDispatcherProviderType
-extension SagaMonitor: ReduxDispatcherProviderType {}
+extension SagaMonitor: ReduxDispatcherProviderType {
+  public var dispatch: AwaitableReduxDispatcher {
+    return self._dispatch!
+  }
+}
 
 // MARK: - SagaMonitorType
 extension SagaMonitor: SagaMonitorType {

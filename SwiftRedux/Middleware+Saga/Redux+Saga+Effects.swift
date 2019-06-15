@@ -14,48 +14,6 @@ import SwiftFP
 public final class SagaEffects {
   init() {}
   
-  /// Create a just effect.
-  ///
-  /// - Parameter value: The value to form the effect with.
-  /// - Returns: An Effect instance.
-  static func just<R>(_ value: R) -> JustEffect<R> {
-    return JustEffect(value)
-  }
-  
-  /// Create a put effect.
-  ///
-  /// - Parameters:
-  ///   - param: The parameter to put into Redux state.
-  ///   - actionCreator: The action creator function.
-  ///   - queue: The queue on which to dispatch the action.
-  /// - Returns: An Effect instance.
-  static func put<R>(
-    _ param: SagaEffect<R>,
-    actionCreator: @escaping (R) -> ReduxActionType,
-    usingQueue queue: DispatchQueue = .global(qos: .default))
-    -> PutEffect<R>
-  {
-    return PutEffect(param, actionCreator, queue)
-  }
-  
-  /// Convenience function to create a put effect with a raw value.
-  ///
-  /// - Parameters:
-  ///   - param: The parameter to put into Redux state.
-  ///   - actionCreator: The action creator function.
-  ///   - queue: The queue on which to dispatch the action.
-  /// - Returns: An Effect instance.
-  static func put<R>(
-    _ param: R,
-    actionCreator: @escaping (R) -> ReduxActionType,
-    usingQueue queue: DispatchQueue = .global(qos: .default))
-    -> PutEffect<R>
-  {
-    return self.put(SagaEffects.just(param),
-                    actionCreator: actionCreator,
-                    usingQueue: queue)
-  }
-  
   /// Create an await effect with a creator function.
   ///
   /// - Parameter creator: Function that await for results from multiple effects.
@@ -98,16 +56,10 @@ public final class SagaEffects {
   
   /// Convenience function to create a put effect that simply puts some action.
   ///
-  /// - Parameters:
-  ///   - action: The action to be dispatched.
-  ///   - queue: The queue on which to dispatch the action.
+  /// - Parameter action: The action to be dispatched.
   /// - Returns: An Effect instance.
-  public static func put(
-    _ action: ReduxActionType,
-    usingQueue queue: DispatchQueue = .global(qos: .default))
-    -> PutEffect<()>
-  {
-    return SagaEffects.put((), actionCreator: {action})
+  public static func put(_ action: ReduxActionType) -> PutEffect<()> {
+    return PutEffect(action)
   }
   
   /// Create a select effect.

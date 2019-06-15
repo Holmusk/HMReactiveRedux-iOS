@@ -9,22 +9,6 @@
 import RxSwift
 import SwiftFP
 
-/// Effect whose output simply emits some specified element.
-final class JustEffect<R>: SagaEffect<R> {
-  private let value: R
-  
-  init(_ value: R) {
-    self.value = value
-  }
-  
-  override func invoke(_ input: SagaInput) -> SagaOutput<R> {
-    return SagaOutput(input.monitor, .just(self.value))
-  }
-}
-
-// MARK: - SingleSagaEffectType
-extension JustEffect: SingleSagaEffectType {}
-
 /// Effect whose output simply accepts an Observable. The resulting emissions
 /// are also wrapped in Try to prevent stream from erroring out.
 public final class FromEffect<O>: SagaEffect<Try<O.E>> where O: ObservableConvertibleType {

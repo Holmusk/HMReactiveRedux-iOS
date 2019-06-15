@@ -40,10 +40,10 @@ public final class ReduxSagaEffectTest: XCTestCase {
     let input = SagaInput(dispatcher: {dispatched.append($0)}, lastState: {4})
     
     let result = try SagaEffects.await {input -> Int in
-      SagaEffects.put(0, actionCreator: Action.init).await(input)
-      SagaEffects.put(1, actionCreator: Action.init).await(input)
-      SagaEffects.put(2, actionCreator: Action.init).await(input)
-      SagaEffects.put(3, actionCreator: Action.init).await(input)
+      SagaEffects.put(Action(0)).await(input)
+      SagaEffects.put(Action(1)).await(input)
+      SagaEffects.put(Action(2)).await(input)
+      SagaEffects.put(Action(3)).await(input)
       return SagaEffects.select(fromType: Int.self, {$0}).await(input)
       }.await(input)
     
@@ -151,70 +151,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     XCTAssertEqual(events.compactMap({$0.value.element?.value}).count, 1)
   }
   
-  public func test_justEffect_shouldEmitOnlyOneValue() throws {
-    /// Setup
-    var dispatchCount = 0
-    let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
-    let input = SagaInput(dispatcher: dispatch, lastState: {()})
-    let effect = SagaEffects.just(10)
-    let output = effect.invoke(input)
-    
-    /// When
-    _ = dispatch(DefaultAction.noop)
-    _ = input.monitor.dispatch(DefaultAction.noop)
-    let value1 = try output.await(timeoutMillis: self.timeout)
-    let value2 = try output.await(timeoutMillis: self.timeout)
-    let value3 = try output.await(timeoutMillis: self.timeout)
-    
-    /// Then
-    XCTAssertEqual(dispatchCount, 1)
-    [value1, value2, value3].forEach({XCTAssertEqual($0, 10)})
-  }
-  
-  public func test_putEffect_shouldDispatchPutAction() throws {
-    /// Setup
-    enum Action: ReduxActionType { case input(Int) }
-    let expect = expectation(description: "Should have completed")
-    var dispatchCount = 0
-    var actions: [ReduxActionType] = []
-    
-    let dispatch: ReduxDispatcher = {
-      dispatchCount += 1
-      actions.append($0)
-      if dispatchCount == 2 { expect.fulfill() }
-    }
-    
-    let queue = DispatchQueue.global(qos: .background)
-    let input = SagaInput(dispatcher: dispatch, lastState: {()})
-    let effect1 = SagaEffects.put(Action.input(200), usingQueue: queue)
-    let effect2 = SagaEffects.put(200, actionCreator: Action.input, usingQueue: queue)
-    let output1 = effect1.invoke(input)
-    let output2 = effect2.invoke(input)
-    
-    /// When
-    _ = input.monitor.dispatch(DefaultAction.noop)
-    _ = input.monitor.dispatch(DefaultAction.noop)
-    _ = try output1.await(timeoutMillis: self.timeout)
-    _ = try output2.await(timeoutMillis: self.timeout)
-    waitForExpectations(timeout: self.timeout, handler: nil)
-    
-    /// Then
-    XCTAssertEqual(dispatchCount, 2)
-    XCTAssertEqual(actions.count, 2)
-    XCTAssert(actions[0] is Action)
-    XCTAssert(actions[1] is Action)
-    let action1 = actions[0] as! Action
-    let action2 = actions[1] as! Action
-    
-    if case let .input(value1) = action1, case let .input(value2) = action2 {
-      XCTAssertEqual(value1, 200)
-      XCTAssertEqual(value2, 200)
-    } else {
-      XCTFail("Should not have reached here")
-    }
-  }
-  
-  public func test_justPutEffect_shouldDispatchAction() {
+  public func test_putEffect_shouldDispatchAction() {
     /// Setup
     struct Action: Equatable, ReduxActionType {
       let value: Int
