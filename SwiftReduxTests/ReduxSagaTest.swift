@@ -13,7 +13,7 @@ import XCTest
 public final class ReduxSagaTest: XCTestCase {
   public func test_sagaInputConvenienceConstructors_shouldWork() throws {
     /// Setup
-    let input = SagaInput(SagaMonitor(), {()})
+    let input = SagaInput(lastState: {()}, monitor: SagaMonitor())
     
     /// When
     let result = try input.dispatcher(DefaultAction.noop).await()

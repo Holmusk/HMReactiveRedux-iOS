@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 /// Function that maps one dispatch to another.
 public typealias DispatchMapper = (DispatchWrapper) -> DispatchWrapper

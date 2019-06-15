@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 /// Errors specific to Redux Saga.
 public enum SagaError: LocalizedError {
@@ -34,23 +35,28 @@ public enum SagaError: LocalizedError {
 
 /// Input for each saga effect.
 public struct SagaInput {
-  let monitor: SagaMonitorType
-  let lastState: ReduxStateGetter<Any>
   let dispatcher: AwaitableReduxDispatcher
+  let lastState: ReduxStateGetter<Any>
+  let monitor: SagaMonitorType
+  let scheduler: SchedulerType
   
-  init(_ monitor: SagaMonitorType,
-       _ lastState: @escaping ReduxStateGetter<Any>,
-       _ dispatcher: @escaping AwaitableReduxDispatcher) {
-    self.monitor = monitor
-    self.lastState = lastState
+  public init(dispatcher: @escaping AwaitableReduxDispatcher,
+              lastState: @escaping ReduxStateGetter<Any>,
+              monitor: SagaMonitorType,
+              scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background)) {
     self.dispatcher = dispatcher
+    self.lastState = lastState
+    self.monitor = monitor
+    self.scheduler = scheduler
   }
   
-  init(_ monitor: SagaMonitorType,
-       _ lastState: @escaping ReduxStateGetter<Any>,
-       _ dispatcher: @escaping ReduxDispatcher = {_ in}) {
-    self.monitor = monitor
-    self.lastState = lastState
+  public init(dispatcher: @escaping ReduxDispatcher = {_ in},
+              lastState: @escaping ReduxStateGetter<Any>,
+              monitor: SagaMonitorType,
+              scheduler: SchedulerType = SerialDispatchQueueScheduler(qos: .background)) {
     self.dispatcher = { dispatcher($0); return EmptyAwaitable.instance }
+    self.lastState = lastState
+    self.monitor = monitor
+    self.scheduler = scheduler
   }
 }

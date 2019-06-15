@@ -37,13 +37,17 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatched = [ReduxActionType]()
     
     /// When
+    let input = SagaInput(dispatcher: {dispatched.append($0)},
+                          lastState: {4},
+                          monitor: SagaMonitor())
+    
     let result = try SagaEffects.await {input -> Int in
       SagaEffects.put(0, actionCreator: Action.init).await(input)
       SagaEffects.put(1, actionCreator: Action.init).await(input)
       SagaEffects.put(2, actionCreator: Action.init).await(input)
       SagaEffects.put(3, actionCreator: Action.init).await(input)
       return SagaEffects.select(fromType: Int.self, {$0}).await(input)
-      }.await(SagaInput(SagaMonitor(), {4}) {dispatched.append($0)})
+      }.await(input)
     
     /// Then
     let dispatchedValues = dispatched.map({$0 as! Action}).map({$0.value})
@@ -58,7 +62,8 @@ public final class ReduxSagaEffectTest: XCTestCase {
     
     let effect = SagaEffect<Int>()
     let monitor = SagaMonitor()
-    let output = effect.invoke(SagaInput(monitor, {()}, dispatch))
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
+    let output = effect.invoke(input)
     
     /// When
     _ = dispatch(DefaultAction.noop)
@@ -76,7 +81,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
   public func test_justCallEffect_shouldReturnCorrectResult() throws {
     /// Setup
     let source = Single.just(1)
-    let input = SagaInput(SagaMonitor(), {()})
+    let input = SagaInput(lastState: {()}, monitor: SagaMonitor())
     
     /// When
     let result = try SagaEffects.call(source).await(input)
@@ -99,7 +104,11 @@ public final class ReduxSagaEffectTest: XCTestCase {
     
     /// When
     var dispatched = [ReduxActionType]()
-    let input = SagaInput(SagaMonitor(), {()}, {dispatched.append($0)})
+
+    let input = SagaInput(dispatcher: {dispatched.append($0)},
+                          lastState: {()},
+                          monitor: SagaMonitor())
+    
     try? effect.await(input)
     
     /// Then
@@ -112,7 +121,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
     let effect = SagaEffects.empty(forType: Int.self)
     let output = effect.invoke(input)
     
@@ -139,7 +148,11 @@ public final class ReduxSagaEffectTest: XCTestCase {
       })
     
     let effect = SagaEffects.from(source)
-    let input = SagaInput(SagaMonitor(), {()}, NoopDispatcher.instance)
+
+    let input = SagaInput(dispatcher: NoopDispatcher.instance,
+                          lastState: {()},
+                          monitor: SagaMonitor())
+    
     effect.invoke(input).source.subscribe(observer).disposed(by: self.disposeBag)
     
     /// When
@@ -156,7 +169,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
     let effect = SagaEffects.just(10)
     let output = effect.invoke(input)
     
@@ -187,7 +200,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     
     let queue = DispatchQueue.global(qos: .background)
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
     let effect1 = SagaEffects.put(Action.input(200), usingQueue: queue)
     let effect2 = SagaEffects.put(200, actionCreator: Action.input, usingQueue: queue)
     let output1 = effect1.invoke(input)
@@ -223,7 +236,11 @@ public final class ReduxSagaEffectTest: XCTestCase {
     }
     
     var dispatched = [ReduxActionType]()
-    let input = SagaInput(SagaMonitor(), {()}) { dispatched.append($0) }
+    
+    let input = SagaInput(dispatcher: { dispatched.append($0) },
+                          lastState: {()},
+                          monitor: SagaMonitor())
+    
     let actions = (0..<100).map(Action.init)
     
     /// Setup
@@ -239,7 +256,7 @@ public final class ReduxSagaEffectTest: XCTestCase {
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
     let effect = SagaEffects.select(fromType: State.self, {_ in 100})
     let output = effect.invoke(input)
     

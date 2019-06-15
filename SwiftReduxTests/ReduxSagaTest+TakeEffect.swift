@@ -38,7 +38,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     var dispatchCount = 0
     let dispatch: ReduxDispatcher = {_ in dispatchCount += 1}
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()}, dispatch)
+    let input = SagaInput(dispatcher: dispatch, lastState: {()}, monitor: monitor)
     
     let callEffectCreator: (Int) -> SagaEffect<Int> = {
       let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
@@ -94,7 +94,7 @@ public final class ReduxSagaTakeEffectTest: XCTestCase {
     let effect = SagaEffects.takeAction(type: TakeAction.self, {_ in 1}).debounce(bySeconds: 2)
     
     let monitor = SagaMonitor()
-    let input = SagaInput(monitor, {()})
+    let input = SagaInput(lastState: {()}, monitor: monitor)
     let output = effect.invoke(input)
     var values = [Int]()
     
