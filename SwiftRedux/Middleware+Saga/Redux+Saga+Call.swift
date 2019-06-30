@@ -7,7 +7,6 @@
 //
 
 import RxSwift
-import SwiftFP
 
 /// Effect whose output simply accepts an external source.
 public final class JustCallEffect<R>: SagaEffect<R> {

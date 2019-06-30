@@ -6,7 +6,6 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
-import SwiftFP
 import SwiftRedux
 
 public final class AppSaga {

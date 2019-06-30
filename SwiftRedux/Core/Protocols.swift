@@ -6,8 +6,6 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
-import SwiftFP
-
 /// Classes that implement this protocol should represent possible actions that
 /// can be passed to a reducer.
 ///

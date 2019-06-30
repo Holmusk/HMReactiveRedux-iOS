@@ -8,7 +8,6 @@
 
 import Foundation
 import RxSwift
-import SwiftFP
 
 /// Top-level namespace for Saga effect creator functions.
 public final class SagaEffects {

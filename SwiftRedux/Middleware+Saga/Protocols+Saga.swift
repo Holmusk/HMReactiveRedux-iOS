@@ -6,8 +6,6 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
-import SwiftFP
-
 /// Implement this protocol to convert to an effect instance.
 public protocol SagaEffectConvertibleType {
   

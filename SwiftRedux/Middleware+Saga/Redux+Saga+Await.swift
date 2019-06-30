@@ -7,7 +7,6 @@
 //
 
 import RxSwift
-import SwiftFP
 
 /// Effect whose output emits the value calculated by a creator function. It is
 /// important that all Saga effects involved in that function must return only

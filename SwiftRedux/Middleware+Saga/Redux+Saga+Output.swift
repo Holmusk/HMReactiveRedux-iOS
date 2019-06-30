@@ -8,7 +8,6 @@
 
 import RxSwift
 import RxBlocking
-import SwiftFP
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
 public final class SagaOutput<T>: Awaitable<T> {

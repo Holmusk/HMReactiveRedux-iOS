@@ -6,9 +6,9 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
-import SwiftFP
 import RxSwift
 import RxTest
+import SwiftFP
 import XCTest
 @testable import SwiftRedux
 

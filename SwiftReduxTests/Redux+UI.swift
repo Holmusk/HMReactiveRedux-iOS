@@ -6,7 +6,6 @@
 //  Copyright © 2018 Hai Pham. All rights reserved.
 //
 
-import SwiftFP
 import UIKit
 import XCTest
 @testable import SwiftRedux
