@@ -52,33 +52,3 @@ public protocol UniqueIDProviderType {
   /// The unique ID of this object.
   var uniqueID: UniqueID { get }
 }
-
-/// Implement this protocol to provide read-write lock capabilities.
-public protocol ReadWriteLockType {
-  
-  /// Lock reads for safe property access.
-  func lockRead()
-  
-  /// Lock writes for safe property modification.
-  func lockWrite()
-  
-  /// Release the lock.
-  func unlock()
-}
-
-public extension ReadWriteLockType {
-  
-  /// Access some property in a thread-safe manner.
-  func access<T>(_ accessor: () throws -> T) rethrows -> T {
-    self.lockRead()
-    defer {self.unlock()}
-    return try accessor()
-  }
-  
-  /// Modify some property in a thread-safe manner.
-  func modify<T>(_ modifier: () throws -> T) rethrows -> T {
-    self.lockWrite()
-    defer {self.unlock()}
-    return try modifier()
-  }
-}

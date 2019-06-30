@@ -31,7 +31,7 @@ final class ViewController1: UIViewController {
       guard let props = self.reduxProps else { return }
       let nextState = props.state
       self.counterTF.text = props.state.number.map(String.init)
-      self.slideTF.text = props.state.slider.map(String.init)
+      self.slideTF.text = props.state.slider.map({String(describing: $0)})
       self.stringTF1.text = props.state.string
       self.stringTF2.text = props.state.string
       self.valueSL.value = props.state.slider ?? valueSL.minimumValue

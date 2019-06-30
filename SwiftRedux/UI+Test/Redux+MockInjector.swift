@@ -25,7 +25,7 @@ import UIKit
 /// This class keeps track of the injection count for each Redux-compatible
 /// view.
 public final class MockInjector<State>: PropInjector<State> {
-  private let lock: ReadWriteLockType = ReadWriteLock()
+  private let lock = NSRecursiveLock()
   private var _injectCount: [String : Int] = [:]
   
   /// Initialize with a mock store that does not have any functionality.
@@ -87,26 +87,28 @@ public final class MockInjector<State>: PropInjector<State> {
   
   /// Reset all internal statistics.
   public func reset() {
-    self.lock.modify { self._injectCount = [:] }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    self._injectCount = [:]
   }
   
   private func addInjecteeCount(_ id: String) {
-    self.lock.modify {
-      self._injectCount[id] = self.injectCount[id, default: 0] + 1
-    }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    self._injectCount[id] = self.injectCount[id, default: 0] + 1
   }
   
   /// Only store the class name because generally we only need to check how
   /// many times views/view controllers of a certain class have received
   /// injection.
-  private func addInjecteeCount<View>(_ view: View) where
-    View: PropContainerType
-  {
+  private func addInjecteeCount<View>(_ view: View) where View: PropContainerType {
     self.addInjecteeCount(String(describing: View.self))
   }
   
   private func getInjecteeCount(_ id: String) -> Int {
-    return self.lock.access { self.injectCount[id, default: 0] }
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    return self.injectCount[id, default: 0]
   }
   
   private func getInjecteeCount<View>(_ type: View.Type) -> Int where

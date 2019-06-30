@@ -6,6 +6,8 @@
 //  Copyright © 2019 Hai Pham. All rights reserved.
 //
 
+import Foundation
+
 /// Nested Redux router that keeps a list of sub-routers sorted by priority.
 /// Every time a screen arrives, iterate through the list and stop at the first
 /// sub-router that succeeds in navigating.
@@ -52,11 +54,11 @@ public final class NestedRouter {
     return NestedRouter()
   }
   
-  private let lock: ReadWriteLockType
+  private let lock: NSRecursiveLock
   private var subRouters: [VetoableReduxRouterType]
   
   private init() {
-    self.lock = ReadWriteLock()
+    self.lock = NSRecursiveLock()
     self.subRouters = []
   }
 }
@@ -68,24 +70,25 @@ extension NestedRouter: ReduxRouterType {
     case let screen as DefaultScreen:
       switch screen {
       case .registerSubRouter(let s):
-        self.lock.modify {
-          guard !self.subRouters.contains(where: {$0.uniqueID == s.uniqueID}) else { return }
-          self.subRouters.insert(s, at: 0)
-          self.subRouters.sort(by: {$0.subRouterPriority > $1.subRouterPriority})
-        }
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        guard !self.subRouters.contains(where: {$0.uniqueID == s.uniqueID}) else { return }
+        self.subRouters.insert(s, at: 0)
+        self.subRouters.sort(by: {$0.subRouterPriority > $1.subRouterPriority})
         
       case .unregisterSubRouter(let id):
-        self.lock.modify {
-          if let index = self.subRouters.firstIndex(where: {$0.uniqueID == id}) {
-            self.subRouters.remove(at: index)
-          }
-        }
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        
+        _ = self.subRouters
+          .firstIndex(where: {$0.uniqueID == id})
+          .map({self.subRouters.remove(at: $0)})
       }
       
     default:
-      return self.lock.access {
-        _ = self.subRouters.first(where: {$0.navigate(screen)})
-      }
+      self.lock.lock()
+      defer { self.lock.unlock() }
+      self.subRouters.first(where: {$0.navigate(screen)})
     }
   }
 }
