@@ -22,6 +22,33 @@ public final class ReduxSagaEffectTest: XCTestCase {
     disposeBag = DisposeBag()
   }
   
+  public func test_allEffect_shouldEmitValuesFromAllSourceStreams() throws {
+    /// Setup
+    let scheduler = TestScheduler(initialClock: 0)
+    let iteration = 1000
+    
+    let effect1 = SagaEffects.all((0..<iteration).map({
+      SagaEffects.from(Observable.just($0, scheduler: scheduler))
+    }))
+    
+    let effect2 = SagaEffects.all(
+      SagaEffects.from(Observable.just(iteration, scheduler: scheduler))
+    )
+    
+    var finalValues = [Int]()
+    
+    SagaEffects.all(effect1, effect2)
+      .invoke(SagaInput(lastState: {}, scheduler: scheduler))
+      .subscribe({finalValues.append($0.value!)})
+      .disposed(by: self.disposeBag)
+    
+    /// When
+    scheduler.advanceTo(200_000_000)
+    
+    /// Then
+    XCTAssertEqual(finalValues, (0...iteration).map({$0}))
+  }
+  
   public func test_awaitEffect_shouldExecuteSynchronously() throws {
     /// Setup
     class Action: ReduxActionType {

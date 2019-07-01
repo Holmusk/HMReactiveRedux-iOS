@@ -13,6 +13,24 @@ import RxSwift
 public final class SagaEffects {
   init() {}
   
+  /// Create an AllEffect from a sequence of other effects.
+  ///
+  /// - Parameter effects: A sequence of SagaEffects.
+  /// - Returns: An AllEffect instance.
+  public static func all<S>(_ effects: S) -> AllEffect<S.Element.R> where
+    S: Sequence, S.Element: SagaEffectConvertibleType
+  {
+    return AllEffect(effects)
+  }
+  
+  /// Create an AllEffect from vararg effects.
+  ///
+  /// - Parameter effects: A vararg of SagaEffects.
+  /// - Returns: An AllEffect instance.
+  public static func all<R>(_ effects: SagaEffect<R>...) -> AllEffect<R> {
+    return SagaEffects.all(effects)
+  }
+  
   /// Create an await effect with a creator function.
   ///
   /// - Parameter creator: Function that await for results from multiple effects.

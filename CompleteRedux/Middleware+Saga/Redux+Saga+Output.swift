@@ -10,7 +10,7 @@ import RxSwift
 import RxBlocking
 
 /// Output for each saga effect. This is simply a wrapper for Observable.
-public final class SagaOutput<T>: Awaitable<T> {
+public final class SagaOutput<T>: Awaitable<T> {  
   let monitor: SagaMonitorType
   let onAction: AwaitableReduxDispatcher
   let source: Observable<T>
